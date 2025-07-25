@@ -12,12 +12,25 @@ type (
 	Stage      mg.Namespace
 	Production mg.Namespace
 	Local      mg.Namespace
+	Build      mg.Namespace
 )
 
 const (
 	templatePath         = "resources"
 	templateServicesPath = "services"
+	templateClustersPath = "clusters"
 )
+
+func (b Build) AllClusters() {
+	for _, cfg := range Clusters {
+		b.DefaultThanos(cfg)
+		b.CRDS(cfg)
+		b.Operator(cfg)
+		b.ServiceMonitors(cfg)
+		b.Alertmanager(cfg)
+		b.Secrets(cfg)
+	}
+}
 
 // Build Builds the manifests for the stage environment.
 func (Stage) Build() {
@@ -27,6 +40,13 @@ func (Stage) Build() {
 // Build Builds the manifests for a local environment.
 func (Local) Build() {
 	mg.SerialDeps(Local.CRDS, Local.Operator, Local.Thanos, Local.TelemeterRules, Local.ServiceMonitors, Local.Secrets)
+}
+
+func (Build) generator(config ClusterConfig, component string) *mimic.Generator {
+	gen := &mimic.Generator{}
+	gen = gen.With(templatePath, templateClustersPath, string(config.Environment), string(config.Name), component)
+	gen.Logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
+	return gen
 }
 
 func (Stage) generator(component string) *mimic.Generator {

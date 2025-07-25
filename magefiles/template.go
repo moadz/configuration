@@ -379,66 +379,75 @@ var StageObjectStorageBucket = ParamMap[v1alpha1.ObjectStorageConfig]{
 
 // ProductionImages is a map of production images.
 var ProductionImages = ParamMap[string]{
-	"STORE02W":        thanosImage,
-	"STORE2W90D":      thanosImage,
-	"STORE90D+":       thanosImage,
-	"STORE_ROS":       thanosImage,
-	"STORE_DEFAULT":   thanosImage,
-	"QUERY":           thanosImage,
-	"QUERY_FRONTEND":  thanosImage,
-	"THANOS_OPERATOR": fmt.Sprintf("%s:%s", thanosOperatorImage, thanosOperatorVersionProd),
-	"KUBE_RBAC_PROXY": "registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:98455d503b797b6b02edcfd37045c8fab0796b95ee5cf4cfe73b221a07e805f0",
-	apiCache:          memcachedImage,
-	memcachedExporter: memcachedExporterImage,
-	observatoriumAPI:  "quay.io/redhat-user-workloads/rhobs-mco-tenant/observatorium-api:9aada65247a07782465beb500323a0e18d7e3d05",
-	jaeger:            "registry.redhat.io/rhosdt/jaeger-agent-rhel8:1.57.0-10",
+	"STORE02W":                 thanosImage,
+	"STORE2W90D":               thanosImage,
+	"STORE90D+":                thanosImage,
+	"STORE_ROS":                thanosImage,
+	"STORE_DEFAULT":            thanosImage,
+	"QUERY":                    thanosImage,
+	"QUERY_FRONTEND":           thanosImage,
+	"RECEIVE_ROUTER":           thanosImage,
+	"RECEIVE_INGESTOR_DEFAULT": thanosImage,
+	"THANOS_OPERATOR":          fmt.Sprintf("%s:%s", thanosOperatorImage, thanosOperatorVersionProd),
+	"KUBE_RBAC_PROXY":          "registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:98455d503b797b6b02edcfd37045c8fab0796b95ee5cf4cfe73b221a07e805f0",
+	apiCache:                   memcachedImage,
+	memcachedExporter:          memcachedExporterImage,
+	observatoriumAPI:           "quay.io/redhat-user-workloads/rhobs-mco-tenant/observatorium-api:9aada65247a07782465beb500323a0e18d7e3d05",
+	jaeger:                     "registry.redhat.io/rhosdt/jaeger-agent-rhel8:1.57.0-10",
 }
 
 // ProductionVersions is a map of production versions.
 var ProductionVersions = ParamMap[string]{
-	"STORE02W":       thanosVersionProd,
-	"STORE2W90D":     thanosVersionProd,
-	"STORE90D+":      thanosVersionProd,
-	"STORE_ROS":      thanosVersionProd,
-	"STORE_DEFAULT":  thanosVersionProd,
-	"QUERY":          thanosVersionProd,
-	"QUERY_FRONTEND": thanosVersionProd,
-	apiCache:         memcachedTag,
-	observatoriumAPI: "9aada65247a07782465beb500323a0e18d7e3d05",
+	"STORE02W":                 thanosVersionProd,
+	"STORE2W90D":               thanosVersionProd,
+	"STORE90D+":                thanosVersionProd,
+	"STORE_ROS":                thanosVersionProd,
+	"STORE_DEFAULT":            thanosVersionProd,
+	"RECEIVE_ROUTER":           thanosVersionProd,
+	"RECEIVE_INGESTOR_DEFAULT": thanosVersionProd,
+	"QUERY":                    thanosVersionProd,
+	"QUERY_FRONTEND":           thanosVersionProd,
+	apiCache:                   memcachedTag,
+	observatoriumAPI:           "9aada65247a07782465beb500323a0e18d7e3d05",
 }
 
 // ProductionLogLevels is a map of production log levels.
 var ProductionLogLevels = ParamMap[string]{
-	"STORE02W":       logLevels[0],
-	"STORE2W90D":     logLevels[0],
-	"STORE90D+":      logLevels[0],
-	"STORE_ROS":      logLevels[0],
-	"STORE_DEFAULT":  logLevels[0],
-	"QUERY":          logLevels[0],
-	"QUERY_FRONTEND": logLevels[0],
-	observatoriumAPI: logLevels[0],
+	"STORE02W":                 logLevels[0],
+	"STORE2W90D":               logLevels[0],
+	"STORE90D+":                logLevels[0],
+	"STORE_ROS":                logLevels[0],
+	"STORE_DEFAULT":            logLevels[0],
+	"RECEIVE_ROUTER":           logLevels[0],
+	"RECEIVE_INGESTOR_DEFAULT": logLevels[0],
+	"QUERY":                    logLevels[0],
+	"QUERY_FRONTEND":           logLevels[0],
+	observatoriumAPI:           logLevels[0],
 }
 
 // ProductionStorageSize is a map of production PV storage sizes.
 var ProductionStorageSize = ParamMap[v1alpha1.StorageSize]{
-	"STORE02W":      "300Gi",
-	"STORE2W90D":    "300Gi",
-	"STORE90D+":     "300Gi",
-	"STORE_ROS":     "300Gi",
-	"STORE_DEFAULT": "300Gi",
+	"STORE02W":        "300Gi",
+	"STORE2W90D":      "300Gi",
+	"STORE90D+":       "300Gi",
+	"STORE_ROS":       "300Gi",
+	"STORE_DEFAULT":   "300Gi",
+	"RECEIVE_DEFAULT": "3Gi",
 }
 
 // ProductionReplicas is a map of production replicas.
 var ProductionReplicas = ParamMap[int32]{
-	"STORE02W":       2,
-	"STORE2W90D":     2,
-	"STORE90D+":      1,
-	"STORE_ROS":      0, //TODO @moadz RHOBS-904: Temporary stage-only configuration for ROS disabled in Production.
-	"STORE_DEFAULT":  2,
-	"QUERY":          3,
-	"QUERY_FRONTEND": 3,
-	apiCache:         1,
-	observatoriumAPI: 2,
+	"STORE02W":                 2,
+	"STORE2W90D":               2,
+	"STORE90D+":                1,
+	"STORE_ROS":                0, //TODO @moadz RHOBS-904: Temporary stage-only configuration for ROS disabled in Production.
+	"STORE_DEFAULT":            2,
+	"RECEIVE_ROUTER":           2,
+	"RECEIVE_INGESTOR_DEFAULT": 3,
+	"QUERY":                    3,
+	"QUERY_FRONTEND":           3,
+	apiCache:                   1,
+	observatoriumAPI:           2,
 }
 
 // ProductionResourceRequirements is a map of production resource requirements.
@@ -483,6 +492,26 @@ var ProductionResourceRequirements = ParamMap[corev1.ResourceRequirements]{
 		Requests: corev1.ResourceList{
 			corev1.ResourceCPU:    resource.MustParse("100m"),
 			corev1.ResourceMemory: resource.MustParse("500Mi"),
+		},
+	},
+	"RECEIVE_ROUTER": corev1.ResourceRequirements{
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("700m"),
+			corev1.ResourceMemory: resource.MustParse("2Gi"),
+		},
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("2"),
+			corev1.ResourceMemory: resource.MustParse("5Gi"),
+		},
+	},
+	"RECEIVE_INGESTOR_DEFAULT": corev1.ResourceRequirements{
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("700m"),
+			corev1.ResourceMemory: resource.MustParse("2Gi"),
+		},
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("2"),
+			corev1.ResourceMemory: resource.MustParse("5Gi"),
 		},
 	},
 	"MANAGER": corev1.ResourceRequirements{
@@ -560,6 +589,16 @@ var ProductionObjectStorageBucket = ParamMap[v1alpha1.ObjectStorageConfig]{
 		},
 		Optional: ptr.To(false),
 	},
+}
+
+var IntegrationMaps = TemplateMaps{
+	Images:               StageImages,
+	Versions:             StageVersions,
+	LogLevels:            StageLogLevels,
+	StorageSize:          StageStorageSize,
+	Replicas:             StageReplicas,
+	ResourceRequirements: StageResourceRequirements,
+	ObjectStorageBucket:  StageObjectStorageBucket,
 }
 
 var StageMaps = TemplateMaps{

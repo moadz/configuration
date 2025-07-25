@@ -37,6 +37,25 @@ type gatewayConfig struct {
 	m         TemplateMaps
 }
 
+type clusterGatewayConfig struct {
+	namespace string
+	generator func(cluster ClusterName, env ClusterEnvironment, component string) *mimic.Generator
+	tenants   *corev1.Secret
+	amsURL    string
+	m         TemplateMaps
+}
+
+//func (b Build) Gateway(cluster ClusterName, config ClusterConfig) error {
+//	conf := clusterGatewayConfig{
+//		namespace: config.Namespace,
+//		generator: b.generator,
+//		amsURL:    "",
+//		m:         StageMaps,
+//		tenants:   stageGatewayTenants(config.Templates, config.Namespace),
+//	}
+//	return clusterGateway(conf)
+//}
+
 // Gateway Generates the Observatorium API Gateway configuration for the stage environment.
 func (s Stage) Gateway() error {
 	conf := gatewayConfig{
@@ -60,6 +79,44 @@ func (p Production) Gateway() error {
 	}
 	return gateway(conf)
 }
+
+//func clusterGateway(c clusterGatewayConfig) error {
+//	ns := c.namespace
+//	b, err := json.Marshal(cfgobservatorium.GenerateRBAC())
+//	if err != nil {
+//		return fmt.Errorf("failed to marshal RBAC configuration: %w", err)
+//	}
+//	rbacYAML, err := yaml.JSONToYAML(b)
+//	if err != nil {
+//		return fmt.Errorf("failed to convert RBAC configuration to YAML: %w", err)
+//	}
+//
+//	objs := []runtime.Object{
+//		gatewayRBAC(StageMaps, ns, string(rbacYAML)),
+//		gatewayDeployment(StageMaps, ns, c.amsURL),
+//		createGatewayService(StageMaps, ns),
+//		c.tenants,
+//	}
+//	gen := c.generator(gatewayName)
+//	template := openshift.WrapInTemplate(objs, metav1.ObjectMeta{
+//		Name: gatewayName,
+//	}, gatewayTemplateParams)
+//	enc := encoding.GhodssYAML(template)
+//	gen.Add(gatewayTemplate, enc)
+//	gen.Generate()
+//
+//	sms := []runtime.Object{
+//		gatewayServiceMonitor(StageMaps, ns),
+//	}
+//	gen = c.generator(gatewayName)
+//	template = openshift.WrapInTemplate(sms, metav1.ObjectMeta{
+//		Name: gatewayName + "-service-monitor",
+//	}, nil)
+//	gen.Add("service-monitor-"+gatewayTemplate, encoding.GhodssYAML(template))
+//	gen.Generate()
+//
+//	return nil
+//}
 
 func gateway(c gatewayConfig) error {
 	ns := c.namespace
