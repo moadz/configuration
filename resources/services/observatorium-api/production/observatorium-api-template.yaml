@@ -201,6 +201,12 @@ objects:
         subjects:
         - kind: user
           name: service-account-9baf25c1-f61e-4b0d-b3a5-41802dbc061e
+      - name: 875c08bc-d313-417f-a044-295212338e81
+        roles:
+        - telemeter-metrics-write
+        subjects:
+        - kind: user
+          name: service-account-875c08bc-d313-417f-a044-295212338e81-staging
       - name: observatorium-rhtap
         roles:
         - rhtap-metrics-read
@@ -390,7 +396,6 @@ objects:
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
       app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
-      test: "yes"
     name: observatorium-api
     namespace: rhobs-production
   spec:

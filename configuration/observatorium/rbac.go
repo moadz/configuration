@@ -318,6 +318,17 @@ func GenerateRBAC() *ObservatoriumRBAC {
 		skipConventionCheck: true,
 	})
 
+	// fedramp write only stage
+	// Special request of extra read account.
+	attachBinding(&obsRBAC, BindingOpts{
+		name:                "875c08bc-d313-417f-a044-295212338e81",
+		tenant:              telemeterTenant,
+		signals:             []signal{metricsSignal},
+		perms:               []rbac.Permission{rbac.Write}, // Write only
+		envs:                []env{stagingEnv},
+		skipConventionCheck: true,
+	})
+
 	// RHTAP
 	// Reader and Writer serviceaccount
 	attachBinding(&obsRBAC, BindingOpts{
