@@ -937,6 +937,12 @@ objects:
         "subjects":
         - "kind": "user"
           "name": "service-account-9baf25c1-f61e-4b0d-b3a5-41802dbc061e"
+      - "name": "cefb23fb-d0a2-4c8f-9180-d95c259e79a3"
+        "roles":
+        - "telemeter-metrics-read"
+        "subjects":
+        - "kind": "user"
+          "name": "service-account-cefb23fb-d0a2-4c8f-9180-d95c259e79a3"
       - "name": "875c08bc-d313-417f-a044-295212338e81"
         "roles":
         - "telemeter-metrics-write"

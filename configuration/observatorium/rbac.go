@@ -318,6 +318,17 @@ func GenerateRBAC() *ObservatoriumRBAC {
 		skipConventionCheck: true,
 	})
 
+	// ai-bu-pms read only prod
+	// Special request of extra read account.
+	attachBinding(&obsRBAC, BindingOpts{
+		name:                "cefb23fb-d0a2-4c8f-9180-d95c259e79a3",
+		tenant:              telemeterTenant,
+		signals:             []signal{metricsSignal},
+		perms:               []rbac.Permission{rbac.Read}, // Read only.
+		envs:                []env{productionEnv},
+		skipConventionCheck: true,
+	})
+
 	// fedramp write only stage
 	// Special request of extra read account.
 	attachBinding(&obsRBAC, BindingOpts{
