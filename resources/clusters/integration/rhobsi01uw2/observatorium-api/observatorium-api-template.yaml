@@ -195,6 +195,30 @@ objects:
         subjects:
         - kind: user
           name: service-account-plmshift
+      - name: 9baf25c1-f61e-4b0d-b3a5-41802dbc061e
+        roles:
+        - telemeter-metrics-read
+        subjects:
+        - kind: user
+          name: service-account-9baf25c1-f61e-4b0d-b3a5-41802dbc061e
+      - name: cefb23fb-d0a2-4c8f-9180-d95c259e79a3
+        roles:
+        - telemeter-metrics-read
+        subjects:
+        - kind: user
+          name: service-account-cefb23fb-d0a2-4c8f-9180-d95c259e79a3
+      - name: 875c08bc-d313-417f-a044-295212338e81
+        roles:
+        - telemeter-metrics-write
+        subjects:
+        - kind: user
+          name: service-account-875c08bc-d313-417f-a044-295212338e81-staging
+      - name: 4cbd24b0-3aed-4b03-839a-f4515b199a5d
+        roles:
+        - telemeter-metrics-write
+        subjects:
+        - kind: user
+          name: service-account-4cbd24b0-3aed-4b03-839a-f4515b199a5d
       - name: observatorium-rhtap
         roles:
         - rhtap-metrics-read
@@ -428,9 +452,13 @@ objects:
           - --log.level=debug
           - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-int.svc.cluster.local:9090
           - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-int.svc.cluster.local:19291
+          - --logs.read.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
+          - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
+          - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-int.svc.cluster.local:3100
           - --metrics.alertmanager.endpoint=http://alertmanager.rhobs-int.svc.cluster.local:9093
           - --rbac.config=/etc/observatorium/rbac.yaml
           - --tenants.config=/etc/observatorium/tenants.yaml
+          - --logs.write-timeout=4m0s
           - --server.read-timeout=5m
           image: quay.io/redhat-user-workloads/rhobs-mco-tenant/observatorium-api:9aada65247a07782465beb500323a0e18d7e3d05
           livenessProbe:

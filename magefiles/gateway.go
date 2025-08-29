@@ -32,6 +32,9 @@ const (
 
 	qfeService    = "thanos-query-frontend-rhobs"
 	routerService = "thanos-receive-router-rhobs"
+
+	logsQfeService    = "observatorium-lokistack-query-frontend-http"
+	logsRouterService = "observatorium-lokistack-distributor-http"
 )
 
 type gatewayConfig struct {
@@ -252,9 +255,13 @@ func createObservatoriumAPIContainer(m clusters.TemplateMaps, namespace string) 
 			fmt.Sprintf("--log.level=%s", logLevel),
 			fmt.Sprintf("--metrics.read.endpoint=http://%s.%s.svc.cluster.local:9090", qfeService, namespace),
 			fmt.Sprintf("--metrics.write.endpoint=http://%s.%s.svc.cluster.local:19291", routerService, namespace),
+			fmt.Sprintf("--logs.read.endpoint=http://%s.%s.svc.cluster.local:3100", logsQfeService, namespace),
+			fmt.Sprintf("--logs.tail.endpoint=http://%s.%s.svc.cluster.local:3100", logsQfeService, namespace),
+			fmt.Sprintf("--logs.write.endpoint=http://%s.%s.svc.cluster.local:3100", logsRouterService, namespace),
 			fmt.Sprintf("--metrics.alertmanager.endpoint=http://%s.%s.svc.cluster.local:9093", alertManagerName, namespace),
 			"--rbac.config=/etc/observatorium/rbac.yaml",
 			"--tenants.config=/etc/observatorium/tenants.yaml",
+			"--logs.write-timeout=4m0s",
 			"--server.read-timeout=5m",
 		},
 		Ports: []corev1.ContainerPort{
