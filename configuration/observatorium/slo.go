@@ -296,10 +296,10 @@ func TelemeterUploadSLOs(envName rhobsInstanceEnv) []pyrrav1alpha1.ServiceLevelO
 //
 // This set of SLOs are driven by the RHOBS Service Level Objectives document
 // https://docs.google.com/document/d/1wJjcpgg-r8rlnOtRiqWGv0zwr1MB6WwkQED1XDWXVQs/edit
-func ObservatoriumSLOs(envName rhobsInstanceEnv, signal signal) []pyrrav1alpha1.ServiceLevelObjective {
+func ObservatoriumSLOs(envName rhobsInstanceEnv, signal Signal) []pyrrav1alpha1.ServiceLevelObjective {
 	var slos rhobSLOList
 	switch signal {
-	case metricsSignal:
+	case MetricsSignal:
 		slos = rhobSLOList{
 			// Observatorium Metrics Availability SLOs.
 			{
@@ -502,7 +502,7 @@ func ObservatoriumSLOs(envName rhobsInstanceEnv, signal signal) []pyrrav1alpha1.
 			},
 		}
 	default:
-		panic(signal + " is not an Observatorium signal")
+		panic(signal + " is not an Observatorium Signal")
 	}
 
 	return slos.GetObjectives(envName)
@@ -513,11 +513,11 @@ func GenSLO(genPyrra, genRules *mimic.Generator) {
 	// Add on extra Telemeter-only SLOs.
 	var telemeterProdObjectives []pyrrav1alpha1.ServiceLevelObjective
 	telemeterProdObjectives = append(telemeterProdObjectives, TelemeterSLOs(telemeterProduction)...)
-	telemeterProdObjectives = append(telemeterProdObjectives, ObservatoriumSLOs(telemeterProduction, metricsSignal)...)
+	telemeterProdObjectives = append(telemeterProdObjectives, ObservatoriumSLOs(telemeterProduction, MetricsSignal)...)
 
 	var telemeterStageObjectives []pyrrav1alpha1.ServiceLevelObjective
 	telemeterStageObjectives = append(telemeterStageObjectives, TelemeterSLOs(telemeterStaging)...)
-	telemeterStageObjectives = append(telemeterStageObjectives, ObservatoriumSLOs(telemeterStaging, metricsSignal)...)
+	telemeterStageObjectives = append(telemeterStageObjectives, ObservatoriumSLOs(telemeterStaging, MetricsSignal)...)
 
 	// Add on for Rhelemeter SLOs, which are a subset of Telemeter SLOs.
 	var rhelemeterProdObjectives []pyrrav1alpha1.ServiceLevelObjective
@@ -560,7 +560,7 @@ func GenSLO(genPyrra, genRules *mimic.Generator) {
 
 	envSLOs(
 		mstProduction,
-		ObservatoriumSLOs(mstProduction, metricsSignal),
+		ObservatoriumSLOs(mstProduction, MetricsSignal),
 		"rhobs-slos-mst-production",
 		genPyrra,
 		genRules,
@@ -568,7 +568,7 @@ func GenSLO(genPyrra, genRules *mimic.Generator) {
 
 	envSLOs(
 		mstStage,
-		ObservatoriumSLOs(mstStage, metricsSignal),
+		ObservatoriumSLOs(mstStage, MetricsSignal),
 		"rhobs-slos-mst-stage",
 		genPyrra,
 		genRules,

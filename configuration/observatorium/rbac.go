@@ -9,25 +9,28 @@ import (
 	"github.com/observatorium/api/rbac"
 )
 
-type tenantID string
+type TenantID string
 
 const (
-	cnvqeTenant     tenantID = "cnvqe"
-	telemeterTenant tenantID = "telemeter"
-	rhobsTenant     tenantID = "rhobs"
-	psiocpTenant    tenantID = "psiocp"
-	rhodsTenant     tenantID = "rhods"
-	rhacsTenant     tenantID = "rhacs"
-	odfmsTenant     tenantID = "odfms"
-	refAddonTenant  tenantID = "reference-addon"
-	rhtapTenant     tenantID = "rhtap"
-	rhelTenant      tenantID = "rhel"
+	cnvqeTenant     TenantID = "cnvqe"
+	telemeterTenant TenantID = "telemeter"
+	rhobsTenant     TenantID = "rhobs"
+	psiocpTenant    TenantID = "psiocp"
+	rhodsTenant     TenantID = "rhods"
+	rhacsTenant     TenantID = "rhacs"
+	odfmsTenant     TenantID = "odfms"
+	refAddonTenant  TenantID = "reference-addon"
+	rhtapTenant     TenantID = "rhtap"
+	rhelTenant      TenantID = "rhel"
+
+	HcpTenant TenantID = "hcp"
 )
 
-type signal string
+type Signal string
 
 const (
-	metricsSignal signal = "metrics"
+	MetricsSignal Signal = "metrics"
+	LogsSignal    Signal = "logs"
 )
 
 type env string
@@ -58,7 +61,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-cnv-qe",
 		tenant:  cnvqeTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write, rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -68,7 +71,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-starburst-isv-write",
 		tenant:  rhodsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write},
 		envs:    []env{stagingEnv},
 	})
@@ -76,7 +79,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-starburst-isv-read",
 		tenant:  rhodsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read},
 		envs:    []env{stagingEnv},
 	})
@@ -85,14 +88,14 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-rhacs-metrics",
 		tenant:  rhacsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write, rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-rhacs-grafana",
 		tenant:  rhacsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -101,14 +104,14 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-rhobs",
 		tenant:  rhobsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write, rbac.Read},
 		envs:    []env{testingEnv, stagingEnv, productionEnv},
 	})
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-rhobs-mst",
 		tenant:  rhobsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write, rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -116,8 +119,8 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	obsRBAC.RoleBindings = append(obsRBAC.RoleBindings, rbac.RoleBinding{
 		Name: "rhobs-admin",
 		Roles: []string{
-			getOrCreateRoleName(&obsRBAC, telemeterTenant, metricsSignal, rbac.Read),
-			getOrCreateRoleName(&obsRBAC, rhobsTenant, metricsSignal, rbac.Read),
+			getOrCreateRoleName(&obsRBAC, telemeterTenant, MetricsSignal, rbac.Read),
+			getOrCreateRoleName(&obsRBAC, rhobsTenant, MetricsSignal, rbac.Read),
 		},
 		Subjects: []rbac.Subject{{Name: "team-monitoring@redhat.com", Kind: rbac.Group}},
 	})
@@ -126,7 +129,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "telemeter-service",
 		tenant:  telemeterTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write, rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -135,7 +138,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-ccx-processing",
 		tenant:  telemeterTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -144,7 +147,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-sdtcs",
 		tenant:  telemeterTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -153,7 +156,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-subwatch",
 		tenant:  telemeterTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -162,7 +165,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-psiocp",
 		tenant:  psiocpTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write, rbac.Read},
 		envs:    []env{stagingEnv},
 	})
@@ -171,7 +174,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-odfms-write",
 		tenant:  odfmsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write}, // Write only.
 		envs:    []env{productionEnv},
 	})
@@ -180,7 +183,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-odfms-read",
 		tenant:  odfmsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read}, // Read only.
 		envs:    []env{productionEnv},
 	})
@@ -189,7 +192,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-odfms",
 		tenant:  odfmsTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read, rbac.Write},
 		envs:    []env{stagingEnv},
 	})
@@ -198,7 +201,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-reference-addon",
 		tenant:  refAddonTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write, rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -209,7 +212,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "7f7f912e-0429-4639-8e70-609ecf65b280",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -221,7 +224,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "8f7aa5e1-aa08-493d-82eb-cf24834fc08f",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -233,7 +236,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "4bfe1a9f-e875-4d37-9c6a-d2faff2a69dc",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -244,7 +247,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "f6b3e12c-bb50-4bfc-89fe-330a28820fa9",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -255,7 +258,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "1a45eb31-bcc6-4bb7-8a38-88f00aa718ee",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -267,7 +270,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "e7c2f772-e418-4ef3-9568-ea09b1acb929",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -279,7 +282,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "e07f5b10-e62b-47a2-9698-e245d1198a3b",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -290,7 +293,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "8a5cc14c-570c-4106-9a3b-cb2fcf4e3de4",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -301,7 +304,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "plmshift",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -312,7 +315,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "9baf25c1-f61e-4b0d-b3a5-41802dbc061e",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -323,7 +326,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "cefb23fb-d0a2-4c8f-9180-d95c259e79a3",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Read}, // Read only.
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -334,7 +337,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "875c08bc-d313-417f-a044-295212338e81",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Write}, // Write only
 		envs:                []env{stagingEnv},
 		skipConventionCheck: true,
@@ -345,7 +348,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:                "4cbd24b0-3aed-4b03-839a-f4515b199a5d",
 		tenant:              telemeterTenant,
-		signals:             []signal{metricsSignal},
+		signals:             []Signal{MetricsSignal},
 		perms:               []rbac.Permission{rbac.Write}, // Write only
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
@@ -356,7 +359,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-rhtap",
 		tenant:  rhtapTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read, rbac.Write},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -366,7 +369,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-rhel-read",
 		tenant:  rhelTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Read},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -375,7 +378,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	attachBinding(&obsRBAC, BindingOpts{
 		name:    "observatorium-rhel-write",
 		tenant:  rhelTenant,
-		signals: []signal{metricsSignal},
+		signals: []Signal{MetricsSignal},
 		perms:   []rbac.Permission{rbac.Write},
 		envs:    []env{stagingEnv, productionEnv},
 	})
@@ -384,9 +387,27 @@ func GenerateRBAC() *ObservatoriumRBAC {
 	return &obsRBAC
 }
 
+// GenerateClusterRBAC generates rbac.json for the cluster
+// RBAC defines roles and role binding for each tenant and matching subject names that will be validated
+// against 'user' field in the incoming JWT token that contains service account.
+func GenerateClusterRBAC(opts ...*BindingOpts) *ObservatoriumRBAC {
+	obsRBAC := ObservatoriumRBAC{
+		mappedRoleNames: map[RoleMapKey]string{},
+	}
+
+	for _, o := range opts {
+		o.skipConventionCheck = true
+		o.envs = []env{productionEnv}
+		attachBinding(&obsRBAC, *o)
+	}
+
+	// Use JSON because we want to have jsonnet using that in configmaps/secrets.
+	return &obsRBAC
+}
+
 type RoleMapKey struct {
-	tenant tenantID
-	signal signal
+	tenant TenantID
+	signal Signal
 	perm   rbac.Permission
 }
 
@@ -404,14 +425,34 @@ type BindingOpts struct {
 	// NOTE(bwplotka): Name is strongly correlated to subject name that corresponds to the service account username (it has to match it)/
 	// Any change, require changes on tenant side, so be careful.
 	name                string
-	tenant              tenantID
-	signals             []signal
+	tenant              TenantID
+	signals             []Signal
 	perms               []rbac.Permission
 	envs                []env
 	skipConventionCheck bool
 }
 
-func getOrCreateRoleName(o *ObservatoriumRBAC, tenant tenantID, s signal, p rbac.Permission) string {
+func (bo *BindingOpts) WithServiceAccountName(n string) *BindingOpts {
+	bo.name = n
+	return bo
+}
+
+func (bo *BindingOpts) WithTenant(t TenantID) *BindingOpts {
+	bo.tenant = t
+	return bo
+}
+
+func (bo *BindingOpts) WithSignals(signals []Signal) *BindingOpts {
+	bo.signals = signals
+	return bo
+}
+
+func (bo *BindingOpts) WithPerms(perms []rbac.Permission) *BindingOpts {
+	bo.perms = perms
+	return bo
+}
+
+func getOrCreateRoleName(o *ObservatoriumRBAC, tenant TenantID, s Signal, p rbac.Permission) string {
 	k := RoleMapKey{tenant: tenant, signal: s, perm: p}
 
 	n, ok := o.mappedRoleNames[k]

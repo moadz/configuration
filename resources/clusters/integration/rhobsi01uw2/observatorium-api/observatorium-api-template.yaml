@@ -8,383 +8,44 @@ objects:
   data:
     rbac.yaml: |
       roleBindings:
-      - name: observatorium-cnv-qe
+      - name: d4045e4b-7b9c-46fc-8af0-5d483d9d205b
         roles:
-        - cnvqe-metrics-write
-        - cnvqe-metrics-read
+        - hcp-metrics-read
+        - hcp-metrics-write
+        - hcp-logs-read
+        - hcp-logs-write
         subjects:
         - kind: user
-          name: service-account-observatorium-cnv-qe-staging
-        - kind: user
-          name: service-account-observatorium-cnv-qe
-      - name: observatorium-starburst-isv-write
-        roles:
-        - rhods-metrics-write
-        subjects:
-        - kind: user
-          name: service-account-observatorium-starburst-isv-write-staging
-      - name: observatorium-starburst-isv-read
-        roles:
-        - rhods-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-starburst-isv-read-staging
-      - name: observatorium-rhacs-metrics
-        roles:
-        - rhacs-metrics-write
-        - rhacs-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-rhacs-metrics-staging
-        - kind: user
-          name: service-account-observatorium-rhacs-metrics
-      - name: observatorium-rhacs-grafana
-        roles:
-        - rhacs-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-rhacs-grafana-staging
-        - kind: user
-          name: service-account-observatorium-rhacs-grafana
-      - name: observatorium-rhobs
-        roles:
-        - rhobs-metrics-write
-        - rhobs-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-rhobs-testing
-        - kind: user
-          name: service-account-observatorium-rhobs-staging
-        - kind: user
-          name: service-account-observatorium-rhobs
-      - name: observatorium-rhobs-mst
-        roles:
-        - rhobs-metrics-write
-        - rhobs-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-rhobs-mst-staging
-        - kind: user
-          name: service-account-observatorium-rhobs-mst
-      - name: rhobs-admin
-        roles:
-        - telemeter-metrics-read
-        - rhobs-metrics-read
-        subjects:
-        - kind: group
-          name: team-monitoring@redhat.com
-      - name: telemeter-service
-        roles:
-        - telemeter-metrics-write
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-telemeter-service-staging
-        - kind: user
-          name: service-account-telemeter-service
-      - name: observatorium-ccx-processing
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-ccx-processing-staging
-        - kind: user
-          name: service-account-observatorium-ccx-processing
-      - name: observatorium-sdtcs
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-sdtcs-staging
-        - kind: user
-          name: service-account-observatorium-sdtcs
-      - name: observatorium-subwatch
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-subwatch-staging
-        - kind: user
-          name: service-account-observatorium-subwatch
-      - name: observatorium-psiocp
-        roles:
-        - psiocp-metrics-write
-        - psiocp-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-psiocp-staging
-      - name: observatorium-odfms-write
-        roles:
-        - odfms-metrics-write
-        subjects:
-        - kind: user
-          name: service-account-observatorium-odfms-write
-      - name: observatorium-odfms-read
-        roles:
-        - odfms-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-odfms-read
-      - name: observatorium-odfms
-        roles:
-        - odfms-metrics-read
-        - odfms-metrics-write
-        subjects:
-        - kind: user
-          name: service-account-observatorium-odfms-staging
-      - name: observatorium-reference-addon
-        roles:
-        - reference-addon-metrics-write
-        - reference-addon-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-reference-addon-staging
-        - kind: user
-          name: service-account-observatorium-reference-addon
-      - name: 7f7f912e-0429-4639-8e70-609ecf65b280
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-7f7f912e-0429-4639-8e70-609ecf65b280
-      - name: 8f7aa5e1-aa08-493d-82eb-cf24834fc08f
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-8f7aa5e1-aa08-493d-82eb-cf24834fc08f
-      - name: 4bfe1a9f-e875-4d37-9c6a-d2faff2a69dc
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-4bfe1a9f-e875-4d37-9c6a-d2faff2a69dc
-      - name: f6b3e12c-bb50-4bfc-89fe-330a28820fa9
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-f6b3e12c-bb50-4bfc-89fe-330a28820fa9
-      - name: 1a45eb31-bcc6-4bb7-8a38-88f00aa718ee
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-1a45eb31-bcc6-4bb7-8a38-88f00aa718ee
-      - name: e7c2f772-e418-4ef3-9568-ea09b1acb929
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-e7c2f772-e418-4ef3-9568-ea09b1acb929
-      - name: e07f5b10-e62b-47a2-9698-e245d1198a3b
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-e07f5b10-e62b-47a2-9698-e245d1198a3b
-      - name: 8a5cc14c-570c-4106-9a3b-cb2fcf4e3de4
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-8a5cc14c-570c-4106-9a3b-cb2fcf4e3de4
-      - name: plmshift
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-plmshift
-      - name: 9baf25c1-f61e-4b0d-b3a5-41802dbc061e
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-9baf25c1-f61e-4b0d-b3a5-41802dbc061e
-      - name: cefb23fb-d0a2-4c8f-9180-d95c259e79a3
-        roles:
-        - telemeter-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-cefb23fb-d0a2-4c8f-9180-d95c259e79a3
-      - name: 875c08bc-d313-417f-a044-295212338e81
-        roles:
-        - telemeter-metrics-write
-        subjects:
-        - kind: user
-          name: service-account-875c08bc-d313-417f-a044-295212338e81-staging
-      - name: 4cbd24b0-3aed-4b03-839a-f4515b199a5d
-        roles:
-        - telemeter-metrics-write
-        subjects:
-        - kind: user
-          name: service-account-4cbd24b0-3aed-4b03-839a-f4515b199a5d
-      - name: observatorium-rhtap
-        roles:
-        - rhtap-metrics-read
-        - rhtap-metrics-write
-        subjects:
-        - kind: user
-          name: service-account-observatorium-rhtap-staging
-        - kind: user
-          name: service-account-observatorium-rhtap
-      - name: observatorium-rhel-read
-        roles:
-        - rhel-metrics-read
-        subjects:
-        - kind: user
-          name: service-account-observatorium-rhel-read-staging
-        - kind: user
-          name: service-account-observatorium-rhel-read
-      - name: observatorium-rhel-write
-        roles:
-        - rhel-metrics-write
-        subjects:
-        - kind: user
-          name: service-account-observatorium-rhel-write-staging
-        - kind: user
-          name: service-account-observatorium-rhel-write
+          name: service-account-d4045e4b-7b9c-46fc-8af0-5d483d9d205b
       roles:
-      - name: cnvqe-metrics-write
-        permissions:
-        - write
-        resources:
-        - metrics
-        tenants:
-        - cnvqe
-      - name: cnvqe-metrics-read
+      - name: hcp-metrics-read
         permissions:
         - read
         resources:
         - metrics
         tenants:
-        - cnvqe
-      - name: rhods-metrics-write
+        - hcp
+      - name: hcp-metrics-write
         permissions:
         - write
         resources:
         - metrics
         tenants:
-        - rhods
-      - name: rhods-metrics-read
+        - hcp
+      - name: hcp-logs-read
         permissions:
         - read
         resources:
-        - metrics
+        - logs
         tenants:
-        - rhods
-      - name: rhacs-metrics-write
+        - hcp
+      - name: hcp-logs-write
         permissions:
         - write
         resources:
-        - metrics
+        - logs
         tenants:
-        - rhacs
-      - name: rhacs-metrics-read
-        permissions:
-        - read
-        resources:
-        - metrics
-        tenants:
-        - rhacs
-      - name: rhobs-metrics-write
-        permissions:
-        - write
-        resources:
-        - metrics
-        tenants:
-        - rhobs
-      - name: rhobs-metrics-read
-        permissions:
-        - read
-        resources:
-        - metrics
-        tenants:
-        - rhobs
-      - name: telemeter-metrics-read
-        permissions:
-        - read
-        resources:
-        - metrics
-        tenants:
-        - telemeter
-      - name: telemeter-metrics-write
-        permissions:
-        - write
-        resources:
-        - metrics
-        tenants:
-        - telemeter
-      - name: psiocp-metrics-write
-        permissions:
-        - write
-        resources:
-        - metrics
-        tenants:
-        - psiocp
-      - name: psiocp-metrics-read
-        permissions:
-        - read
-        resources:
-        - metrics
-        tenants:
-        - psiocp
-      - name: odfms-metrics-write
-        permissions:
-        - write
-        resources:
-        - metrics
-        tenants:
-        - odfms
-      - name: odfms-metrics-read
-        permissions:
-        - read
-        resources:
-        - metrics
-        tenants:
-        - odfms
-      - name: reference-addon-metrics-write
-        permissions:
-        - write
-        resources:
-        - metrics
-        tenants:
-        - reference-addon
-      - name: reference-addon-metrics-read
-        permissions:
-        - read
-        resources:
-        - metrics
-        tenants:
-        - reference-addon
-      - name: rhtap-metrics-read
-        permissions:
-        - read
-        resources:
-        - metrics
-        tenants:
-        - rhtap
-      - name: rhtap-metrics-write
-        permissions:
-        - write
-        resources:
-        - metrics
-        tenants:
-        - rhtap
-      - name: rhel-metrics-read
-        permissions:
-        - read
-        resources:
-        - metrics
-        tenants:
-        - rhel
-      - name: rhel-metrics-write
-        permissions:
-        - write
-        resources:
-        - metrics
-        tenants:
-        - rhel
+        - hcp
   kind: ConfigMap
   metadata:
     annotations:
@@ -648,7 +309,7 @@ objects:
       - Authenticator: null
         ID: EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         MTLS: null
-        Name: hypershift-integration
+        Name: hcp
         OIDC:
           ClientID: ${CLIENT_ID}
           ClientSecret: ${CLIENT_SECRET}
