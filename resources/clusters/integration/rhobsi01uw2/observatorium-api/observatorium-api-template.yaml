@@ -117,11 +117,12 @@ objects:
           - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
           - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-int.svc.cluster.local:3100
           - --metrics.alertmanager.endpoint=http://alertmanager.rhobs-int.svc.cluster.local:9093
+          - --probes.endpoint=http://synthetics-api.rhobs-int.svc.cluster.local:8080/probes
           - --rbac.config=/etc/observatorium/rbac.yaml
           - --tenants.config=/etc/observatorium/tenants.yaml
           - --logs.write-timeout=4m0s
           - --server.read-timeout=5m
-          image: quay.io/redhat-user-workloads/rhobs-mco-tenant/observatorium-api:9aada65247a07782465beb500323a0e18d7e3d05
+          image: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-obs-api:c4febd5e003fafa99d8c299cf2bfbecd4aafd514
           livenessProbe:
             failureThreshold: 10
             httpGet:
