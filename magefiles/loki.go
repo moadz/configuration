@@ -14,7 +14,7 @@ import (
 func (b Build) DefaultLokiStack(config clusters.ClusterConfig) {
 	gen := b.generator(config, "loki-operator-default-cr")
 	objs := []runtime.Object{
-		NewLokiStack(config.Namespace),
+		NewLokiStack(config.Namespace, config.Templates),
 	}
 
 	gen.Add("loki-operator-default-cr.yaml", encoding.GhodssYAML(
@@ -41,7 +41,7 @@ func (b Build) DefaultLokiStack(config clusters.ClusterConfig) {
 	gen.Generate()
 }
 
-func NewLokiStack(namespace string) *lokiv1.LokiStack {
+func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.LokiStack {
 	return &lokiv1.LokiStack{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "loki.grafana.com/v1",
@@ -52,6 +52,17 @@ func NewLokiStack(namespace string) *lokiv1.LokiStack {
 			Namespace: namespace,
 		},
 		Spec: lokiv1.LokiStackSpec{
+			Limits: &lokiv1.LimitsSpec{
+				Global: &lokiv1.LimitsTemplateSpec{
+					IngestionLimits: &lokiv1.IngestionLimitSpec{
+						IngestionRate:      overrides.LokiOverrides[clusters.LokiLimits].IngestionRateLimitMB,
+						IngestionBurstSize: overrides.LokiOverrides[clusters.LokiLimits].IngestionBurstSizeMB,
+					},
+					QueryLimits: &lokiv1.QueryLimitSpec{
+						QueryTimeout: overrides.LokiOverrides[clusters.LokiLimits].QueryTimeout,
+					},
+				},
+			},
 			ManagementState: lokiv1.ManagementStateManaged,
 			Size:            "${LOKI_SIZE}",
 			Storage: lokiv1.ObjectStorageSpec{

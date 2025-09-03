@@ -11,6 +11,13 @@ objects:
     name: observatorium-lokistack
     namespace: rhobs-int
   spec:
+    limits:
+      global:
+        ingestion:
+          ingestionBurstSize: 6
+          ingestionRate: 4
+        queries:
+          queryTimeout: 3m
     managementState: Managed
     size: ${LOKI_SIZE}
     storage:

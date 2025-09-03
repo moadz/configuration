@@ -21,6 +21,18 @@ type TemplateMaps struct {
 	Replicas             ParamMap[int32]
 	ResourceRequirements ParamMap[corev1.ResourceRequirements]
 	ObjectStorageBucket  ParamMap[v1alpha1.ObjectStorageConfig]
+	LokiOverrides        ParamMap[LokiLimitOverrides]
+}
+
+type LokiOverrides struct {
+	LokiLimitOverrides
+}
+
+type LokiLimitOverrides struct {
+	IngestionRateLimitMB int32
+	IngestionBurstSizeMB int32
+
+	QueryTimeout string
 }
 
 // Override applies overrides to a TemplateMaps and returns a new instance
@@ -170,6 +182,8 @@ const (
 	Query                  = "QUERY"
 	QueryFrontend          = "QUERY_FRONTEND"
 	Manager                = "MANAGER"
+
+	LokiLimits = "LOKI_LIMITS"
 
 	// Object storage keys
 	DefaultBucket = "DEFAULT_BUCKET"
@@ -331,6 +345,13 @@ func DefaultBaseTemplate() TemplateMaps {
 					Name: "default-thanos-bucket",
 				},
 				Optional: ptr.To(false),
+			},
+		},
+		LokiOverrides: ParamMap[LokiLimitOverrides]{
+			LokiLimits: {
+				IngestionRateLimitMB: 4,
+				IngestionBurstSizeMB: 6,
+				QueryTimeout:         "3m",
 			},
 		},
 	}
