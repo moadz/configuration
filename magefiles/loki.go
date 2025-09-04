@@ -52,14 +52,15 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 			Namespace: namespace,
 		},
 		Spec: lokiv1.LokiStackSpec{
+
 			Limits: &lokiv1.LimitsSpec{
 				Global: &lokiv1.LimitsTemplateSpec{
 					IngestionLimits: &lokiv1.IngestionLimitSpec{
-						IngestionRate:      overrides.LokiOverrides[clusters.LokiLimits].IngestionRateLimitMB,
-						IngestionBurstSize: overrides.LokiOverrides[clusters.LokiLimits].IngestionBurstSizeMB,
+						IngestionRate:      overrides.LokiOverrides[clusters.LokiConfig].IngestionRateLimitMB,
+						IngestionBurstSize: overrides.LokiOverrides[clusters.LokiConfig].IngestionBurstSizeMB,
 					},
 					QueryLimits: &lokiv1.QueryLimitSpec{
-						QueryTimeout: overrides.LokiOverrides[clusters.LokiLimits].QueryTimeout,
+						QueryTimeout: overrides.LokiOverrides[clusters.LokiConfig].QueryTimeout,
 					},
 				},
 			},
@@ -78,6 +79,20 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 				},
 			},
 			StorageClassName: "${LOKI_STORAGE_CLASS}",
+			Template: &lokiv1.LokiTemplateSpec{
+				Distributor: &lokiv1.LokiComponentSpec{
+					Replicas: overrides.LokiOverrides[clusters.LokiConfig].Router.Replicas,
+				},
+				Ingester: &lokiv1.LokiComponentSpec{
+					Replicas: overrides.LokiOverrides[clusters.LokiConfig].Ingest.Replicas,
+				},
+				Querier: &lokiv1.LokiComponentSpec{
+					Replicas: overrides.LokiOverrides[clusters.LokiConfig].Query.Replicas,
+				},
+				QueryFrontend: &lokiv1.LokiComponentSpec{
+					Replicas: overrides.LokiOverrides[clusters.LokiConfig].QueryFrontend.Replicas,
+				},
+			},
 		},
 	}
 }

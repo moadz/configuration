@@ -21,11 +21,15 @@ type TemplateMaps struct {
 	Replicas             ParamMap[int32]
 	ResourceRequirements ParamMap[corev1.ResourceRequirements]
 	ObjectStorageBucket  ParamMap[v1alpha1.ObjectStorageConfig]
-	LokiOverrides        ParamMap[LokiLimitOverrides]
+	LokiOverrides        ParamMap[LokiOverrides]
 }
 
 type LokiOverrides struct {
 	LokiLimitOverrides
+	Router        LokiComponentSpec
+	Ingest        LokiComponentSpec
+	Query         LokiComponentSpec
+	QueryFrontend LokiComponentSpec
 }
 
 type LokiLimitOverrides struct {
@@ -33,6 +37,10 @@ type LokiLimitOverrides struct {
 	IngestionBurstSizeMB int32
 
 	QueryTimeout string
+}
+
+type LokiComponentSpec struct {
+	Replicas int32
 }
 
 // Override applies overrides to a TemplateMaps and returns a new instance
@@ -127,6 +135,40 @@ func (v Versions) Apply(t TemplateMaps) TemplateMaps {
 	return t
 }
 
+// LokiOverridesMap override
+type LokiOverridesMap map[string]LokiOverrides
+
+func (l LokiOverridesMap) Apply(t TemplateMaps) TemplateMaps {
+	if t.LokiOverrides == nil {
+		t.LokiOverrides = make(ParamMap[LokiOverrides])
+	}
+	for k, v := range l {
+		// Get existing config or create empty one
+		existing := t.LokiOverrides[k]
+
+		// Merge the override with existing values
+		merged := LokiOverrides{
+			LokiLimitOverrides: v.LokiLimitOverrides, // Always use override values for limits
+			Router:             mergeComponentSpec(existing.Router, v.Router),
+			Ingest:             mergeComponentSpec(existing.Ingest, v.Ingest),
+			Query:              mergeComponentSpec(existing.Query, v.Query),
+			QueryFrontend:      mergeComponentSpec(existing.QueryFrontend, v.QueryFrontend),
+		}
+
+		t.LokiOverrides[k] = merged
+	}
+	return t
+}
+
+// mergeComponentSpec merges two LokiComponentSpec, using override values when non-zero
+func mergeComponentSpec(existing, override LokiComponentSpec) LokiComponentSpec {
+	result := existing
+	if override.Replicas != 0 {
+		result.Replicas = override.Replicas
+	}
+	return result
+}
+
 // TemplateFn is a function that returns a value from a map.
 // It panics if the param is not found in the map.
 // It returns the value of the param.
@@ -183,7 +225,7 @@ const (
 	QueryFrontend          = "QUERY_FRONTEND"
 	Manager                = "MANAGER"
 
-	LokiLimits = "LOKI_LIMITS"
+	LokiConfig = "LOKI_CONFIG"
 
 	// Object storage keys
 	DefaultBucket = "DEFAULT_BUCKET"
@@ -347,11 +389,25 @@ func DefaultBaseTemplate() TemplateMaps {
 				Optional: ptr.To(false),
 			},
 		},
-		LokiOverrides: ParamMap[LokiLimitOverrides]{
-			LokiLimits: {
-				IngestionRateLimitMB: 4,
-				IngestionBurstSizeMB: 6,
-				QueryTimeout:         "3m",
+		LokiOverrides: ParamMap[LokiOverrides]{
+			LokiConfig: LokiOverrides{
+				LokiLimitOverrides: LokiLimitOverrides{
+					IngestionRateLimitMB: 4,
+					IngestionBurstSizeMB: 6,
+					QueryTimeout:         "3m",
+				},
+				Router: LokiComponentSpec{
+					Replicas: 2,
+				},
+				Ingest: LokiComponentSpec{
+					Replicas: 2,
+				},
+				Query: LokiComponentSpec{
+					Replicas: 2,
+				},
+				QueryFrontend: LokiComponentSpec{
+					Replicas: 2,
+				},
 			},
 		},
 	}

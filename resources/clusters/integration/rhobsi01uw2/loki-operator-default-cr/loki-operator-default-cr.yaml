@@ -13,11 +13,9 @@ objects:
   spec:
     limits:
       global:
-        ingestion:
-          ingestionBurstSize: 6
-          ingestionRate: 4
+        ingestion: {}
         queries:
-          queryTimeout: 3m
+          queryTimeout: 5m
     managementState: Managed
     size: ${LOKI_SIZE}
     storage:
@@ -28,6 +26,15 @@ objects:
         name: ${LOKI_STORAGE_SECRET_NAME}
         type: s3
     storageClassName: ${LOKI_STORAGE_CLASS}
+    template:
+      distributor:
+        replicas: 2
+      ingester:
+        replicas: 2
+      querier:
+        replicas: 2
+      queryFrontend:
+        replicas: 2
   status:
     components: {}
     storage: {}

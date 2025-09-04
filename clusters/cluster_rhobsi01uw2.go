@@ -59,5 +59,12 @@ func rhobsi01uw2BuildSteps() []string {
 // rhobsi01uw2TemplateMaps returns template mappings specific to the rhobsi01uw2 integration cluster
 func rhobsi01uw2TemplateMaps() TemplateMaps {
 	// Start with integration base template and override only what's different
-	return DefaultBaseTemplate().Override()
+	lokiOverrides := LokiOverridesMap{
+		LokiConfig: LokiOverrides{
+			LokiLimitOverrides: LokiLimitOverrides{
+				QueryTimeout: "5m",
+			},
+		},
+	}
+	return DefaultBaseTemplate().Override(lokiOverrides)
 }
