@@ -122,7 +122,7 @@ objects:
           - --tenants.config=/etc/observatorium/tenants.yaml
           - --logs.write-timeout=4m0s
           - --server.read-timeout=5m
-          image: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-obs-api:c4febd5e003fafa99d8c299cf2bfbecd4aafd514
+          image: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-obs-api:a8d9c695a510d67f78f01e3a43f71e4c96d13faa
           livenessProbe:
             failureThreshold: 10
             httpGet:
