@@ -14,6 +14,8 @@ objects:
         - hcp-metrics-write
         - hcp-logs-read
         - hcp-logs-write
+        - hcp-probes-read
+        - hcp-probes-write
         subjects:
         - kind: user
           name: service-account-d4045e4b-7b9c-46fc-8af0-5d483d9d205b
@@ -44,6 +46,20 @@ objects:
         - write
         resources:
         - logs
+        tenants:
+        - hcp
+      - name: hcp-probes-read
+        permissions:
+        - read
+        resources:
+        - probes
+        tenants:
+        - hcp
+      - name: hcp-probes-write
+        permissions:
+        - write
+        resources:
+        - probes
         tenants:
         - hcp
   kind: ConfigMap
