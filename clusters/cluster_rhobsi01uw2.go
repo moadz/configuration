@@ -45,7 +45,7 @@ func rhobsi01uw2RBAC() cfgobservatorium.ObservatoriumRBAC {
 	opts := &cfgobservatorium.BindingOpts{}
 	opts.WithServiceAccountName("d4045e4b-7b9c-46fc-8af0-5d483d9d205b").
 		WithTenant(cfgobservatorium.HcpTenant).
-		WithSignals([]cfgobservatorium.Signal{cfgobservatorium.MetricsSignal, cfgobservatorium.LogsSignal}).
+		WithSignals([]cfgobservatorium.Resource{cfgobservatorium.MetricsResource, cfgobservatorium.LogsResource, cfgobservatorium.ProbesResource}).
 		WithPerms([]rbac.Permission{rbac.Read, rbac.Write})
 
 	config := cfgobservatorium.GenerateClusterRBAC(opts)

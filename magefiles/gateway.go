@@ -56,12 +56,16 @@ func (b Build) Gateway(config clusters.ClusterConfig) error {
 		return fmt.Errorf("failed to convert RBAC configuration to YAML: %w", err)
 	}
 
+	deployment := gatewayDeployment(config.Templates, ns, config.AMSUrl)
+	probeEndpoint := fmt.Sprintf("--probes.endpoint=http://synthetics-api.%s.svc.cluster.local:8080/probes", ns)
+	deployment.Spec.Template.Spec.Containers[0].Args = append(deployment.Spec.Template.Spec.Containers[0].Args, probeEndpoint)
+
 	objs := []runtime.Object{
-		gatewayRBAC(clusters.StageMaps, ns, string(rbacYAML)),
-		gatewayDeployment(clusters.StageMaps, ns, config.AMSUrl),
-		createGatewayService(clusters.StageMaps, ns),
+		gatewayRBAC(config.Templates, ns, string(rbacYAML)),
+		deployment,
+		createGatewayService(config.Templates, ns),
 		createTenantSecret(config, ns),
-		createGatewayServiceAccount(clusters.StageMaps, ns),
+		createGatewayServiceAccount(config.Templates, ns),
 	}
 	gen := b.generator(config, gatewayName)
 	template := openshift.WrapInTemplate(objs, metav1.ObjectMeta{
@@ -162,6 +166,18 @@ func gatewayLabels(m clusters.TemplateMaps) (labels map[string]string, selectorL
 }
 
 func gatewayDeployment(m clusters.TemplateMaps, namespace, amsURL string) *appsv1.Deployment {
+	containers := []corev1.Container{
+		createObservatoriumAPIContainer(m, namespace),
+	}
+
+	if _, ok := m.Images[opaAMS]; ok {
+		containers = append(containers, createOPAAMSContainer(m, namespace, amsURL))
+	}
+
+	if _, ok := m.Images[componentJaegerAgent]; ok {
+		containers = append(containers, createJaegerAgentContainer(m))
+	}
+
 	metaLabels, selectorLabels := gatewayLabels(m)
 	replicas := m.Replicas[observatoriumAPI]
 	return &appsv1.Deployment{
@@ -212,11 +228,7 @@ func gatewayDeployment(m clusters.TemplateMaps, namespace, amsURL string) *appsv
 							},
 						},
 					},
-					Containers: []corev1.Container{
-						createObservatoriumAPIContainer(m, namespace),
-						createOPAAMSContainer(m, namespace, amsURL),
-						createJaegerAgentContainer(m),
-					},
+					Containers: containers,
 					Affinity: &corev1.Affinity{
 						PodAntiAffinity: &corev1.PodAntiAffinity{
 							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{

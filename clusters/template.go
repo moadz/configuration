@@ -203,6 +203,11 @@ const (
 	syntheticsApiVersionProd  = "cea7d4656cd0ad338e580cc6ba266264a9938e5c"
 )
 
+const (
+	ObservatoriumImage   = "quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-obs-api"
+	ObservatoriumVersion = "9011fb0ead0c0a7d248cd11945a321fc48df8707"
+)
+
 // Template key constants - exportable template parameter names
 const (
 	// Service and component keys
@@ -249,6 +254,7 @@ func DefaultBaseTemplate() TemplateMaps {
 			Jaeger:                 "registry.redhat.io/rhosdt/jaeger-agent-rhel8:1.57.0-10",
 			ApiCache:               "docker.io/memcached:1.6.17-alpine",
 			MemcachedExporter:      memcachedExporterImage,
+			ObservatoriumAPI:       fmt.Sprintf("%s:%s", ObservatoriumImage, ObservatoriumVersion),
 			SyntheticsAPI:          syntheticsApiImage,
 		},
 		Versions: ParamMap[string]{
@@ -260,8 +266,8 @@ func DefaultBaseTemplate() TemplateMaps {
 			Query:                  thanosVersionProd,
 			QueryFrontend:          thanosVersionProd,
 			ApiCache:               memcachedTag,
-			ObservatoriumAPI:       "9aada65247a07782465beb500323a0e18d7e3d05",
 			SyntheticsAPI:          syntheticsApiVersionProd,
+			ObservatoriumAPI:       ObservatoriumVersion,
 		},
 		LogLevels: ParamMap[string]{
 			StoreDefault:           logLevels[1],
@@ -272,6 +278,7 @@ func DefaultBaseTemplate() TemplateMaps {
 			Query:                  logLevels[1],
 			QueryFrontend:          logLevels[1],
 			SyntheticsAPI:          logLevels[1],
+			ObservatoriumAPI:       logLevels[1],
 		},
 		ResourceRequirements: ParamMap[corev1.ResourceRequirements]{
 			StoreDefault: {
@@ -373,6 +380,7 @@ func DefaultBaseTemplate() TemplateMaps {
 			Query:                  1,
 			QueryFrontend:          1,
 			CompactDefault:         1,
+			ObservatoriumAPI:       2,
 		},
 		StorageSize: ParamMap[v1alpha1.StorageSize]{
 			StoreDefault:           "10Gi",
