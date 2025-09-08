@@ -148,6 +148,7 @@ objects:
           - --whitelist={__name__="cluster:route_metrics_controller_routes_per_shard:max"}
           - --whitelist={__name__="cluster:route_metrics_controller_routes_per_shard:median"}
           - --whitelist={__name__="cluster:route_metrics_controller_routes_per_shard:min"}
+          - --whitelist={__name__="cluster:selinux_warning_controller_selinux_volume_conflict:count"}
           - --whitelist={__name__="cluster:telemetry_selected_series:count"}
           - --whitelist={__name__="cluster:virt_platform_nodes:sum"}
           - --whitelist={__name__="cluster:vmi_request_cpu_cores:sum"}
@@ -293,6 +294,7 @@ objects:
           - --whitelist={__name__="type:tempo_operator_tempostack_multi_tenancy:sum",type=~"static|openshift|disabled"}
           - --whitelist={__name__="type:tempo_operator_tempostack_storage_backend:sum",type=~"azure|gcs|s3"}
           - --whitelist={__name__="vendor_model:node_accelerator_cards:sum",vendor=~"NVIDIA|AMD|GAUDI|INTEL|QUALCOMM"}
+          - --whitelist={__name__="vendor_model:node_accelerator_cards:sum",vendor=~"NVIDIA|AMD|GAUDI|INTEL|QUALCOMM|Marvell|Mellanox"}
           - --whitelist={__name__="workload:cpu_usage_cores:sum"}
           - --whitelist={__name__="workload:memory_usage_bytes:sum"}
           - --whitelist={__name__=~"cluster:usage:.*"}
@@ -449,6 +451,7 @@ objects:
           - --whitelist={__name__="cluster:route_metrics_controller_routes_per_shard:max"}
           - --whitelist={__name__="cluster:route_metrics_controller_routes_per_shard:median"}
           - --whitelist={__name__="cluster:route_metrics_controller_routes_per_shard:min"}
+          - --whitelist={__name__="cluster:selinux_warning_controller_selinux_volume_conflict:count"}
           - --whitelist={__name__="cluster:telemetry_selected_series:count"}
           - --whitelist={__name__="cluster:virt_platform_nodes:sum"}
           - --whitelist={__name__="cluster:vmi_request_cpu_cores:sum"}
@@ -594,6 +597,7 @@ objects:
           - --whitelist={__name__="type:tempo_operator_tempostack_multi_tenancy:sum",type=~"static|openshift|disabled"}
           - --whitelist={__name__="type:tempo_operator_tempostack_storage_backend:sum",type=~"azure|gcs|s3"}
           - --whitelist={__name__="vendor_model:node_accelerator_cards:sum",vendor=~"NVIDIA|AMD|GAUDI|INTEL|QUALCOMM"}
+          - --whitelist={__name__="vendor_model:node_accelerator_cards:sum",vendor=~"NVIDIA|AMD|GAUDI|INTEL|QUALCOMM|Marvell|Mellanox"}
           - --whitelist={__name__="workload:cpu_usage_cores:sum"}
           - --whitelist={__name__="workload:memory_usage_bytes:sum"}
           - --whitelist={__name__=~"cluster:usage:.*"}

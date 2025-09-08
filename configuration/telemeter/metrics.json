@@ -54,6 +54,7 @@
   "{__name__=\"cluster:route_metrics_controller_routes_per_shard:max\"}",
   "{__name__=\"cluster:route_metrics_controller_routes_per_shard:median\"}",
   "{__name__=\"cluster:route_metrics_controller_routes_per_shard:min\"}",
+  "{__name__=\"cluster:selinux_warning_controller_selinux_volume_conflict:count\"}",
   "{__name__=\"cluster:telemetry_selected_series:count\"}",
   "{__name__=\"cluster:virt_platform_nodes:sum\"}",
   "{__name__=\"cluster:vmi_request_cpu_cores:sum\"}",
@@ -199,6 +200,7 @@
   "{__name__=\"type:tempo_operator_tempostack_multi_tenancy:sum\",type=~\"static|openshift|disabled\"}",
   "{__name__=\"type:tempo_operator_tempostack_storage_backend:sum\",type=~\"azure|gcs|s3\"}",
   "{__name__=\"vendor_model:node_accelerator_cards:sum\",vendor=~\"NVIDIA|AMD|GAUDI|INTEL|QUALCOMM\"}",
+  "{__name__=\"vendor_model:node_accelerator_cards:sum\",vendor=~\"NVIDIA|AMD|GAUDI|INTEL|QUALCOMM|Marvell|Mellanox\"}",
   "{__name__=\"workload:cpu_usage_cores:sum\"}",
   "{__name__=\"workload:memory_usage_bytes:sum\"}",
   "{__name__=~\"cluster:usage:.*\"}"
