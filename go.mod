@@ -15,8 +15,10 @@ require (
 	github.com/observatorium/observatorium v0.0.0-20250205114057-5a240b5d0bec
 	github.com/observatorium/up v0.0.0-20240109115132-3a34c4c4fa24
 	github.com/openshift/api v3.9.0+incompatible
+	github.com/perses/promql-builder v0.1.1-0.20250701065948-b9977cb8da59
 	github.com/philipgough/mimic v0.0.0-20250112154247-23e51fe097ae
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.84.0
+	github.com/prometheus/prometheus v1.8.2-0.20220211202545-56e14463bccf
 	github.com/pyrra-dev/pyrra v0.7.2
 	github.com/thanos-community/thanos-operator v0.0.0-20250505082510-dc27793644ad
 	github.com/thanos-io/objstore v0.0.0-20241111205755-d1dd89d41f97
@@ -175,7 +177,6 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.63.0 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
-	github.com/prometheus/prometheus v1.8.2-0.20220211202545-56e14463bccf // indirect
 	github.com/prometheus/sigv4 v0.1.2 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/redis/rueidis v1.0.61 // indirect

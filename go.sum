@@ -1215,6 +1215,8 @@ github.com/oracle/oci-go-sdk/v65 v65.93.1/go.mod h1:u6XRPsw9tPziBh76K7GrrRXPa8P8
 github.com/ovh/go-ovh v1.7.0 h1:V14nF7FwDjQrZt9g7jzcvAAQ3HN6DNShRFRMC3jLoPw=
 github.com/ovh/go-ovh v1.7.0/go.mod h1:cTVDnl94z4tl8pP1uZ/8jlVxntjSIf09bNcQ5TJSC7c=
 github.com/pborman/getopt v0.0.0-20170112200414-7148bc3a4c30/go.mod h1:85jBQOZwpVEaDAr341tbn15RS4fCAsIst0qp7i8ex1o=
+github.com/perses/promql-builder v0.1.1-0.20250701065948-b9977cb8da59 h1:9sgdUYDjZHGJ1NRXcHjd6dEI540vcCRWB55IlygjPAA=
+github.com/perses/promql-builder v0.1.1-0.20250701065948-b9977cb8da59/go.mod h1:jIIdR4K7bnKa3HQfIhhnia4JpyabxNyjACnEqdQbGkg=
 github.com/philipgough/mimic v0.0.0-20250112154247-23e51fe097ae h1:gVta72edrfZlBSJZQFtUHuhwUWsruo/xGYuYw0CFsXs=
 github.com/philipgough/mimic v0.0.0-20250112154247-23e51fe097ae/go.mod h1:77oIx2ozDojDKUhCVOw4KHTVwl7fsiN/NZ6q+0MLJwI=
 github.com/phpdave11/gofpdf v1.4.2/go.mod h1:zpO6xFn9yxo3YLyMvW8HcKWVdbNqgIfOOp2dXMnm1mY=
