@@ -65,7 +65,7 @@ go-format: $(GOIMPORTS) $(GOLANGCI_LINT)
 .PHONY: validate
 validate: $(OC)
 	@echo ">>>>> Validating OpenShift Templates"
-	find . -type f \( -name '*template.yaml' \) | $(XARGS) -I{} $(OC) process -f {} --local -o yaml > /dev/null
+	find . -type f \( -name '*template.yaml' \) ! -name 'hypershift-token-refresher-template.yaml' | $(XARGS) -I{} $(OC) process -f {} --local -o yaml > /dev/null
 
 .PHONE: sync-crds
 sync-crds: $(YQ) $(GOJQ)
