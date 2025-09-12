@@ -91,10 +91,8 @@ objects:
               type: drop
               drop:
                 - test:
-                    - match:
-                        - key: kubernetes.namespace_name
-                          operator: notEqual
-                          value: openshift-logging
+                    - field: ".kubernetes.namespace_name"
+                      notMatches: "^openshift-logging$"
           pipelines:
             - name: logging-to-loki
               inputRefs:
