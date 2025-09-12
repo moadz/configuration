@@ -1,0 +1,115 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-logging-cluster-log-forwarder
+  annotations:
+    description: "Template for deploying CLF for HCP to support log forwarding to RHOBS"
+parameters:
+  - name: REGION
+    description: region of SC/MC clusters
+    required: true
+
+objects:
+- apiVersion: hive.openshift.io/v1
+  kind: SelectorSyncSet
+  metadata:
+    labels:
+      managed.openshift.io/osd: 'true'
+    name: rhobs-logs-cluster-log-forwarder
+  spec:
+    resourceApplyMode: Sync
+    clusterDeploymentSelector:
+      matchLabels:
+        api.openshift.com/managed: 'true'
+      matchExpressions:
+        - key: api.openshift.com/fedramp
+          operator: NotIn
+          values:
+            - 'true'
+        - key: ext-hypershift.openshift.io/cluster-type
+          operator: In
+          values:
+            - management-cluster
+            - service-cluster
+        - key: ext-hypershift.openshift.io/cluster-region
+          operator: In
+          values:
+            - ${REGION}
+
+    resources:
+      - apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: rhobs-logs
+          namespace: openshift-logging
+      - apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: rhobs-logs-collect-application-logs
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: collect-application-logs
+        subjects:
+        - kind: ServiceAccount
+          name: rhobs-logs
+          namespace: openshift-logging
+      - apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: rhobs-logs-collect-infrastructure-logs
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: collect-infrastructure-logs
+        subjects:
+        - kind: ServiceAccount
+          name: rhobs-logs
+          namespace: openshift-logging
+      - apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: rhobs-logs-collect-audit-logs
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: collect-audit-logs
+        subjects:
+        - kind: ServiceAccount
+          name: rhobs-logs
+          namespace: openshift-logging
+      - apiVersion: observability.openshift.io/v1
+        kind: ClusterLogForwarder
+        metadata:
+          name: rhobs
+          namespace: openshift-logging
+        spec:
+          serviceAccount:
+            name: rhobs-logs
+          filters:
+            - name: drop-not-logging-ns
+              type: drop
+              drop:
+                - test:
+                    - match:
+                        - key: kubernetes.namespace_name
+                          operator: notEqual
+                          value: openshift-logging
+          pipelines:
+            - name: logging-to-loki
+              inputRefs:
+                - application
+              filterRefs:
+                - drop-not-logging-ns
+              outputRefs:
+                - loki-remote
+          outputs:
+            - name: loki-remote
+              type: loki
+              loki:
+                url: http://token-refresher.openshift-logging.svc:8080/api/logs/v1/hcp
+                labelKeys:
+                  - log_type
+                  - kubernetes.namespace_name
+                  - kubernetes.pod_name
+
