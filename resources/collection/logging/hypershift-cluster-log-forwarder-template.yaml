@@ -86,19 +86,10 @@ objects:
         spec:
           serviceAccount:
             name: rhobs-logs
-          filters:
-            - name: drop-not-logging-ns
-              type: drop
-              drop:
-                - test:
-                    - field: ".kubernetes.namespace_name"
-                      notMatches: "^openshift-logging$"
           pipelines:
             - name: logging-to-loki
               inputRefs:
                 - application
-              filterRefs:
-                - drop-not-logging-ns
               outputRefs:
                 - loki-remote
           outputs:
