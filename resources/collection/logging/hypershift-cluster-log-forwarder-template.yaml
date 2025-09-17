@@ -94,11 +94,6 @@ objects:
                 - loki-remote
           outputs:
             - name: loki-remote
-              type: loki
-              loki:
-                url: http://token-refresher.openshift-logging.svc:80/api/logs/v1/hcp
-                labelKeys:
-                  - log_type
-                  - kubernetes.namespace_name
-                  - kubernetes.pod_name
-
+              type: otlp
+              otlp:
+                url: http://token-refresher.openshift-logging.svc:80/api/logs/v1/hcp/otlp/v1/logs
