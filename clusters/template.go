@@ -415,15 +415,15 @@ func DefaultBaseTemplate() TemplateMaps {
 		LokiOverrides: ParamMap[LokiOverrides]{
 			LokiConfig: LokiOverrides{
 				LokiLimitOverrides: LokiLimitOverrides{
-					IngestionRateLimitMB: 4,
+					IngestionRateLimitMB: 12,
 					IngestionBurstSizeMB: 16,
 					QueryTimeout:         "3m",
 				},
 				Router: LokiComponentSpec{
-					Replicas: 2,
+					Replicas: 3,
 				},
 				Ingest: LokiComponentSpec{
-					Replicas: 2,
+					Replicas: 3,
 				},
 				Query: LokiComponentSpec{
 					Replicas: 2,

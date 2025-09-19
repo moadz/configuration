@@ -15,7 +15,7 @@ objects:
       global:
         ingestion:
           ingestionBurstSize: 16
-          ingestionRate: 4
+          ingestionRate: 12
         queries:
           queryTimeout: 5m
     managementState: Managed
@@ -30,9 +30,9 @@ objects:
     storageClassName: ${LOKI_STORAGE_CLASS}
     template:
       distributor:
-        replicas: 2
+        replicas: 3
       ingester:
-        replicas: 2
+        replicas: 3
       querier:
         replicas: 2
       queryFrontend:
