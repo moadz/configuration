@@ -90,6 +90,8 @@ objects:
         metadata:
           name: rhobs
           namespace: openshift-logging
+          annotations:
+            logging.openshift.io/tech-preview-otlp: "enabled"
         spec:
           serviceAccount:
             name: rhobs-logs
