@@ -13,7 +13,9 @@ objects:
   spec:
     limits:
       global:
-        ingestion: {}
+        ingestion:
+          ingestionBurstSize: 16
+          ingestionRate: 4
         queries:
           queryTimeout: 5m
     managementState: Managed

@@ -148,7 +148,7 @@ func (l LokiOverridesMap) Apply(t TemplateMaps) TemplateMaps {
 
 		// Merge the override with existing values
 		merged := LokiOverrides{
-			LokiLimitOverrides: v.LokiLimitOverrides, // Always use override values for limits
+			LokiLimitOverrides: mergeLokiLimitOverrides(existing.LokiLimitOverrides, v.LokiLimitOverrides),
 			Router:             mergeComponentSpec(existing.Router, v.Router),
 			Ingest:             mergeComponentSpec(existing.Ingest, v.Ingest),
 			Query:              mergeComponentSpec(existing.Query, v.Query),
@@ -165,6 +165,21 @@ func mergeComponentSpec(existing, override LokiComponentSpec) LokiComponentSpec 
 	result := existing
 	if override.Replicas != 0 {
 		result.Replicas = override.Replicas
+	}
+	return result
+}
+
+// mergeLokiLimitOverrides merges two LokiLimitOverrides, using override values when non-zero/non-empty
+func mergeLokiLimitOverrides(existing, override LokiLimitOverrides) LokiLimitOverrides {
+	result := existing
+	if override.IngestionRateLimitMB != 0 {
+		result.IngestionRateLimitMB = override.IngestionRateLimitMB
+	}
+	if override.IngestionBurstSizeMB != 0 {
+		result.IngestionBurstSizeMB = override.IngestionBurstSizeMB
+	}
+	if override.QueryTimeout != "" {
+		result.QueryTimeout = override.QueryTimeout
 	}
 	return result
 }
@@ -401,7 +416,7 @@ func DefaultBaseTemplate() TemplateMaps {
 			LokiConfig: LokiOverrides{
 				LokiLimitOverrides: LokiLimitOverrides{
 					IngestionRateLimitMB: 4,
-					IngestionBurstSizeMB: 6,
+					IngestionBurstSizeMB: 16,
 					QueryTimeout:         "3m",
 				},
 				Router: LokiComponentSpec{
