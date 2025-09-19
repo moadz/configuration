@@ -8,6 +8,9 @@ parameters:
   - name: REGION
     description: region of SC/MC clusters
     required: true
+  - name: SECTOR
+    description: sector of SC/MC clusters
+    required: true
 
 objects:
 - apiVersion: hive.openshift.io/v1
@@ -35,6 +38,10 @@ objects:
           operator: In
           values:
             - ${REGION}
+        - key: ext-hypershift.openshift.io/cluster-sector
+          operator: In
+          values:
+            - ${SECTOR}
 
     resources:
       - apiVersion: v1

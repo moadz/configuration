@@ -7,6 +7,8 @@ metadata:
 parameters:
   - name: REGION
     description: region of SC/MC clusters
+  - name: SECTOR
+    description: sector of SC/MC clusters
     required: true
   - name: CLIENT_ID
     description: "OIDC client ID"
@@ -44,6 +46,10 @@ objects:
           operator: In
           values:
             - ${REGION}
+        - key: ext-hypershift.openshift.io/cluster-sector
+          operator: In
+          values:
+            - ${SECTOR}
 
     resources:
       - apiVersion: v1
