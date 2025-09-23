@@ -302,13 +302,9 @@ func DefaultBaseTemplate() TemplateMaps {
 				},
 			},
 			ReceiveIngestorDefault: {
-				Limits: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("200m"),
-					corev1.ResourceMemory: resource.MustParse("512Mi"),
-				},
 				Requests: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("100m"),
-					corev1.ResourceMemory: resource.MustParse("256Mi"),
+					corev1.ResourceCPU:    resource.MustParse("4"),
+					corev1.ResourceMemory: resource.MustParse("28Gi"),
 				},
 			},
 			Ruler: {
