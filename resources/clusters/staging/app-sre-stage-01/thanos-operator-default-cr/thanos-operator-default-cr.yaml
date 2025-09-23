@@ -447,12 +447,9 @@ objects:
           optional: false
         replicas: 3
         resourceRequirements:
-          limits:
-            cpu: 200m
-            memory: 512Mi
           requests:
-            cpu: 100m
-            memory: 256Mi
+            cpu: "4"
+            memory: 28Gi
         storageSize: 10Gi
         storeLimitsOptions: {}
         tenancyConfig:
