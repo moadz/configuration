@@ -62,20 +62,6 @@ objects:
         - probes
         tenants:
         - hcp
-      - name: hcp-probes-read
-        permissions:
-        - read
-        resources:
-        - probes
-        tenants:
-        - hcp
-      - name: hcp-probes-write
-        permissions:
-        - write
-        resources:
-        - probes
-        tenants:
-        - hcp
   kind: ConfigMap
   metadata:
     annotations:

@@ -57,7 +57,7 @@ func (b Build) Gateway(config clusters.ClusterConfig) error {
 	}
 
 	deployment := gatewayDeployment(config.Templates, ns, config.AMSUrl)
-	probeEndpoint := fmt.Sprintf("--probes.endpoint=http://synthetics-api.%s.svc.cluster.local:8080/probes", ns)
+	probeEndpoint := fmt.Sprintf("--probes.endpoint=http://synthetics-api.%s.svc.cluster.local:8080", ns)
 	deployment.Spec.Template.Spec.Containers[0].Args = append(deployment.Spec.Template.Spec.Containers[0].Args, probeEndpoint)
 
 	objs := []runtime.Object{
