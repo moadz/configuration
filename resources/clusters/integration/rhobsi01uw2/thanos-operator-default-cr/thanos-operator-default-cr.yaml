@@ -449,7 +449,7 @@ objects:
         resourceRequirements:
           requests:
             cpu: "4"
-            memory: 28Gi
+            memory: 20Gi
         storageSize: 10Gi
         storeLimitsOptions: {}
         tenancyConfig:
