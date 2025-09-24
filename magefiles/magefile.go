@@ -13,8 +13,10 @@ import (
 type (
 	Stage      mg.Namespace
 	Production mg.Namespace
-	Build      mg.Namespace
 	Unified    mg.Namespace
+
+	Build mg.Namespace
+	List  mg.Namespace
 )
 
 const (
@@ -94,6 +96,7 @@ func (b Build) executeSteps(steps []string, cfg clusters.ClusterConfig) error {
 	return nil
 }
 
+// Clusters Builds manifests for all registered clusters
 func (b Build) Clusters() error {
 	clusterConfigs := clusters.GetClusters()
 	if len(clusterConfigs) == 0 {
@@ -108,7 +111,7 @@ func (b Build) Clusters() error {
 	return nil
 }
 
-// BuildCluster builds manifests for a specific cluster by name
+// Cluster Builds manifests for a specific cluster
 func (b Build) Cluster(clusterName string) error {
 	cluster, err := clusters.GetClusterByName(clusters.ClusterName(clusterName))
 	if err != nil {
@@ -118,7 +121,7 @@ func (b Build) Cluster(clusterName string) error {
 	return b.executeSteps(cluster.BuildSteps, *cluster)
 }
 
-// BuildEnvironment builds manifests for all clusters in a specific environment
+// Environment Builds manifests for all clusters in a specific environment
 func (b Build) Environment(environment string) error {
 	env := clusters.ClusterEnvironment(environment)
 	if !env.IsValid() {
@@ -138,16 +141,16 @@ func (b Build) Environment(environment string) error {
 	return nil
 }
 
-// ListAvailableSteps lists all available build steps
-func (b Build) List() {
+// Steps Shows all available build steps
+func (l List) Steps() {
 	fmt.Fprintln(os.Stdout, "Available build steps:")
 	for step := range BuildStepFunctions {
 		fmt.Fprintf(os.Stdout, "  - %s\n", step)
 	}
 }
 
-// ListClusterSteps shows the build steps for each registered cluster
-func (b Build) ListClusters() {
+// Clusters lists all registered clusters and their build steps
+func (l List) Clusters() {
 	clusterConfigs := clusters.GetClusters()
 	if len(clusterConfigs) == 0 {
 		fmt.Fprintln(os.Stdout, "No clusters registered")
