@@ -67,12 +67,6 @@ validate: $(OC)
 	@echo ">>>>> Validating OpenShift Templates"
 	find . -type f \( -name '*template.yaml' \) ! -name 'hypershift-token-refresher-template.yaml' ! -name 'hypershift-cluster-log-forwarder-template.yaml' | $(XARGS) -I{} $(OC) process -f {} --local -o yaml > /dev/null
 
-.PHONE: sync-crds
-sync-crds: $(YQ) $(GOJQ)
-	@curl https://raw.githubusercontent.com/grafana/loki/main/operator/bundle/community/manifests/loki.grafana.com_alertingrules.yaml | $(YQ) eval -j > $(CRD_DIR)/loki.grafana.com_alertingrules.libsonnet
-	@curl https://raw.githubusercontent.com/grafana/loki/main/operator/bundle/community/manifests/loki.grafana.com_recordingrules.yaml | $(YQ) eval -j > $(CRD_DIR)/loki.grafana.com_recordingrules.libsonnet
-	$(MAKE) format
-
 .PHONY: prometheusrules
 prometheusrules: resources/observability/prometheusrules
 	$(MAKE) clean
@@ -195,14 +189,6 @@ resources/.tmp/tenants/rbac.json: configuration/observatorium/rbac.go
 .PHONY: mimic
 mimic:
 	GOFLAGS="-mod=mod" go run ./mimic.go generate -o resources
-
-# In theory we'd be able to run Pyrra as a CLI directly.
-# PYRRA_DIR := $(shell pwd)/test
-#
-# .PHONY: docker-pyrra
-# docker-pyrra:
-# 	@chmod -R 777 $(PYRRA_DIR)
-# 	docker run -v $(PYRRA_DIR):/shared -i ghcr.io/pyrra-dev/pyrra:main generate --config-files=/shared/pyrra/*.yaml --prometheus-folder=/shared/rules/ --generic-rules
 
 # Tools
 $(TMP_DIR):

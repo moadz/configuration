@@ -112,7 +112,7 @@ objects:
     name: alertmanager
     namespace: rhobs-stage
   spec:
-    replicas: ${{ALERTMANAGER_REPLICAS}}
+    replicas: 2
     selector:
       matchLabels:
         app.kubernetes.io/component: alertmanager
@@ -154,7 +154,7 @@ objects:
           - --cluster.peer=alertmanager-0.alertmanager-cluster.rhobs-stage.svc.cluster.local:9094
           - --cluster.peer=alertmanager-1.alertmanager-cluster.rhobs-stage.svc.cluster.local:9094
           - --cluster.reconnect-timeout=5m0s
-          - --log.level=${ALERTMANAGER_LOG_LEVEL}
+          - --log.level=warn
           - --log.format=logfmt
           image: registry.redhat.io/openshift4/ose-prometheus-alertmanager:v4.15
           imagePullPolicy: IfNotPresent
@@ -182,10 +182,10 @@ objects:
           resources:
             limits:
               cpu: "5"
-              memory: ${ALERTMANAGER_MEMORY_LIMIT}
+              memory: 5Gi
             requests:
-              cpu: ${ALERTMANAGER_CPU_REQUEST}
-              memory: ${ALERTMANAGER_MEMORY_REQUEST}
+              cpu: 100m
+              memory: 256Mi
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
           - mountPath: /data
@@ -260,16 +260,6 @@ objects:
     availableReplicas: 0
     replicas: 0
 parameters:
-- name: ALERTMANAGER_CPU_REQUEST
-  value: 100m
-- name: ALERTMANAGER_LOG_LEVEL
-  value: warn
-- name: ALERTMANAGER_MEMORY_LIMIT
-  value: 5Gi
-- name: ALERTMANAGER_MEMORY_REQUEST
-  value: 256Mi
-- name: ALERTMANAGER_REPLICAS
-  value: "2"
 - from: '[a-zA-Z0-9]{40}'
   generate: expression
   name: OAUTH_PROXY_COOKIE_SECRET

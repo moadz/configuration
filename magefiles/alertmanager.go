@@ -15,8 +15,6 @@ import (
 	"github.com/philipgough/mimic/encoding"
 	monv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
-	"github.com/rhobs/configuration/services_go/observatorium"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -200,17 +198,16 @@ func alertmanagerPostProcess(manifests []runtime.Object, namespace string) encod
 		},
 	})
 
-	// Set encoders and template params
-	params := []templatev1.Parameter{}
-	params = append(params, templatev1.Parameter{
-		Name:     "OAUTH_PROXY_COOKIE_SECRET",
-		Generate: "expression",
-		From:     "[a-zA-Z0-9]{40}",
-	})
-	alertEncoder := observatorium.NewStdTemplateYAML(alertManagerName, "ALERTMANAGER").WithLogLevel()
-	params = append(params, alertEncoder.TemplateParams()...)
-	template := openshift.WrapInTemplate(manifests, metav1.ObjectMeta{
-		Name: alertManagerName,
-	}, sortTemplateParams(params))
-	return alertEncoder.Wrap(encoding.GhodssYAML(template))
+	return encoding.GhodssYAML(
+		openshift.WrapInTemplate(
+			manifests,
+			metav1.ObjectMeta{Name: alertManagerName},
+			[]templatev1.Parameter{
+				{
+					Name:     "OAUTH_PROXY_COOKIE_SECRET",
+					Generate: "expression",
+					From:     `[a-zA-Z0-9]{40}`,
+				},
+			},
+		))
 }
