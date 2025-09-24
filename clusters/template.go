@@ -318,8 +318,8 @@ func DefaultBaseTemplate() TemplateMaps {
 			},
 			ReceiveIngestorDefault: {
 				Requests: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("4"),
-					corev1.ResourceMemory: resource.MustParse("20Gi"),
+					corev1.ResourceCPU:    resource.MustParse("2"),
+					corev1.ResourceMemory: resource.MustParse("15Gi"),
 				},
 			},
 			Ruler: {

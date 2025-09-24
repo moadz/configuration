@@ -448,8 +448,8 @@ objects:
         replicas: 3
         resourceRequirements:
           requests:
-            cpu: "4"
-            memory: 20Gi
+            cpu: "2"
+            memory: 15Gi
         storageSize: 10Gi
         storeLimitsOptions: {}
         tenancyConfig:
