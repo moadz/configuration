@@ -448,7 +448,7 @@ objects:
         replicas: 3
         resourceRequirements:
           requests:
-            cpu: "4"
+            cpu: "2"
             memory: 20Gi
         storageSize: 10Gi
         storeLimitsOptions: {}
