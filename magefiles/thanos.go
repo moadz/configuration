@@ -152,48 +152,6 @@ func (s Stage) Thanos() {
 	gen.Generate()
 }
 
-// Thanos Generates the RHOBS-specific CRs for Thanos Operator for a local environment.
-func (l Local) Thanos() {
-	templateDir := "rhobs-thanos-operator"
-
-	gen := l.generator(templateDir)
-
-	var objs []runtime.Object
-
-	objs = append(objs, receiveCR(l.namespace(), clusters.LocalMaps))
-	objs = append(objs, queryCR(l.namespace(), clusters.LocalMaps, false)...)
-	objs = append(objs, rulerCR(l.namespace(), clusters.LocalMaps))
-	objs = append(objs, compactCR(l.namespace(), clusters.LocalMaps, false)...)
-	objs = append(objs, storeCR(l.namespace(), clusters.LocalMaps)...)
-
-	// Sort objects by Kind then Name
-	sort.Slice(objs, func(i, j int) bool {
-		iMeta := objs[i].(metav1.Object)
-		jMeta := objs[j].(metav1.Object)
-		iType := objs[i].GetObjectKind().GroupVersionKind().Kind
-		jType := objs[j].GetObjectKind().GroupVersionKind().Kind
-
-		if iType != jType {
-			return iType < jType
-		}
-		return iMeta.GetName() < jMeta.GetName()
-	})
-
-	gen.Add("rhobs.yaml", encoding.GhodssYAML(
-		objs[0],
-		objs[1],
-		objs[2],
-		objs[3],
-		objs[4],
-		objs[5],
-		objs[6],
-		objs[7],
-		objs[8],
-	))
-
-	gen.Generate()
-}
-
 // tracingSidecar is the jaeger-agent sidecar container for tracing.
 func tracingSidecar(m clusters.TemplateMaps) corev1.Container {
 	return corev1.Container{

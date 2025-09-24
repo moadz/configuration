@@ -8,6 +8,7 @@ import (
 	templatev1 "github.com/openshift/api/template/v1"
 	"github.com/philipgough/mimic"
 	"github.com/philipgough/mimic/encoding"
+	"github.com/rhobs/configuration/clusters"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -18,8 +19,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/utils/ptr"
-
-	"github.com/rhobs/configuration/clusters"
 )
 
 const (
@@ -50,13 +49,6 @@ func (p Production) CRDS() error {
 // https://github.com/thanos-community/thanos-operator/tree/main/config/crd/bases
 func (s Stage) CRDS() error {
 	return crds(s.generator(crdTemplateDir), clusters.StageMaps)
-}
-
-// CRDS Generates the CRDs for the Thanos operator for a local environment.
-// This is synced from the latest upstream main at:
-// https://github.com/thanos-community/thanos-operator/tree/main/config/crd/bases
-func (l Local) CRDS() error {
-	return crds(l.generator(crdTemplateDir), clusters.StageMaps)
 }
 
 func crds(gen *mimic.Generator, templates clusters.TemplateMaps) error {
@@ -141,13 +133,6 @@ func operator(namespace string, gen *mimic.Generator, m clusters.TemplateMaps) {
 	))
 
 	gen.Generate()
-}
-
-// Operator Generates the Thanos Operator Manager resources for a local environment.
-func (l Local) Operator() {
-	gen := l.generator("operator")
-	templates := clusters.LocalMaps
-	operator(l.namespace(), gen, templates)
 }
 
 func operatorResources(namespace string, m clusters.TemplateMaps) []runtime.Object {

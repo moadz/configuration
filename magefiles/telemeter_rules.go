@@ -39,34 +39,6 @@ func (s Stage) TelemeterRules() {
 	gen.Generate()
 }
 
-// TelemeterRules generates the Rules for telemetry for a local environment.
-func (l Local) TelemeterRules() {
-	rules := monitoringv1.PrometheusRule{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "monitoring.coreos.com/v1",
-			Kind:       "PrometheusRule",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "telemeter-rules",
-			Namespace: l.namespace(),
-			Labels: map[string]string{
-				"operator.thanos.io/prometheus-rule": "true",
-				"app.kubernetes.io/name":             "telemeter",
-				"app.kubernetes.io/part-of":          "rhobs",
-				"app.kubernetes.io/component":        "rules",
-			},
-		},
-		Spec: monitoringv1.PrometheusRuleSpec{
-			Groups: rules(),
-		},
-	}
-
-	gen := l.generator("rhobs-thanos-operator")
-	encoder := encoding.GhodssYAML(rules)
-	gen.Add("telemeter-rules.yaml", encoder)
-	gen.Generate()
-}
-
 func rules() []monitoringv1.RuleGroup {
 	interval := monitoringv1.Duration("4m")
 	tenantLbls := map[string]string{"tenant_id": "FB870BF3-9F3A-44FF-9BF7-D7A047A52F43"}

@@ -13,7 +13,6 @@ import (
 type (
 	Stage      mg.Namespace
 	Production mg.Namespace
-	Local      mg.Namespace
 	Build      mg.Namespace
 	Unified    mg.Namespace
 )
@@ -166,11 +165,6 @@ func (Stage) Build() {
 	mg.SerialDeps(Stage.Alertmanager, Stage.CRDS, Stage.Operator, Stage.Thanos, Stage.TelemeterRules, Stage.ServiceMonitors, Stage.Secrets)
 }
 
-// Build Builds the manifests for a local environment.
-func (Local) Build() {
-	mg.SerialDeps(Local.CRDS, Local.Operator, Local.Thanos, Local.TelemeterRules, Local.ServiceMonitors, Local.Secrets)
-}
-
 func (Build) generator(config clusters.ClusterConfig, component string) *mimic.Generator {
 	gen := &mimic.Generator{}
 	gen = gen.With(templatePath, templateClustersPath, string(config.Environment), string(config.Name), component)
@@ -192,13 +186,6 @@ func (Production) generator(component string) *mimic.Generator {
 	return gen
 }
 
-func (Local) generator(component string) *mimic.Generator {
-	gen := &mimic.Generator{}
-	gen = gen.With(templatePath, templateServicesPath, component, "local")
-	gen.Logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
-	return gen
-}
-
 func (Unified) generator(component string) *mimic.Generator {
 	gen := &mimic.Generator{}
 	gen = gen.With(templatePath, templateServicesPath)
@@ -209,7 +196,6 @@ func (Unified) generator(component string) *mimic.Generator {
 const (
 	stageNamespace = "rhobs-stage"
 	prodNamespace  = "rhobs-production"
-	localNamespace = "rhobs-local"
 )
 
 func (Stage) namespace() string {
@@ -218,10 +204,6 @@ func (Stage) namespace() string {
 
 func (Production) namespace() string {
 	return prodNamespace
-}
-
-func (Local) namespace() string {
-	return localNamespace
 }
 
 // Build Builds the manifests for the production environment.

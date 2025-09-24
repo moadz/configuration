@@ -50,16 +50,6 @@ func serviceMonitorTemplateGen(gen *mimic.Generator, objs []runtime.Object) {
 	gen.Generate()
 }
 
-func (l Local) ServiceMonitors() {
-	gen := l.generator("servicemonitors")
-
-	objs := thanosOperatorServiceMonitor(l.namespace())
-
-	encoder := encoding.GhodssYAML(objs[0])
-	gen.Add("servicemonitors.yaml", encoder)
-	gen.Generate()
-}
-
 func thanosOperatorServiceMonitor(namespace string) []runtime.Object {
 	return []runtime.Object{
 		&monitoringv1.ServiceMonitor{

@@ -150,22 +150,6 @@ func (b Build) Secrets(config clusters.ClusterConfig) {
 	gen.Generate()
 }
 
-// Secrets generates the secrets for the Local environment
-func (l Local) Secrets() {
-	templateDir := "objstore"
-	gen := l.generator(templateDir)
-
-	gen.Add("thanos-telemeter-secret.yaml", encoding.GhodssYAML(
-		localThanosObjectStore("thanos-objectstorage", l.namespace()),
-	))
-
-	gen.Add("thanos-default-secret.yaml", encoding.GhodssYAML(
-		localThanosObjectStore("observatorium-mst-thanos-objectstorage", l.namespace()),
-	))
-
-	gen.Generate()
-}
-
 func cacheSecretsStage(namespace string) []*corev1.Secret {
 	redisClientConfig := cacheutil.DefaultRedisClientConfig
 	redisClientConfig.Addr = "${INDEX_CACHE_ADDR}:${INDEX_CACHE_PORT}"
