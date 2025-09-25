@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/rhobs/configuration/clusters"
 
+	"github.com/bwplotka/mimic"
+	"github.com/bwplotka/mimic/encoding"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	templatev1 "github.com/openshift/api/template/v1"
-	"github.com/philipgough/mimic"
-	"github.com/philipgough/mimic/encoding"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 
 	appsv1 "k8s.io/api/apps/v1"

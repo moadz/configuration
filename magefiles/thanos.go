@@ -4,11 +4,11 @@ import (
 	"log"
 	"sort"
 
+	"github.com/bwplotka/mimic/encoding"
 	kghelpers "github.com/observatorium/observatorium/configuration_go/kubegen/helpers"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	routev1 "github.com/openshift/api/route/v1"
 	templatev1 "github.com/openshift/api/template/v1"
-	"github.com/philipgough/mimic/encoding"
 	"github.com/rhobs/configuration/clusters"
 	"github.com/thanos-community/thanos-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"

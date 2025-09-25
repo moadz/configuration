@@ -5,7 +5,7 @@ go 1.24.0
 toolchain go1.24.6
 
 require (
-	github.com/bwplotka/mimic v0.2.1-0.20230303101552-f705cca2f4a4
+	github.com/bwplotka/mimic v0.2.1-0.20250807101815-4c21956e840a
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-kit/log v0.2.1
 	github.com/grafana/loki/operator/apis/loki v0.0.0-20241021105923-5e970e50b166
@@ -14,7 +14,6 @@ require (
 	github.com/observatorium/observatorium v0.0.0-20250205114057-5a240b5d0bec
 	github.com/openshift/api v3.9.0+incompatible
 	github.com/perses/promql-builder v0.1.1-0.20250701065948-b9977cb8da59
-	github.com/philipgough/mimic v0.0.0-20250112154247-23e51fe097ae
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.84.0
 	github.com/prometheus/prometheus v1.8.2-0.20220211202545-56e14463bccf
 	github.com/pyrra-dev/pyrra v0.7.2

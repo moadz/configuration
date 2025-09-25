@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/bwplotka/mimic"
+	"github.com/bwplotka/mimic/encoding"
 	"github.com/ghodss/yaml"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	templatev1 "github.com/openshift/api/template/v1"
-	"github.com/philipgough/mimic"
-	"github.com/philipgough/mimic/encoding"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
 	cfgobservatorium "github.com/rhobs/configuration/configuration/observatorium"

@@ -3,12 +3,12 @@ package main
 import (
 	"time"
 
+	"github.com/bwplotka/mimic"
+	"github.com/bwplotka/mimic/encoding"
 	promqlbuilder "github.com/perses/promql-builder"
 	"github.com/perses/promql-builder/label"
 	"github.com/perses/promql-builder/matrix"
 	"github.com/perses/promql-builder/vector"
-	"github.com/philipgough/mimic"
-	"github.com/philipgough/mimic/encoding"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
 )

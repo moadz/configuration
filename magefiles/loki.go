@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/bwplotka/mimic/encoding"
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	templatev1 "github.com/openshift/api/template/v1"
-	"github.com/philipgough/mimic/encoding"
 	"github.com/rhobs/configuration/clusters"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

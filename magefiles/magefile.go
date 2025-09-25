@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bwplotka/mimic"
 	"github.com/go-kit/log"
 	"github.com/magefile/mage/mg"
-	"github.com/philipgough/mimic"
 	"github.com/rhobs/configuration/clusters"
 )
 

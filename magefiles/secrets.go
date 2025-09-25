@@ -6,11 +6,11 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/bwplotka/mimic"
+	"github.com/bwplotka/mimic/encoding"
 	"github.com/go-kit/log"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	templatev1 "github.com/openshift/api/template/v1"
-	"github.com/philipgough/mimic"
-	"github.com/philipgough/mimic/encoding"
 	"github.com/rhobs/configuration/clusters"
 	"github.com/thanos-io/objstore/client"
 	"github.com/thanos-io/objstore/providers/s3"
