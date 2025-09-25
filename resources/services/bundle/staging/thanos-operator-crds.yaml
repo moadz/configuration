@@ -219,7 +219,7 @@ objects:
                           Cannot be updated.
                         items:
                           description: EnvFromSource represents the source of a set
-                            of ConfigMaps
+                            of ConfigMaps or Secrets
                           properties:
                             configMapRef:
                               description: The ConfigMap to select from
@@ -240,8 +240,8 @@ objects:
                               type: object
                               x-kubernetes-map-type: atomic
                             prefix:
-                              description: An optional identifier to prepend to each
-                                key in the ConfigMap. Must be a C_IDENTIFIER.
+                              description: Optional text to prepend to the name of
+                                each environment variable. Must be a C_IDENTIFIER.
                               type: string
                             secretRef:
                               description: The Secret to select from
@@ -505,6 +505,12 @@ objects:
                                 - port
                                 type: object
                             type: object
+                          stopSignal:
+                            description: |-
+                              StopSignal defines which signal will be sent to a container when it is being stopped.
+                              If not specified, the default is defined by the container runtime in use.
+                              StopSignal can only be set for Pods with a non-empty .spec.os.name
+                            type: string
                         type: object
                       livenessProbe:
                         description: |-
@@ -2705,7 +2711,7 @@ objects:
                           The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                           The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
                           The volume will be mounted read-only (ro) and non-executable files (noexec).
-                          Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+                          Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                           The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                         properties:
                           pullPolicy:
@@ -3853,7 +3859,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -3868,7 +3873,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -4035,7 +4039,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                   Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -4050,7 +4053,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                   Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -4215,7 +4217,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -4230,7 +4231,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -4397,7 +4397,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                   Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -4412,7 +4411,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                   Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -4533,14 +4531,14 @@ objects:
                       default: 1m
                       description: BlockViewerGlobalSyncInterval for syncing the blocks
                         between local and remote view for /global Block Viewer UI.
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     blockViewerGlobalSyncTimeout:
                       default: 5m
                       description: |-
                         BlockViewerGlobalSyncTimeout is the maximum time for syncing the blocks
                         between local and remote view for /global Block Viewer UI.
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                   type: object
                 compactConfig:
@@ -4552,7 +4550,7 @@ objects:
                       description: |-
                         ConsistencyDelay is the minimum age of fresh (non-compacted) blocks before they are being processed.
                         Malformed blocks older than the maximum of consistency-delay and 48h0m0s will be removed.
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     blockFetchConcurrency:
                       default: 1
@@ -4567,7 +4565,7 @@ objects:
                         that are marked for deletion.
                         Cleaning happens at the end of an iteration.
                         Setting this to 0s disables the cleanup.
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     compactConcurrency:
                       default: 1
@@ -4602,16 +4600,16 @@ objects:
                   description: DownsamplingConfig is the downsampling configuration
                     for the compact component.
                   properties:
+                    disable:
+                      default: false
+                      description: Disable downsampling.
+                      type: boolean
                     downsamplingConcurrency:
                       default: 1
                       description: Concurrency is the number of goroutines to use
                         when downsampling blocks.
                       format: int32
                       type: integer
-                    downsamplingEnabled:
-                      default: false
-                      description: Disable downsampling.
-                      type: boolean
                   type: object
                 featureGates:
                   default:
@@ -4720,18 +4718,6 @@ objects:
                   - warn
                   - error
                   type: string
-                maxTime:
-                  description: |-
-                    Maximum time range to serve. Any data after this upper time range will be ignored.
-                    If not set, will be set as max value, so all blocks will be served.
-                  pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
-                  type: string
-                minTime:
-                  description: |-
-                    Minimum time range to serve. Any data earlier than this lower time range will be ignored.
-                    If not set, will be set as zero value, so most recent blocks will be served.
-                  pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
-                  type: string
                 nodeSelector:
                   additionalProperties:
                     type: string
@@ -4836,7 +4822,7 @@ objects:
                         FiveMinutes is the retention configuration for samples of resolution 1 (5 minutes).
                         This configures how long to retain samples of resolution 1 (5 minutes) in storage.
                         The default value is 0d, which means these samples are retained indefinitely.
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     oneHour:
                       default: 0d
@@ -4844,7 +4830,7 @@ objects:
                         OneHour is the retention configuration for samples of resolution 2 (1 hour).
                         This configures how long to retain samples of resolution 2 (1 hour) in storage.
                         The default value is 0d, which means these samples are retained indefinitely.
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     raw:
                       default: 0d
@@ -4852,7 +4838,7 @@ objects:
                         Raw is the retention configuration for the raw samples.
                         This configures how long to retain raw samples in the storage.
                         The default value is 0d, which means samples are retained indefinitely.
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                   required:
                   - fiveMinutes
@@ -4862,59 +4848,66 @@ objects:
                 shardingConfig:
                   description: ShardingConfig is the sharding configuration for the
                     compact component.
-                  properties:
-                    externalLabelSharding:
-                      description: ExternalLabelSharding is the sharding configuration
-                        based on explicit external labels and their values.
-                      items:
-                        description: "ExternalLabelShardingConfig defines the sharding
-                          configuration based on explicit external labels and their
-                          values.\nThe keys are the external labels to shard on and
-                          the values are the values (as regular expressions) to shard
-                          on.\nEach value will be a configured and deployed as a separate
-                          compact component.\nFor example, if the 'label' is set to
-                          `tenant_id` with values `tenant-a` and `!tenant-a`\ntwo
-                          compact components will be deployed.\nThe resulting compact
-                          StatefulSets will have an appropriate --selection.relabel-config
-                          flag set to the value of the external label sharding.\nAnd
-                          named such that:\n\n\t\tThe first compact component will
-                          have the name {ThanosCompact.Name}-{shardName}-0 with the
-                          flag\n\t    --selector.relabel-config=\n\t       - source_labels:\n\t
-                          \        - tenant_id\n\t         regex: 'tenant-a'\n\t         action:
-                          keep\n\n\t\tThe second compact component will have the name
-                          {ThanosCompact.Name}-{shardName}-1 with the flag\n\t    --selector.relabel-config=\n\t
-                          \      - source_labels:\n\t         - tenant_id\n\t         regex:
-                          '!tenant-a'\n\t         action: keep"
-                        properties:
-                          label:
-                            description: Label is the external label to shard on.
-                            type: string
-                          shardName:
-                            description: |-
-                              ShardName is the name of the shard.
-                              ShardName is used to identify the shard in the compact component.
-                            type: string
-                          values:
-                            description: Values are the values (as regular expressions)
-                              to shard on.
-                            items:
+                  items:
+                    description: ShardingConfig defines the sharding configuration
+                      for the compact component.
+                    properties:
+                      externalLabelSharding:
+                        description: |-
+                          ExternalLabelSharding is the sharding configuration based on explicit external labels and their values.
+                          Configuration is ANDed together per shard
+                        items:
+                          description: ExternalLabelShardingConfig defines the sharding
+                            configuration based on explicit external labels and their
+                            values.
+                          properties:
+                            label:
+                              description: Label is the external label to shard on.
                               type: string
-                            type: array
-                        required:
-                        - label
-                        - shardName
-                        - values
-                        type: object
-                      type: array
-                      x-kubernetes-list-map-keys:
-                      - shardName
-                      x-kubernetes-list-type: map
-                  type: object
+                            value:
+                              description: Value is the value (as regular expression)
+                                to shard on.
+                              type: string
+                          required:
+                          - label
+                          - value
+                          type: object
+                        type: array
+                      shardName:
+                        description: |-
+                          ShardName is the name of the shard.
+                          ShardName is used to identify the shard in the compact component.
+                        type: string
+                    required:
+                    - externalLabelSharding
+                    - shardName
+                    type: object
+                  type: array
+                  x-kubernetes-list-map-keys:
+                  - shardName
+                  x-kubernetes-list-type: map
                 storageSize:
                   description: StorageSize is the size of the storage to be used by
                     the Thanos Compact StatefulSets.
                   pattern: ^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                   type: string
+                timeRangeConfig:
+                  description: TimeRangeConfig configures the time range of data to
+                    serve for the compact component..
+                  properties:
+                    maxTime:
+                      description: |-
+                        Maximum time range to serve. Any data after this upper time range will be ignored.
+                        If not set, will be set as max value, so all blocks will be served.
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
+                      type: string
+                    minTime:
+                      description: |-
+                        Minimum time range to serve. Any data earlier than this lower time range will be ignored.
+                        If not set, will be set as zero value, so most recent blocks will be served.
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
+                      type: string
+                  type: object
                 tolerations:
                   description: Tolerations defines the workloads tolerations if specified.
                   items:
@@ -4970,7 +4963,7 @@ objects:
               properties:
                 conditions:
                   description: Conditions represent the latest available observations
-                    of the state of the hashring.
+                    of the state of the Compactor.
                   items:
                     description: Condition contains details for one aspect of the
                       current state of this API Resource.
@@ -5027,6 +5020,40 @@ objects:
                     - type
                     type: object
                   type: array
+                paused:
+                  description: Paused is the flag to pause the Compactor.
+                  type: boolean
+                shardStatuses:
+                  additionalProperties:
+                    properties:
+                      availableReplicas:
+                        description: Total number of available pods (ready for at
+                          least minReadySeconds) targeted by this StatefulSet.
+                        format: int32
+                        type: integer
+                      currentReplicas:
+                        description: currentReplicas is the number of Pods created
+                          by the StatefulSet.
+                        format: int32
+                        type: integer
+                      readyReplicas:
+                        description: ReadyReplicas is the number of pods created for
+                          this StatefulSet with a Ready Condition.
+                        format: int32
+                        type: integer
+                      replicas:
+                        description: Replicas is the number of replicas of the StatefulSet.
+                        format: int32
+                        type: integer
+                      updatedReplicas:
+                        description: ' Total number of non-terminating pods targeted
+                          by StatefulSet that have the desired template spec..'
+                        format: int32
+                        type: integer
+                    type: object
+                  description: ShardStatuses is the status of the shards in the compact
+                    component.
+                  type: object
               type: object
           type: object
       served: true
@@ -5254,7 +5281,7 @@ objects:
                           Cannot be updated.
                         items:
                           description: EnvFromSource represents the source of a set
-                            of ConfigMaps
+                            of ConfigMaps or Secrets
                           properties:
                             configMapRef:
                               description: The ConfigMap to select from
@@ -5275,8 +5302,8 @@ objects:
                               type: object
                               x-kubernetes-map-type: atomic
                             prefix:
-                              description: An optional identifier to prepend to each
-                                key in the ConfigMap. Must be a C_IDENTIFIER.
+                              description: Optional text to prepend to the name of
+                                each environment variable. Must be a C_IDENTIFIER.
                               type: string
                             secretRef:
                               description: The Secret to select from
@@ -5540,6 +5567,12 @@ objects:
                                 - port
                                 type: object
                             type: object
+                          stopSignal:
+                            description: |-
+                              StopSignal defines which signal will be sent to a container when it is being stopped.
+                              If not specified, the default is defined by the container runtime in use.
+                              StopSignal can only be set for Pods with a non-empty .spec.os.name
+                            type: string
                         type: object
                       livenessProbe:
                         description: |-
@@ -7740,7 +7773,7 @@ objects:
                           The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                           The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
                           The volume will be mounted read-only (ro) and non-executable files (noexec).
-                          Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+                          Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                           The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                         properties:
                           pullPolicy:
@@ -8888,7 +8921,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -8903,7 +8935,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -9070,7 +9101,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                   Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -9085,7 +9115,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                   Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -9250,7 +9279,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -9265,7 +9293,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -9432,7 +9459,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                   Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -9447,7 +9473,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                   Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -9888,7 +9913,7 @@ objects:
                               Cannot be updated.
                             items:
                               description: EnvFromSource represents the source of
-                                a set of ConfigMaps
+                                a set of ConfigMaps or Secrets
                               properties:
                                 configMapRef:
                                   description: The ConfigMap to select from
@@ -9909,8 +9934,8 @@ objects:
                                   type: object
                                   x-kubernetes-map-type: atomic
                                 prefix:
-                                  description: An optional identifier to prepend to
-                                    each key in the ConfigMap. Must be a C_IDENTIFIER.
+                                  description: Optional text to prepend to the name
+                                    of each environment variable. Must be a C_IDENTIFIER.
                                   type: string
                                 secretRef:
                                   description: The Secret to select from
@@ -10174,6 +10199,12 @@ objects:
                                     - port
                                     type: object
                                 type: object
+                              stopSignal:
+                                description: |-
+                                  StopSignal defines which signal will be sent to a container when it is being stopped.
+                                  If not specified, the default is defined by the container runtime in use.
+                                  StopSignal can only be set for Pods with a non-empty .spec.os.name
+                                type: string
                             type: object
                           livenessProbe:
                             description: |-
@@ -12382,7 +12413,7 @@ objects:
                               The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                               The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
                               The volume will be mounted read-only (ro) and non-executable files (noexec).
-                              Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+                              Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                               The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                             properties:
                               pullPolicy:
@@ -13540,7 +13571,6 @@ objects:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                           Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         items:
                                           type: string
                                         type: array
@@ -13555,7 +13585,6 @@ objects:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                           Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         items:
                                           type: string
                                         type: array
@@ -13722,7 +13751,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -13737,7 +13765,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -13902,7 +13929,6 @@ objects:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                           Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         items:
                                           type: string
                                         type: array
@@ -13917,7 +13943,6 @@ objects:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                           Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         items:
                                           type: string
                                         type: array
@@ -14084,7 +14109,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -14099,7 +14123,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -14224,7 +14247,7 @@ objects:
                     labelsDefaultTimeRange:
                       description: LabelsDefaultTimeRange sets the default time range
                         for label queries
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     labelsMaxRetries:
                       default: 5
@@ -14235,7 +14258,7 @@ objects:
                     labelsSplitInterval:
                       description: LabelsSplitInterval sets the split interval for
                         labels
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     logFormat:
                       default: logfmt
@@ -14255,7 +14278,7 @@ objects:
                     logQueriesLongerThan:
                       description: LogQueriesLongerThan sets the duration threshold
                         for logging long queries
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     nodeSelector:
                       additionalProperties:
@@ -14369,7 +14392,7 @@ objects:
                     queryRangeSplitInterval:
                       description: QueryRangeSplitInterval sets the split interval
                         for query range
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                     replicas:
                       default: 1
@@ -14661,7 +14684,9 @@ objects:
               - replicas
               type: object
             status:
-              description: ThanosQueryStatus defines the observed state of ThanosQuery
+              description: |-
+                ThanosQueryStatus defines the observed state of ThanosQuery
+                Includes reconciliation state, deployment status, pod status, and last reconciled statistics.
               properties:
                 conditions:
                   description: Conditions represent the latest available observations
@@ -14722,6 +14747,77 @@ objects:
                     - type
                     type: object
                   type: array
+                paused:
+                  description: Paused is the flag to pause the Querier.
+                  type: boolean
+                querierStatus:
+                  description: Querier is the status of the Querier.
+                  properties:
+                    availableReplicas:
+                      description: Total number of available pods (ready for at least
+                        minReadySeconds) targeted by this Deployment.
+                      format: int32
+                      type: integer
+                    readyReplicas:
+                      description: ReadyReplicas is the number of pods created for
+                        this Deployment with a Ready Condition.
+                      format: int32
+                      type: integer
+                    replicas:
+                      description: Replicas is the number of replicas of the Deployment.
+                      format: int32
+                      type: integer
+                    unavailableReplicas:
+                      description: UnavailableReplicas is the number of pods that
+                        are needed for Deployment to have 100% capacity.
+                      format: int32
+                      type: integer
+                    updatedReplicas:
+                      description: UpdatedReplicas is the number of Pods created by
+                        the Deployment.
+                      format: int32
+                      type: integer
+                  required:
+                  - availableReplicas
+                  - readyReplicas
+                  - replicas
+                  - unavailableReplicas
+                  - updatedReplicas
+                  type: object
+                queryFrontendStatus:
+                  description: QueryFrontend is the status of the Query Frontend.
+                  properties:
+                    availableReplicas:
+                      description: Total number of available pods (ready for at least
+                        minReadySeconds) targeted by this Deployment.
+                      format: int32
+                      type: integer
+                    readyReplicas:
+                      description: ReadyReplicas is the number of pods created for
+                        this Deployment with a Ready Condition.
+                      format: int32
+                      type: integer
+                    replicas:
+                      description: Replicas is the number of replicas of the Deployment.
+                      format: int32
+                      type: integer
+                    unavailableReplicas:
+                      description: UnavailableReplicas is the number of pods that
+                        are needed for Deployment to have 100% capacity.
+                      format: int32
+                      type: integer
+                    updatedReplicas:
+                      description: UpdatedReplicas is the number of Pods created by
+                        the Deployment.
+                      format: int32
+                      type: integer
+                  required:
+                  - availableReplicas
+                  - readyReplicas
+                  - replicas
+                  - unavailableReplicas
+                  - updatedReplicas
+                  type: object
               type: object
           type: object
       served: true
@@ -15007,7 +15103,7 @@ objects:
                               Cannot be updated.
                             items:
                               description: EnvFromSource represents the source of
-                                a set of ConfigMaps
+                                a set of ConfigMaps or Secrets
                               properties:
                                 configMapRef:
                                   description: The ConfigMap to select from
@@ -15028,8 +15124,8 @@ objects:
                                   type: object
                                   x-kubernetes-map-type: atomic
                                 prefix:
-                                  description: An optional identifier to prepend to
-                                    each key in the ConfigMap. Must be a C_IDENTIFIER.
+                                  description: Optional text to prepend to the name
+                                    of each environment variable. Must be a C_IDENTIFIER.
                                   type: string
                                 secretRef:
                                   description: The Secret to select from
@@ -15293,6 +15389,12 @@ objects:
                                     - port
                                     type: object
                                 type: object
+                              stopSignal:
+                                description: |-
+                                  StopSignal defines which signal will be sent to a container when it is being stopped.
+                                  If not specified, the default is defined by the container runtime in use.
+                                  StopSignal can only be set for Pods with a non-empty .spec.os.name
+                                type: string
                             type: object
                           livenessProbe:
                             description: |-
@@ -17501,7 +17603,7 @@ objects:
                               The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                               The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
                               The volume will be mounted read-only (ro) and non-executable files (noexec).
-                              Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+                              Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                               The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                             properties:
                               pullPolicy:
@@ -18692,7 +18794,6 @@ objects:
                                                 pod labels will be ignored. The default value is empty.
                                                 The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                 Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                               items:
                                                 type: string
                                               type: array
@@ -18707,7 +18808,6 @@ objects:
                                                 pod labels will be ignored. The default value is empty.
                                                 The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                 Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                               items:
                                                 type: string
                                               type: array
@@ -18876,7 +18976,6 @@ objects:
                                             pod labels will be ignored. The default value is empty.
                                             The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                             Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                           items:
                                             type: string
                                           type: array
@@ -18891,7 +18990,6 @@ objects:
                                             pod labels will be ignored. The default value is empty.
                                             The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                             Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                           items:
                                             type: string
                                           type: array
@@ -19058,7 +19156,6 @@ objects:
                                                 pod labels will be ignored. The default value is empty.
                                                 The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                 Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                               items:
                                                 type: string
                                               type: array
@@ -19073,7 +19170,6 @@ objects:
                                                 pod labels will be ignored. The default value is empty.
                                                 The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                 Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                               items:
                                                 type: string
                                               type: array
@@ -19242,7 +19338,6 @@ objects:
                                             pod labels will be ignored. The default value is empty.
                                             The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                             Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                           items:
                                             type: string
                                           type: array
@@ -19257,7 +19352,6 @@ objects:
                                             pod labels will be ignored. The default value is empty.
                                             The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                             Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                           items:
                                             type: string
                                           type: array
@@ -19360,6 +19454,14 @@ objects:
                               blocks.
                             minProperties: 1
                             type: object
+                          grpcCompression:
+                            default: snappy
+                            description: GRPCCompression defines the compression algorithm
+                              for gRPC communication.
+                            enum:
+                            - none
+                            - snappy
+                            type: string
                           imagePullPolicy:
                             default: IfNotPresent
                             description: |-
@@ -19639,7 +19741,7 @@ objects:
                             description: |-
                               TooFarInFutureTimeWindow is the allowed time window for ingesting samples too far in the future.
                               0s means disabled.
-                            pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                            pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                             type: string
                           tsdbConfig:
                             description: TSDB configuration for the ingestor.
@@ -19648,7 +19750,7 @@ objects:
                                 default: 2h
                                 description: Retention is the duration for which a
                                   particular TSDB will retain data.
-                                pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                                pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                                 type: string
                             required:
                             - retention
@@ -19858,7 +19960,7 @@ objects:
                               Cannot be updated.
                             items:
                               description: EnvFromSource represents the source of
-                                a set of ConfigMaps
+                                a set of ConfigMaps or Secrets
                               properties:
                                 configMapRef:
                                   description: The ConfigMap to select from
@@ -19879,8 +19981,8 @@ objects:
                                   type: object
                                   x-kubernetes-map-type: atomic
                                 prefix:
-                                  description: An optional identifier to prepend to
-                                    each key in the ConfigMap. Must be a C_IDENTIFIER.
+                                  description: Optional text to prepend to the name
+                                    of each environment variable. Must be a C_IDENTIFIER.
                                   type: string
                                 secretRef:
                                   description: The Secret to select from
@@ -20144,6 +20246,12 @@ objects:
                                     - port
                                     type: object
                                 type: object
+                              stopSignal:
+                                description: |-
+                                  StopSignal defines which signal will be sent to a container when it is being stopped.
+                                  If not specified, the default is defined by the container runtime in use.
+                                  StopSignal can only be set for Pods with a non-empty .spec.os.name
+                                type: string
                             type: object
                           livenessProbe:
                             description: |-
@@ -22352,7 +22460,7 @@ objects:
                               The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                               The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
                               The volume will be mounted read-only (ro) and non-executable files (noexec).
-                              Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+                              Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                               The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                             properties:
                               pullPolicy:
@@ -23510,7 +23618,6 @@ objects:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                           Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         items:
                                           type: string
                                         type: array
@@ -23525,7 +23632,6 @@ objects:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                           Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         items:
                                           type: string
                                         type: array
@@ -23692,7 +23798,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -23707,7 +23812,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -23872,7 +23976,6 @@ objects:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                           Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         items:
                                           type: string
                                         type: array
@@ -23887,7 +23990,6 @@ objects:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                           Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         items:
                                           type: string
                                         type: array
@@ -24054,7 +24156,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -24069,7 +24170,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -24164,6 +24264,14 @@ objects:
                         to the ingesters.
                       minProperties: 1
                       type: object
+                    hashringPolicy:
+                      default: static
+                      description: HashringPolicy defines the policy for how the hashring
+                        is built and maintained at runtime.
+                      enum:
+                      - static
+                      - dynamic
+                      type: string
                     imagePullPolicy:
                       default: IfNotPresent
                       description: |-
@@ -24240,6 +24348,14 @@ objects:
                       - 5
                       format: int32
                       type: integer
+                    replicationProtocol:
+                      default: grpc
+                      description: ReplicationProtocol is the protocol for remote
+                        write replication.
+                      enum:
+                      - grpc
+                      - capnproto
+                      type: string
                     resourceRequirements:
                       description: ResourceRequirements for the Thanos component container.
                       properties:
@@ -24364,7 +24480,7 @@ objects:
               properties:
                 conditions:
                   description: Conditions represent the latest available observations
-                    of the state of the hashring.
+                    of the state of the ThanosReceive CRD.
                   items:
                     description: Condition contains details for one aspect of the
                       current state of this API Resource.
@@ -24421,6 +24537,75 @@ objects:
                     - type
                     type: object
                   type: array
+                hashringStatus:
+                  additionalProperties:
+                    properties:
+                      availableReplicas:
+                        description: Total number of available pods (ready for at
+                          least minReadySeconds) targeted by this StatefulSet.
+                        format: int32
+                        type: integer
+                      currentReplicas:
+                        description: currentReplicas is the number of Pods created
+                          by the StatefulSet.
+                        format: int32
+                        type: integer
+                      readyReplicas:
+                        description: ReadyReplicas is the number of pods created for
+                          this StatefulSet with a Ready Condition.
+                        format: int32
+                        type: integer
+                      replicas:
+                        description: Replicas is the number of replicas of the StatefulSet.
+                        format: int32
+                        type: integer
+                      updatedReplicas:
+                        description: ' Total number of non-terminating pods targeted
+                          by StatefulSet that have the desired template spec..'
+                        format: int32
+                        type: integer
+                    type: object
+                  description: HashringStatus is a map of ingester statuses to hashring
+                    names.
+                  type: object
+                paused:
+                  description: Paused is a flag that indicates if the ThanosReceive
+                    is paused.
+                  type: boolean
+                routerStatus:
+                  description: RouterStatus is the status of the Receive router.
+                  properties:
+                    availableReplicas:
+                      description: Total number of available pods (ready for at least
+                        minReadySeconds) targeted by this Deployment.
+                      format: int32
+                      type: integer
+                    readyReplicas:
+                      description: ReadyReplicas is the number of pods created for
+                        this Deployment with a Ready Condition.
+                      format: int32
+                      type: integer
+                    replicas:
+                      description: Replicas is the number of replicas of the Deployment.
+                      format: int32
+                      type: integer
+                    unavailableReplicas:
+                      description: UnavailableReplicas is the number of pods that
+                        are needed for Deployment to have 100% capacity.
+                      format: int32
+                      type: integer
+                    updatedReplicas:
+                      description: UpdatedReplicas is the number of Pods created by
+                        the Deployment.
+                      format: int32
+                      type: integer
+                  required:
+                  - availableReplicas
+                  - readyReplicas
+                  - replicas
+                  - unavailableReplicas
+                  - updatedReplicas
+                  type: object
               type: object
           type: object
       served: true
@@ -24648,7 +24833,7 @@ objects:
                           Cannot be updated.
                         items:
                           description: EnvFromSource represents the source of a set
-                            of ConfigMaps
+                            of ConfigMaps or Secrets
                           properties:
                             configMapRef:
                               description: The ConfigMap to select from
@@ -24669,8 +24854,8 @@ objects:
                               type: object
                               x-kubernetes-map-type: atomic
                             prefix:
-                              description: An optional identifier to prepend to each
-                                key in the ConfigMap. Must be a C_IDENTIFIER.
+                              description: Optional text to prepend to the name of
+                                each environment variable. Must be a C_IDENTIFIER.
                               type: string
                             secretRef:
                               description: The Secret to select from
@@ -24934,6 +25119,12 @@ objects:
                                 - port
                                 type: object
                             type: object
+                          stopSignal:
+                            description: |-
+                              StopSignal defines which signal will be sent to a container when it is being stopped.
+                              If not specified, the default is defined by the container runtime in use.
+                              StopSignal can only be set for Pods with a non-empty .spec.os.name
+                            type: string
                         type: object
                       livenessProbe:
                         description: |-
@@ -27134,7 +27325,7 @@ objects:
                           The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                           The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
                           The volume will be mounted read-only (ro) and non-executable files (noexec).
-                          Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+                          Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                           The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                         properties:
                           pullPolicy:
@@ -28282,7 +28473,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -28297,7 +28487,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -28464,7 +28653,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                   Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -28479,7 +28667,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                   Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -28644,7 +28831,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -28659,7 +28845,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -28826,7 +29011,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                   Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -28841,7 +29025,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                   Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -28967,7 +29150,7 @@ objects:
                   default: 1m
                   description: EvaluationInterval is the default interval at which
                     rules are evaluated.
-                  pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                  pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                   type: string
                 externalLabels:
                   additionalProperties:
@@ -29269,7 +29452,7 @@ objects:
                   default: 2h
                   description: Retention is the duration for which the Thanos Rule
                     StatefulSet will retain data.
-                  pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                  pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                   type: string
                 ruleConfigSelector:
                   description: |-
@@ -29321,6 +29504,26 @@ objects:
                       type: object
                   type: object
                   x-kubernetes-map-type: atomic
+                ruleTenancyConfig:
+                  description: RuleTenancyConfig is the configuration for the rule
+                    tenancy.
+                  properties:
+                    tenantLabel:
+                      description: |-
+                        TenantLabel is the label that will be used to identify the tenant.
+                        Setting this value will mean, that all rules configured on ThanosRuler will
+                        have this labelname (with value to set the tenant label value).
+                        effectively <tenantLabelName> = <value of tenantValueLabel key>
+                      type: string
+                    tenantValueLabel:
+                      description: |-
+                        TenantValueLabel is the key of the PrometheusRule label that will be used to set the value of the tenant label
+                        for particular rules configured on ThanosRuler.
+                      type: string
+                  required:
+                  - tenantLabel
+                  - tenantValueLabel
+                  type: object
                 storageSize:
                   description: StorageSize is the size of the storage to be used by
                     the Thanos Ruler StatefulSet.
@@ -29383,6 +29586,11 @@ objects:
             status:
               description: ThanosRulerStatus defines the observed state of ThanosRuler
               properties:
+                availableReplicas:
+                  description: Total number of available pods (ready for at least
+                    minReadySeconds) targeted by this StatefulSet.
+                  format: int32
+                  type: integer
                 conditions:
                   description: Conditions represent the latest available observations
                     of the state of the Ruler.
@@ -29442,6 +29650,28 @@ objects:
                     - type
                     type: object
                   type: array
+                currentReplicas:
+                  description: currentReplicas is the number of Pods created by the
+                    StatefulSet.
+                  format: int32
+                  type: integer
+                paused:
+                  description: Paused is a flag that indicates if the Ruler is paused.
+                  type: boolean
+                readyReplicas:
+                  description: ReadyReplicas is the number of pods created for this
+                    StatefulSet with a Ready Condition.
+                  format: int32
+                  type: integer
+                replicas:
+                  description: Replicas is the number of replicas of the StatefulSet.
+                  format: int32
+                  type: integer
+                updatedReplicas:
+                  description: ' Total number of non-terminating pods targeted by
+                    StatefulSet that have the desired template spec..'
+                  format: int32
+                  type: integer
               type: object
           type: object
       served: true
@@ -29669,7 +29899,7 @@ objects:
                           Cannot be updated.
                         items:
                           description: EnvFromSource represents the source of a set
-                            of ConfigMaps
+                            of ConfigMaps or Secrets
                           properties:
                             configMapRef:
                               description: The ConfigMap to select from
@@ -29690,8 +29920,8 @@ objects:
                               type: object
                               x-kubernetes-map-type: atomic
                             prefix:
-                              description: An optional identifier to prepend to each
-                                key in the ConfigMap. Must be a C_IDENTIFIER.
+                              description: Optional text to prepend to the name of
+                                each environment variable. Must be a C_IDENTIFIER.
                               type: string
                             secretRef:
                               description: The Secret to select from
@@ -29955,6 +30185,12 @@ objects:
                                 - port
                                 type: object
                             type: object
+                          stopSignal:
+                            description: |-
+                              StopSignal defines which signal will be sent to a container when it is being stopped.
+                              If not specified, the default is defined by the container runtime in use.
+                              StopSignal can only be set for Pods with a non-empty .spec.os.name
+                            type: string
                         type: object
                       livenessProbe:
                         description: |-
@@ -32155,7 +32391,7 @@ objects:
                           The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                           The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
                           The volume will be mounted read-only (ro) and non-executable files (noexec).
-                          Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+                          Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                           The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                         properties:
                           pullPolicy:
@@ -33303,7 +33539,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -33318,7 +33553,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -33485,7 +33719,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                   Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -33500,7 +33733,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                   Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -33665,7 +33897,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -33680,7 +33911,6 @@ objects:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     items:
                                       type: string
                                     type: array
@@ -33847,7 +34077,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                   Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -33862,7 +34091,6 @@ objects:
                                   pod labels will be ignored. The default value is empty.
                                   The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                   Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                  This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                 items:
                                   type: string
                                 type: array
@@ -34082,7 +34310,7 @@ objects:
                     This ensures store can still serve blocks that are meant to be deleted but do not have a replacement yet.
                     If delete-delay duration is provided to compactor or bucket verify component, it will upload deletion-mark.json
                     file to mark after what duration the block should be deleted rather than deleting the block straight away.
-                  pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                  pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                   type: string
                 imagePullPolicy:
                   default: IfNotPresent
@@ -34185,7 +34413,7 @@ objects:
                       description: If index-header lazy reader is enabled and this
                         idle timeout setting is > 0, memory map-ed index-headers will
                         be automatically released after 'idle timeout' inactivity
-                      pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
                       type: string
                   type: object
                 labels:
@@ -34207,18 +34435,6 @@ objects:
                   - info
                   - warn
                   - error
-                  type: string
-                maxTime:
-                  description: |-
-                    Maximum time range to serve. Any data after this upper time range will be ignored.
-                    If not set, will be set as max value, so all blocks will be served.
-                  pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
-                  type: string
-                minTime:
-                  description: |-
-                    Minimum time range to serve. Any data earlier than this lower time range will be ignored.
-                    If not set, will be set as zero value, so most recent blocks will be served.
-                  pattern: ^-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
                   type: string
                 nodeSelector:
                   additionalProperties:
@@ -34364,6 +34580,23 @@ objects:
                       format: int64
                       type: integer
                   type: object
+                timeRangeConfig:
+                  description: TimeRangeConfig configures the time range of data to
+                    serve for the store component.
+                  properties:
+                    maxTime:
+                      description: |-
+                        Maximum time range to serve. Any data after this upper time range will be ignored.
+                        If not set, will be set as max value, so all blocks will be served.
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
+                      type: string
+                    minTime:
+                      description: |-
+                        Minimum time range to serve. Any data earlier than this lower time range will be ignored.
+                        If not set, will be set as zero value, so most recent blocks will be served.
+                      pattern: ^(-?(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)|([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})))$
+                      type: string
+                  type: object
                 tolerations:
                   description: Tolerations defines the workloads tolerations if specified.
                   items:
@@ -34420,7 +34653,7 @@ objects:
               properties:
                 conditions:
                   description: Conditions represent the latest available observations
-                    of the state of the Querier.
+                    of the state of the Store.
                   items:
                     description: Condition contains details for one aspect of the
                       current state of this API Resource.
@@ -34477,6 +34710,39 @@ objects:
                     - type
                     type: object
                   type: array
+                paused:
+                  description: Paused is a flag that indicates if the Store is paused.
+                  type: boolean
+                shardStatuses:
+                  additionalProperties:
+                    properties:
+                      availableReplicas:
+                        description: Total number of available pods (ready for at
+                          least minReadySeconds) targeted by this StatefulSet.
+                        format: int32
+                        type: integer
+                      currentReplicas:
+                        description: currentReplicas is the number of Pods created
+                          by the StatefulSet.
+                        format: int32
+                        type: integer
+                      readyReplicas:
+                        description: ReadyReplicas is the number of pods created for
+                          this StatefulSet with a Ready Condition.
+                        format: int32
+                        type: integer
+                      replicas:
+                        description: Replicas is the number of replicas of the StatefulSet.
+                        format: int32
+                        type: integer
+                      updatedReplicas:
+                        description: ' Total number of non-terminating pods targeted
+                          by StatefulSet that have the desired template spec..'
+                        format: int32
+                        type: integer
+                    type: object
+                  description: ShardStatuses is a map of shard statuses to shard numbers.
+                  type: object
               type: object
           type: object
       served: true

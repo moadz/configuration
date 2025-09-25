@@ -75,6 +75,7 @@ func (p Production) Thanos() {
 	objs = append(objs, queryCR(ns, clusters.ProductionMaps, true, tmpAdditionalQueryArgs...)...)
 	objs = append(objs, tmpStoreProduction(ns, clusters.ProductionMaps)...)
 	objs = append(objs, compactTempProduction(clusters.ProductionMaps)...)
+	// objs = append(objs, tmpRulerCR(ns, clusters.ProductionMaps))
 
 	// Sort objects by Kind then Name
 	sort.Slice(objs, func(i, j int) bool {
@@ -958,6 +959,76 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 	return []runtime.Object{store0to2w, store2wto90d, store90dplus, storeDefault}
 }
 
+func TmpRulerCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.ThanosRuler {
+	return &v1alpha1.ThanosRuler{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "monitoring.thanos.io/v1alpha1",
+			Kind:       "ThanosRuler",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "telemeter",
+			Namespace: namespace,
+		},
+		Spec: v1alpha1.ThanosRulerSpec{
+			CommonFields: v1alpha1.CommonFields{
+				Image:                ptr.To(clusters.TemplateFn("RULER", templates.Images)),
+				Version:              ptr.To(clusters.TemplateFn("RULER", templates.Versions)),
+				ImagePullPolicy:      ptr.To(corev1.PullIfNotPresent),
+				LogLevel:             ptr.To(clusters.TemplateFn("RULER", templates.LogLevels)),
+				LogFormat:            ptr.To("logfmt"),
+				ResourceRequirements: ptr.To(clusters.TemplateFn("RULER", templates.ResourceRequirements)),
+			},
+			Replicas:    clusters.TemplateFn("RULER", templates.Replicas),
+			StorageSize: string(clusters.TemplateFn("RULER", templates.StorageSize)),
+			FeatureGates: &v1alpha1.FeatureGates{
+				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
+					Enable: ptr.To(false),
+				},
+			},
+			RuleConfigSelector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"operator.thanos.io/rule-file": "true",
+				},
+			},
+			PrometheusRuleSelector: metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"operator.thanos.io/prometheus-rule": "true",
+				},
+			},
+			QueryLabelSelector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"operator.thanos.io/query-api": "true",
+					"app.kubernetes.io/part-of":    "thanos",
+				},
+			},
+			RuleTenancyConfig: &v1alpha1.RuleTenancyConfig{
+				TenantLabel:      "tenant_id",
+				TenantValueLabel: "operator.thanos.io/tenant",
+			},
+			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", templates.ObjectStorageBucket),
+			ExternalLabels: map[string]string{
+				"rule_replica": "$(NAME)",
+			},
+			AlertmanagerURL:    "dnssrv+http://alertmanager-cluster." + namespace + ".svc.cluster.local:9093",
+			AlertLabelDrop:     []string{"rule_replica"},
+			Retention:          v1alpha1.Duration("2h"),
+			EvaluationInterval: v1alpha1.Duration("1m"),
+			Additional: v1alpha1.Additional{
+				Containers: []corev1.Container{
+					tracingSidecar(templates),
+				},
+				Args: []string{
+					`--tracing.config="config":
+  "sampler_param": 2
+  "sampler_type": "ratelimiting"
+  "service_name": "thanos-ruler"
+"type": "JAEGER"`,
+				},
+			},
+		},
+	}
+}
+
 func receiveCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.ThanosReceive {
 	return &v1alpha1.ThanosReceive{
 		TypeMeta: metav1.TypeMeta{
@@ -1542,6 +1613,10 @@ func defaultRulerCR(namespace string, templates clusters.TemplateMaps) runtime.O
 					"app.kubernetes.io/part-of":    "thanos",
 				},
 			},
+			RuleTenancyConfig: &v1alpha1.RuleTenancyConfig{
+				TenantLabel:      "tenant_id",
+				TenantValueLabel: "operator.thanos.io/tenant",
+			},
 			ExternalLabels: map[string]string{
 				"rule_replica": "$(NAME)",
 			},
@@ -1737,7 +1812,6 @@ func rulerCR(namespace string, templates clusters.TemplateMaps) runtime.Object {
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("RULER", templates.ResourceRequirements)),
 			},
-			Paused:   ptr.To(true),
 			Replicas: clusters.TemplateFn("RULER", templates.Replicas),
 			RuleConfigSelector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
@@ -1759,11 +1833,15 @@ func rulerCR(namespace string, templates clusters.TemplateMaps) runtime.Object {
 				"rule_replica": "$(NAME)",
 			},
 			ObjectStorageConfig: clusters.TemplateFn("DEFAULT", templates.ObjectStorageBucket),
-			AlertmanagerURL:     "dnssrv+http://alertmanager-cluster." + namespace + ".svc.cluster.local:9093",
-			AlertLabelDrop:      []string{"rule_replica"},
-			Retention:           v1alpha1.Duration("48h"),
-			EvaluationInterval:  v1alpha1.Duration("1m"),
-			StorageSize:         string(clusters.TemplateFn("RULER", templates.StorageSize)),
+			RuleTenancyConfig: &v1alpha1.RuleTenancyConfig{
+				TenantLabel:      "tenant_id",
+				TenantValueLabel: "operator.thanos.io/tenant",
+			},
+			AlertmanagerURL:    "dnssrv+http://alertmanager-cluster." + namespace + ".svc.cluster.local:9093",
+			AlertLabelDrop:     []string{"rule_replica"},
+			Retention:          v1alpha1.Duration("48h"),
+			EvaluationInterval: v1alpha1.Duration("1m"),
+			StorageSize:        string(clusters.TemplateFn("RULER", templates.StorageSize)),
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(templates),

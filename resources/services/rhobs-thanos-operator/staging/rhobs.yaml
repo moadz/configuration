@@ -97,7 +97,7 @@ objects:
     storeLimitsOptions: {}
     timeRangeConfig:
       maxTime: -22h
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: a5a425269814420c179d51a69a2017ff197baa2e
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosQuery
@@ -187,7 +187,7 @@ objects:
         requests:
           cpu: 100m
           memory: 500Mi
-      version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+      version: a5a425269814420c179d51a69a2017ff197baa2e
     replicaLabels:
     - prometheus_replica
     - replica
@@ -215,10 +215,22 @@ objects:
       - "30"
       - "60"
       - "120"
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: a5a425269814420c179d51a69a2017ff197baa2e
     webConfig:
       prefixHeader: X-Forwarded-Prefix
-  status: {}
+  status:
+    querierStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
+    queryFrontendStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosReceive
   metadata:
@@ -314,7 +326,7 @@ objects:
         tooFarInFutureTimeWindow: 5m
         tsdbConfig:
           retention: 4h
-        version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+        version: a5a425269814420c179d51a69a2017ff197baa2e
       - asyncForwardWorkerCount: 5
         baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
         externalLabels:
@@ -345,7 +357,7 @@ objects:
         tooFarInFutureTimeWindow: 5m
         tsdbConfig:
           retention: 1d
-        version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+        version: a5a425269814420c179d51a69a2017ff197baa2e
     routerSpec:
       additionalArgs:
       - |-
@@ -413,8 +425,14 @@ objects:
         requests:
           cpu: 700m
           memory: 2Gi
-      version: 03c9fefbda1b33830a950bd28484fa0a1e039555
-  status: {}
+      version: a5a425269814420c179d51a69a2017ff197baa2e
+  status:
+    routerStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosRuler
   metadata:
@@ -490,7 +508,6 @@ objects:
     imagePullPolicy: IfNotPresent
     logFormat: logfmt
     logLevel: info
-    paused: true
     prometheusRuleSelector:
       matchLabels:
         operator.thanos.io/prometheus-rule: "true"
@@ -510,8 +527,11 @@ objects:
     ruleConfigSelector:
       matchLabels:
         operator.thanos.io/rule-file: "true"
+    ruleTenancyConfig:
+      tenantLabel: tenant_id
+      tenantValueLabel: operator.thanos.io/tenant
     storageSize: 512Mi
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: a5a425269814420c179d51a69a2017ff197baa2e
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosCompact
@@ -603,7 +623,7 @@ objects:
       oneHour: 14d
       raw: 14d
     storageSize: 512Mi
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: a5a425269814420c179d51a69a2017ff197baa2e
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosStore
@@ -696,7 +716,7 @@ objects:
       type: block
     storageSize: 512Mi
     storeLimitsOptions: {}
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: a5a425269814420c179d51a69a2017ff197baa2e
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosStore
@@ -793,7 +813,7 @@ objects:
       storeLimitsRequestSeries: 1000000
     timeRangeConfig:
       maxTime: -2w
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: a5a425269814420c179d51a69a2017ff197baa2e
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosStore
@@ -893,7 +913,7 @@ objects:
     timeRangeConfig:
       maxTime: -2w
       minTime: -90d
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: a5a425269814420c179d51a69a2017ff197baa2e
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosStore
@@ -990,7 +1010,7 @@ objects:
       storeLimitsRequestSeries: 1000000
     timeRangeConfig:
       minTime: -90d
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: a5a425269814420c179d51a69a2017ff197baa2e
   status: {}
 - apiVersion: route.openshift.io/v1
   kind: Route

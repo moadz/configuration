@@ -191,7 +191,7 @@ func TemplateFn[T any](param string, m ParamMap[T]) T {
 	v, ok := m[param]
 	// TODO moadz: We should surface the error, so that we can track the build chain for debug
 	if !ok {
-		panic(fmt.Sprintf("param %s not found", param))
+		panic(fmt.Sprintf("param %s not found %v", param, m))
 	}
 	return v
 }
@@ -202,7 +202,7 @@ const (
 	thanosVersionProd  = "a5a425269814420c179d51a69a2017ff197baa2e"
 
 	thanosOperatorImage        = "quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos-operator"
-	thanosOperatorVersionStage = "bd364e71543440e27f12ccf41f206ee5d1302215"
+	thanosOperatorVersionStage = "6498eed03b49b29f5a768dd203f61314083702f7"
 	thanosOperatorVersionProd  = "bd364e71543440e27f12ccf41f206ee5d1302215"
 )
 
@@ -772,6 +772,8 @@ var ProductionImages = ParamMap[string]{
 	"QUERY_FRONTEND":           thanosImage,
 	"RECEIVE_ROUTER":           thanosImage,
 	"RECEIVE_INGESTOR_DEFAULT": thanosImage,
+	"RULER":                    thanosImage,
+	"COMPACT":                  thanosImage,
 	"THANOS_OPERATOR":          fmt.Sprintf("%s:%s", thanosOperatorImage, thanosOperatorVersionProd),
 	"KUBE_RBAC_PROXY":          "registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:98455d503b797b6b02edcfd37045c8fab0796b95ee5cf4cfe73b221a07e805f0",
 	ApiCache:                   memcachedImage,
@@ -792,6 +794,7 @@ var ProductionVersions = ParamMap[string]{
 	"RECEIVE_INGESTOR_DEFAULT": thanosVersionProd,
 	"QUERY":                    thanosVersionProd,
 	"QUERY_FRONTEND":           thanosVersionProd,
+	"RULER":                    thanosVersionProd,
 	ApiCache:                   memcachedTag,
 	ObservatoriumAPI:           "9aada65247a07782465beb500323a0e18d7e3d05",
 	SyntheticsAPI:              syntheticsApiVersionProd,
@@ -808,6 +811,7 @@ var ProductionLogLevels = ParamMap[string]{
 	"RECEIVE_INGESTOR_DEFAULT": logLevels[0],
 	"QUERY":                    logLevels[0],
 	"QUERY_FRONTEND":           logLevels[0],
+	"RULER":                    logLevels[0],
 	ObservatoriumAPI:           logLevels[0],
 	SyntheticsAPI:              logLevels[0],
 }
@@ -820,6 +824,7 @@ var ProductionStorageSize = ParamMap[v1alpha1.StorageSize]{
 	"STORE_ROS":       "300Gi",
 	"STORE_DEFAULT":   "300Gi",
 	"RECEIVE_DEFAULT": "3Gi",
+	"RULER":           "3Gi",
 }
 
 // ProductionReplicas is a map of production replicas.
@@ -833,6 +838,7 @@ var ProductionReplicas = ParamMap[int32]{
 	"RECEIVE_INGESTOR_DEFAULT": 3,
 	"QUERY":                    3,
 	"QUERY_FRONTEND":           3,
+	"RULER":                    1,
 	ApiCache:                   1,
 	ObservatoriumAPI:           2,
 	SyntheticsAPI:              2,
@@ -900,6 +906,16 @@ var ProductionResourceRequirements = ParamMap[corev1.ResourceRequirements]{
 		Limits: corev1.ResourceList{
 			corev1.ResourceCPU:    resource.MustParse("2"),
 			corev1.ResourceMemory: resource.MustParse("5Gi"),
+		},
+	},
+	"RULER": corev1.ResourceRequirements{
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("300m"),
+			corev1.ResourceMemory: resource.MustParse("1Gi"),
+		},
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("1"),
+			corev1.ResourceMemory: resource.MustParse("4Gi"),
 		},
 	},
 	"MANAGER": corev1.ResourceRequirements{
