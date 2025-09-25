@@ -117,7 +117,7 @@ func (s Stage) Thanos() {
 
 	objs = append(objs, receiveCR(s.namespace(), clusters.StageMaps))
 	objs = append(objs, queryCR(s.namespace(), clusters.StageMaps, true)...)
-	objs = append(objs, rulerCR(s.namespace(), clusters.StageMaps))
+	objs = append(objs, rulerCR(s.namespace(), clusters.StageMaps)...)
 	// TODO: Add compact CRs for stage once we shut down previous
 	// objs = append(objs, compactCR(s.namespace(), templates, true)...)
 	objs = append(objs, stageCompactCR(s.namespace(), clusters.StageMaps)...)
@@ -1793,8 +1793,8 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 	return objs
 }
 
-func rulerCR(namespace string, templates clusters.TemplateMaps) runtime.Object {
-	return &v1alpha1.ThanosRuler{
+func rulerCR(namespace string, templates clusters.TemplateMaps) []runtime.Object {
+	return []runtime.Object{&v1alpha1.ThanosRuler{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "monitoring.thanos.io/v1alpha1",
 			Kind:       "ThanosRuler",
@@ -1842,21 +1842,65 @@ func rulerCR(namespace string, templates clusters.TemplateMaps) runtime.Object {
 			Retention:          v1alpha1.Duration("48h"),
 			EvaluationInterval: v1alpha1.Duration("1m"),
 			StorageSize:        string(clusters.TemplateFn("RULER", templates.StorageSize)),
-			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(templates),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-ruler"
-"type": "JAEGER"`,
-				},
-			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
+				},
+			},
+		},
+	},
+		&v1alpha1.ThanosRuler{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.thanos.io/v1alpha1",
+				Kind:       "ThanosRuler",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "telemeter",
+				Namespace: namespace,
+			},
+			Spec: v1alpha1.ThanosRulerSpec{
+				CommonFields: v1alpha1.CommonFields{
+					Image:                ptr.To(clusters.TemplateFn("RULER", templates.Images)),
+					Version:              ptr.To(clusters.TemplateFn("RULER", templates.Versions)),
+					ImagePullPolicy:      ptr.To(corev1.PullIfNotPresent),
+					LogLevel:             ptr.To(clusters.TemplateFn("RULER", templates.LogLevels)),
+					LogFormat:            ptr.To("logfmt"),
+					ResourceRequirements: ptr.To(clusters.TemplateFn("RULER", templates.ResourceRequirements)),
+				},
+				Replicas: clusters.TemplateFn("RULER", templates.Replicas),
+				RuleConfigSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"operator.thanos.io/rule-file": "true",
+					},
+				},
+				PrometheusRuleSelector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"operator.thanos.io/prometheus-rule": "true",
+					},
+				},
+				QueryLabelSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"operator.thanos.io/query-api": "true",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+				ExternalLabels: map[string]string{
+					"rule_replica": "$(NAME)",
+				},
+				ObjectStorageConfig: clusters.TemplateFn("TELEMETER", templates.ObjectStorageBucket),
+				RuleTenancyConfig: &v1alpha1.RuleTenancyConfig{
+					TenantLabel:      "tenant_id",
+					TenantValueLabel: "operator.thanos.io/tenant",
+				},
+				AlertmanagerURL:    "dnssrv+http://alertmanager-cluster." + namespace + ".svc.cluster.local:9093",
+				AlertLabelDrop:     []string{"rule_replica"},
+				Retention:          v1alpha1.Duration("48h"),
+				EvaluationInterval: v1alpha1.Duration("1m"),
+				StorageSize:        string(clusters.TemplateFn("RULER", templates.StorageSize)),
+				FeatureGates: &v1alpha1.FeatureGates{
+					ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
+						Enable: ptr.To(false),
+					},
 				},
 			},
 		},
