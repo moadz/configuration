@@ -12,7 +12,7 @@ objects:
       app.kubernetes.io/component: rules
       app.kubernetes.io/name: telemeter
       app.kubernetes.io/part-of: rhobs
-      operator.thanos.io/prometheus-rule: "true"
+      operator.thanos.io/prometheus-rule: "false"
     name: telemeter-rules
     namespace: rhobs-stage
   spec:
