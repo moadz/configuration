@@ -505,7 +505,7 @@ var StageStorageSize = ParamMap[v1alpha1.StorageSize]{
 	"STORE2W90D":        "512Mi",
 	"STORE90D+":         "512Mi",
 	"STORE_ROS":         "512Mi",
-	"STORE_DEFAULT":     "512Mi",
+	"STORE_DEFAULT":     "3Gi",
 	"RECEIVE_TELEMETER": "3Gi",
 	"RECEIVE_DEFAULT":   "3Gi",
 	"RULER":             "512Mi",
