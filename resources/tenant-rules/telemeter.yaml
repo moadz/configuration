@@ -1,0 +1,46 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: telemeter-prometheus-rules
+  annotations:
+    description: "Template for deploying PrometheusRule objects for Telemeter tenant"
+parameters:
+- name: NAMESPACE
+  description: "Namespace where the rules will be deployed"
+  value: "openshift-monitoring"
+  required: true
+- name: TENANT_ID
+  description: "UUID of the tenant for labeling"
+  value: "FB870BF3-9F3A-44FF-9BF7-D7A047A52F43"
+  required: true
+
+objects:
+- apiVersion: monitoring.coreos.com/v1
+  kind: PrometheusRule
+  metadata:
+    name: rosa-hcp
+    namespace: ${NAMESPACE}
+    labels:
+      operator.thanos.io/tenant: ${TENANT_ID}
+      operator.thanos.io/prometheus-rule: "true"
+  spec:
+    groups:
+    - name: hcp.billing
+      rules:
+      - alert: HCPClustersBillingMetricsMissing
+        expr: |
+          count(
+            max by (_id)(hostedcluster:hypershift_cluster_vcpus:vcpu_hours) or vector(0)
+          ) / count(
+            max by (_id)(ocm_subscription{product="moa-hostedcontrolplane"})
+          ) > 0
+        for: 5m
+        labels:
+          severity: critical
+          tenant_id: ${TENANT_ID}
+        annotations:
+          summary: "HCP clusters billing metrics are missing"
+          description: "HCP clusters billing metrics have been missing for more than 5 minutes. This may affect billing calculations."
+          runbook_url: "https://github.com/openshift/telemeter/blob/master/docs/runbooks/HCPBillingMetricsMissing.md"
+
+
