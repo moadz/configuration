@@ -436,55 +436,6 @@ objects:
       unavailableReplicas: 0
       updatedReplicas: 0
 - apiVersion: monitoring.thanos.io/v1alpha1
-  kind: ThanosRuler
-  metadata:
-    creationTimestamp: null
-    name: rhobs
-    namespace: rhobs-stage
-  spec:
-    alertLabelDrop:
-    - rule_replica
-    alertmanagerURL: dnssrv+http://alertmanager-cluster.rhobs-stage.svc.cluster.local:9093
-    baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
-    defaultObjectStorageConfig:
-      key: thanos.yaml
-      name: observatorium-mst-thanos-objectstorage
-      optional: false
-    evaluationInterval: 1m
-    externalLabels:
-      rule_replica: $(NAME)
-    featureGates:
-      serviceMonitor:
-        enable: false
-    imagePullPolicy: IfNotPresent
-    logFormat: logfmt
-    logLevel: info
-    prometheusRuleSelector:
-      matchLabels:
-        operator.thanos.io/prometheus-rule: "true"
-    queryLabelSelector:
-      matchLabels:
-        app.kubernetes.io/part-of: thanos
-        operator.thanos.io/query-api: "true"
-    replicas: 2
-    resourceRequirements:
-      limits:
-        cpu: "2"
-        memory: 3Gi
-      requests:
-        cpu: 700m
-        memory: 1Gi
-    retention: 48h
-    ruleConfigSelector:
-      matchLabels:
-        operator.thanos.io/rule-file: "true"
-    ruleTenancyConfig:
-      tenantLabel: tenant_id
-      tenantValueLabel: operator.thanos.io/tenant
-    storageSize: 512Mi
-    version: a5a425269814420c179d51a69a2017ff197baa2e
-  status: {}
-- apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosCompact
   metadata:
     creationTimestamp: null

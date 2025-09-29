@@ -165,7 +165,7 @@ func (l List) Clusters() {
 
 // Build Builds the manifests for the stage environment.
 func (Stage) Build() {
-	mg.SerialDeps(Stage.Alertmanager, Stage.CRDS, Stage.Operator, Stage.Thanos, Stage.TelemeterRules, Stage.ServiceMonitors, Stage.Secrets)
+	mg.SerialDeps(Stage.Alertmanager, Stage.CRDS, Stage.Operator, Stage.Thanos, Stage.ServiceMonitors, Stage.Secrets)
 }
 
 func (Build) generator(config clusters.ClusterConfig, component string) *mimic.Generator {
