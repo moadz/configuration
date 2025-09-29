@@ -11,6 +11,7 @@ import (
 	templatev1 "github.com/openshift/api/template/v1"
 	"github.com/rhobs/configuration/clusters"
 	"github.com/thanos-community/thanos-operator/api/v1alpha1"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -112,11 +113,14 @@ func (s Stage) Thanos() {
 	templateDir := "rhobs-thanos-operator"
 
 	gen := s.generator(templateDir)
-
+	tmpAdditionalQueryArgs := []string{
+		`--rule=dnssrv+_grpc._tcp.observatorium-thanos-rule.observatorium-metrics-stage.svc.cluster.local`,
+		`--endpoint=dnssrv+_grpc._tcp.observatorium-thanos-receive-default.observatorium-metrics-stage.svc.cluster.local`,
+	}
 	var objs []runtime.Object
 
 	objs = append(objs, receiveCR(s.namespace(), clusters.StageMaps))
-	objs = append(objs, queryCR(s.namespace(), clusters.StageMaps, true)...)
+	objs = append(objs, queryCR(s.namespace(), clusters.StageMaps, true, tmpAdditionalQueryArgs...)...)
 	objs = append(objs, rulerCR(s.namespace(), clusters.StageMaps)...)
 	// TODO: Add compact CRs for stage once we shut down previous
 	// objs = append(objs, compactCR(s.namespace(), templates, true)...)

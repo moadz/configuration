@@ -109,6 +109,9 @@ objects:
     name: rhobs
     namespace: rhobs-stage
   spec:
+    additionalArgs:
+    - --rule=dnssrv+_grpc._tcp.observatorium-thanos-rule.observatorium-metrics-stage.svc.cluster.local
+    - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-receive-default.observatorium-metrics-stage.svc.cluster.local
     baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
     customStoreLabelSelector:
       matchLabels:
