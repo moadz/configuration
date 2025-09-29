@@ -114,7 +114,6 @@ func (s Stage) Thanos() {
 
 	gen := s.generator(templateDir)
 	tmpAdditionalQueryArgs := []string{
-		`--rule=dnssrv+_grpc._tcp.observatorium-thanos-rule.observatorium-metrics-stage.svc.cluster.local`,
 		`--endpoint=dnssrv+_grpc._tcp.observatorium-thanos-receive-default.observatorium-metrics-stage.svc.cluster.local`,
 	}
 	var objs []runtime.Object
