@@ -72,6 +72,7 @@ objects:
         kind: Secret
         metadata:
           name: rhobs-hcp-write-credentials
+          namespace: ${NAMESPACE}
         type: Opaque
         stringData:
           client-id: "${CLIENT_ID}"
