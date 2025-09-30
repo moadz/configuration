@@ -10,10 +10,18 @@ parameters:
   - name: SECTOR
     description: sector of SC/MC clusters
     required: true
+  - name: CLUSTER_REGION
+    required: true
+    value: {{ fromCDLabel "ext-hypershift.openshift.io/cluster-region" }}
+  - name: CLUSTER_SECTOR
+    required: true
+    value: { { fromCDLabel "ext-hypershift.openshift.io/cluster-sector" } }
   - name: CLUSTER_NAME
     required: true
+    value: {{ fromCDLabel "api.openshift.com/name" }}
   - name: CLUSTER_ID
     required: true
+    value: {{ fromCDLabel "api.openshift.com/id }}
   - name: CLIENT_ID
     description: "OIDC client ID"
     required: true
@@ -43,6 +51,7 @@ objects:
       name: rhobs-hcp-monitoring-stack
     spec:
       resourceApplyMode: Sync
+      enableResourceTemplates: true
       clusterDeploymentSelector:
         matchLabels:
           api.openshift.com/managed: 'true'
@@ -103,8 +112,8 @@ objects:
             externalLabels:
               mc_name: ${CLUSTER_NAME}
               _mc_id: ${CLUSTER_ID}
-              region: ${REGION}
-              sector: ${SECTOR}
+              region: ${CLUSTER_REGION}
+              sector: ${CLUSTER_SECTOR}
               env: ${RHOBS_ENV}
             remoteWrite:
               - name: RHOBS
