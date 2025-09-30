@@ -1,0 +1,336 @@
+#
+# Deploys the monitoring stack resource to management clusters for writing to RHOBS
+#
+apiVersion: v1
+kind: Template
+metadata:
+  name: rhobs-management-cluster-monitoring-stack
+objects:
+
+  # Deploys the HyperShift monitoring stack
+  - apiVersion: monitoring.rhobs/v1alpha1
+    kind: MonitoringStack
+    metadata:
+      name: rhobs-hypershift-monitoring-stack
+      namespace: ${NAMESPACE}
+    spec:
+      resourceSelector: {}
+      namespaceSelector:
+        matchExpressions:
+          - key: hypershift.openshift.io/monitoring
+            operator: Exists
+      replicas: 2
+      logLevel: info
+      retention: 2h
+      alertmanagerConfig:
+        disabled: false
+      prometheusConfig:
+        enableRemoteWriteReceiver: true
+        scrapeInterval: 60s
+        externalLabels:
+          mc_name: ${CLUSTER_NAME}
+          _mc_id: ${CLUSTER_ID}
+          region: ${CLUSTER_REGION}
+          sector: ${CLUSTER_SECTOR}
+          env: ${RHOBS_ENV}
+        remoteWrite:
+          - name: RHOBS
+            url: ${HCP_RHOBS_ROOT_URL}/api/metrics/v1/hcp/api/v1/receive
+            oauth2:
+              clientId:
+                secret:
+                  key: client-id
+                  name: ${RHOBS_SECRET_NAME}
+              clientSecret:
+                key: client-secret
+                name: ${RHOBS_SECRET_NAME}
+              scopes:
+                - profile
+              tokenUrl: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+            queueConfig:
+              capacity: 2500
+              maxShards: 500
+              minShards: 1
+              maxSamplesPerSend: 2000
+              batchSendDeadline: 60s
+              minBackoff: 30ms
+              maxBackoff: 256s
+            metadataConfig:
+              send: false
+            writeRelabelConfigs:
+              - sourceLabels: [ __name__, source ]
+                action: keep
+                separator: ;
+                # We filter MC metrics based on their names
+                # and
+                # We forward all metrics with the source label DP as the filtering happens in preceding DP-> MC forwarding side step
+                # We forward all metrics with the source label MC, MC metrics are filtered in the federation service monitor
+                # As `sourceLabels: [__name__, source]` results in a concatenation fo the two labels followed by a regexp match with the below, the HCP metrics look like `apiserver_audit_event_total;`, and DP metrics look like `dp_metric_name;DP`, hence the `;.*` and `.*;DP` in the below regexp.
+                regex: "(\
+                  apiserver_audit_error_total;.*|\
+                  apiserver_audit_event_total;.*|\
+                  apiserver_current_inflight_requests;.*|\
+                  apiserver_longrunning_requests;.*|\
+                  apiserver_request:counts:read:total;.*|\
+                  apiserver_request:counts:read:errors;.*|\
+                  apiserver_request:counts:read:slow_resource;.*|\
+                  apiserver_request:counts:read:slow_namespace;.*|\
+                  apiserver_request:counts:read:slow_cluster;.*|\
+                  apiserver_request:counts:write:total;.*|\
+                  apiserver_request:counts:write:errors;.*|\
+                  apiserver_request:counts:write:slow;.*|\
+                  apiserver_storage_objects;.*|\
+                  apiserver_storage_size_bytes;.*|\
+                  cluster_autoscaler_unschedulable_pods_count;.*|\
+                  cluster_autoscaler_cluster_safe_to_autoscale;.*|\
+                  cluster_autoscaler_skipped_scale_events_count;.*|\
+                  cluster_autoscaler_errors_total;.*|\
+                  cluster_autoscaler_failed_scale_ups_total;.*|\
+                  cluster_operator_up;.*|\
+                  etcd_mvcc_db_total_size_in_bytes;.*|\
+                  etcd_server_has_leader;.*|\
+                  etcd_server_is_leader;.*|\
+                  etcd_server_leader_changes_seen_total;.*|\
+                  etcd_server_quota_backend_bytes;.*|\
+                  etcd_disk_wal_fsync_duration_seconds_bucket;.*|\
+                  hypershift_hostedcluster_nodepools;.*|\
+                  hypershift_hostedclusters;.*|\
+                  hypershift_cluster_limited_support_enabled;.*|\
+                  hypershift_cluster_silence_alerts;.*|\
+                  sre:oauth:pods_up;.*|\
+                  sre:oauth:deployment_pods_unavailable;.*|\
+                  hypershift_nodepools;.*|\
+                  hypershift_nodepools_size;.*|\
+                  hypershift_nodepools_available_replicas;.*|\
+                  hypershift_cluster_vcpus;.*|\
+                  hostedcluster:hypershift_cluster_vcpus:max;.*|\
+                  cluster:capacity_cpu_cores:sum;.*|\
+                  ingress_controller_conditions;.*|\
+                  hypershift_node:consumption:cpu;.*|\
+                  hypershift_node:container_cpu_count;.*|\
+                  hypershift_node:consumption:memory;.*|\
+                  hypershift_node:container_rss;.*|\
+                  hypershift_node:consumption:network:in;.*|\
+                  hypershift_node:consumption:network:out;.*|\
+                  hypershift_node:consumption:filesystem;.*|\
+                  hypershift_node:consumption:disk_io:out;.*|\
+                  hypershift_node:consumption:disk_io:in;.*|\
+                  hypershift_node:not_ready;.*|\
+                  hypershift_node:in_bad_condition;.*|\
+                  ALERTS;.*|\
+                  sre:node_request_serving.*;.*|\
+                  sre:apiserver_up;.*|\
+                  sre:apiserver_request:total;.*|\
+                  sre:apiserver_request:duration_seconds_bucket;.*|\
+                  vector_component_sent_events_total;.*|\
+                  probe_success;.*|\
+                  certmanager_certificate_ready_status;.*|\
+                  mce_hs_addon_failed_reconcile_count;.*|\
+                  mce_hs_addon_total_reconcile_count;.*|\
+                  policy_governance_info;.*|\
+                  node_ethtool_bw_in_allowance_exceeded;.*|\
+                  node_ethtool_bw_out_allowance_exceeded;.*|\
+                  node_ethtool_pps_allowance_exceeded;.*|\
+                  hypershift_operator_info;.*|\
+                  hypershift_cluster_size_override_instances;.*|\
+                  hypershift_cluster_waiting_initial_avaibility_duration_seconds;.*|\
+                  )"
+              # Matches 'no label'.
+              # Basically: if source is defined already (i.e on the data plane/management cluster), keep the label.
+              # Otherwise, use MC
+              - action: replace
+                regex: $^
+                replacement: MC
+                sourceLabels:
+                  - source
+                targetLabel: source
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+
+  # Grant hypershift-monitoring-stack service account cluster-monitoring-view cluster role
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      labels:
+        hive.openshift.io/managed: "true"
+      name: hypershift-ms-view
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: cluster-monitoring-view
+    subjects:
+      - kind: ServiceAccount
+        name: hypershift-monitoring-stack-prometheus
+        namespace: openshift-observability-operator
+
+  # Service monitor to federate Management Cluster CMO metrics
+  # Management Cluster metric filtering is done here
+  - apiVersion: monitoring.rhobs/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        app.kubernetes.io/name: prometheus
+      name: hypershift-cmo-federate
+      namespace: ${OPENSHIFT_MONITORING_NAMESPACE}
+    spec:
+      namespaceSelector: {}
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: prometheus
+          app.kubernetes.io/instance: k8s
+          app.kubernetes.io/name: prometheus
+          app.kubernetes.io/part-of: openshift-monitoring
+      endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          bearerTokenSecret:
+            key: ""
+          honorLabels: true
+          interval: 30s
+          relabelings:
+            - targetLabel: source
+              replacement: MC
+          port: web
+          scheme: https
+          path: "/federate"
+          params:
+            'match[]':
+              - "{__name__=~\"\
+              container_cpu_usage_seconds_total|\
+              container_fs_writes_bytes_total|\
+              kube_deployment_spec_replicas|\
+              kube_deployment_status_condition|\
+              kube_deployment_status_replicas_available|\
+              kube_deployment_status_replicas_ready|\
+              kube_deployment_status_replicas_unavailable|\
+              kube_deployment_status_replicas_updated|\
+              kube_pod_deletion_timestamp|\
+              kube_pod_info|\
+              kube_pod_resource_limit|\
+              kube_pod_resource_request|\
+              kube_pod_start_time|\
+              kube_pod_status_ready|\
+              kube_pod_status_reason|\
+              kube_pod_status_scheduled_time|\
+              kube_pod_status_unschedulable|\
+              kube_pod_tolerations|\
+              kube_poddisruptionbudget_status_current_healthy|\
+              kube_poddisruptionbudget_status_desired_healthy|\
+              kube_poddisruptionbudget_status_expected_pods|\
+              kube_running_pod_ready|\
+              kubelet_volume_stats_available_bytes|\
+              kubelet_volume_stats_capacity_bytes|\
+              kubelet_volume_stats_inodes|\
+              kubelet_volume_stats_inodes_free|\
+              kubelet_volume_stats_inodes_used|\
+              kubelet_volume_stats_used_bytes|\
+              node_namespace_pod:kube_pod_info:|\
+              node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate|\
+              pod:container_cpu_usage:sum|\
+              prober_probe_total|\
+              mce_hs_addon_failed_to_start_bool|\
+              mce_hs_addon_install_in_progress_bool|\
+              mce_hs_addon_install_failing_gauge_bool|\
+              mce_hs_addon_install_failure_gauge|\
+              mce_hs_addon_placement_score_failure_count|\
+              mce_hs_addon_cluster_claims_failure_count|\
+              mce_hs_addon_kubeconfig_secret_copy_failure_count|\
+              mce_hs_addon_hub_sync_failure_count|\
+              mce_hs_addon_total_hosted_control_planes_gauge|\
+              mce_hs_addon_available_hosted_control_planes_gauge|\
+              mce_hs_addon_available_hosted_clusters_gauge|\
+              mce_hs_addon_deleted_hosted_clusters_gauge|\
+              mce_hs_addon_max_hosted_clusters_gauge|\
+              mce_hs_addon_threshold_hosted_clusters_gauge|\
+              mce_hs_addon_hypershift_operator_degraded_bool|\
+              mce_hs_addon_ext_dns_operator_degraded_bool|\
+              mce_hs_addon_aws_s3_bucket_secret_configured_bool|\
+              mce_hs_addon_total_reconcile_count|\
+              mce_hs_addon_failed_reconcile_count|\
+              mce_hs_addon_reconcile_requeue_count|\
+              config_policy_evaluation_total|\
+              policy_system_errors_total|\
+              kube_pod_container_status_restarts_total|\
+              controller_runtime_reconcile_total|\
+              controller_runtime_reconcile_errors_total|\
+              workqueue_depth|\
+              node_cpu_seconds_total|\
+              node_memory_MemTotal_bytes|\
+              node_memory_MemAvailable_bytes|\
+              node_network_transmit_bytes_total|\
+              node_network_receive_bytes_total|\
+              node_network_transmit_drop_total|\
+              node_network_receive_drop_total|\
+              node_disk_reads_completed_total|\
+              node_disk_writes_completed_total|\
+              cluster:nodes_roles|\
+              kube_node_labels|\
+              kube_node_role|\
+              container_memory_rss|\
+              container_memory_cache|\
+              cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests|\
+              cluster:namespace:pod_memory:active:kube_pod_container_resource_requests|\
+              etcd_server_leader_changes_seen_total|\
+              etcd_disk_backend_commit_duration_seconds_bucket|\
+              etcd_disk_wal_fsync_duration_seconds_bucket|\
+              etcd_network_peer_round_trip_time_seconds_bucket|\
+              etcd_cluster_version|\
+              ovnkube_master_network_programming_duration_seconds_bucket\"}"
+          tlsConfig:
+            ca:
+              configMap:
+                key: service-ca.crt
+                name: serving-certs-ca-bundle
+            cert:
+              secret:
+                key: tls.crt
+                name: metrics-client-certs
+            keySecret:
+              key: tls.key
+              name: metrics-client-certs
+            serverName: prometheus-k8s.openshift-monitoring.svc
+
+  - apiVersion: monitoring.rhobs/v1
+    kind: ServiceMonitor
+    metadata:
+      name: cert-manager-rhobs
+      namespace: ${CERT_MANAGER_NS}
+    spec:
+      endpoints:
+        - interval: 30s
+          port: tcp-prometheus-servicemonitor
+          scheme: http
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: controller
+          app.kubernetes.io/instance: cert-manager
+          app.kubernetes.io/name: ${CERT_MANAGER_NAME}
+
+parameters:
+  - name: CLUSTER_NAME
+    required: true
+  - name: CLUSTER_ID
+    required: true
+  - name: CLUSTER_REGION
+    required: true
+  - name: CLUSTER_SECTOR
+    required: true
+  - name: HCP_RHOBS_ROOT_URL
+    required: true
+  - name: RHOBS_SECRET_NAME
+    value: rhobs-hcp-credential
+  - name: NAMESPACE
+    value: openshift-observability-operator
+  - name: RHOBS_ENV
+    value: placeholdervalue
+  - name: OPENSHIFT_MONITORING_NAMESPACE
+    value: openshift-monitoring
+  - name: OBO_NAMESPACE
+    value: openshift-observability-operator
+  - name: SECRET_NAME
+    value: hypershift-telemeter-client
+  - name: CERT_MANAGER_NS
+    value: cert-manager
+  - name: CERT_MANAGER_NAME
+    value: cert-manager
