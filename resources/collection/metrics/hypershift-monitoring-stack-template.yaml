@@ -12,16 +12,16 @@ parameters:
     required: true
   - name: CLUSTER_REGION
     required: true
-    value: {{ fromCDLabel "ext-hypershift.openshift.io/cluster-region" }}
+    value: { { fromCDLabel "ext-hypershift.openshift.io/cluster-region" } }
   - name: CLUSTER_SECTOR
     required: true
     value: { { fromCDLabel "ext-hypershift.openshift.io/cluster-sector" } }
   - name: CLUSTER_NAME
     required: true
-    value: {{ fromCDLabel "api.openshift.com/name" }}
+    value: { { fromCDLabel "api.openshift.com/name" } }
   - name: CLUSTER_ID
     required: true
-    value: {{ fromCDLabel "api.openshift.com/id }}
+    value: { { fromCDLabel "api.openshift.com/id } }
   - name: CLIENT_ID
     description: "OIDC client ID"
     required: true
