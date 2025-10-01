@@ -30,6 +30,30 @@ parameters:
     value: openshift-observability-operator
   - name: SECRET_NAME
     value: hypershift-telemeter-client
+  - name: MATCH_EXPRESSION
+    value: |-2
+      - key: api.openshift.com/fedramp
+                  operator: NotIn
+                  values:
+                    - 'true'
+      - key: ext-hypershift.openshift.io/cluster-type
+        operator: In
+        values:
+          - management-cluster
+          - service-cluster
+      - key: ext-hypershift.openshift.io/cluster-region
+        operator: In
+        values:
+          - ${REGION}
+      - key: ext-hypershift.openshift.io/cluster-sector
+        operator: In
+        values:
+          - ${SECTOR}
+      - key: api.openshift.com/short-name
+        operator: In
+        values:
+          - hs-mc-o2d6208f0
+          - hs-sc-o2d61voi0
 objects:
   - apiVersion: hive.openshift.io/v1
     kind: SelectorSyncSet
@@ -43,29 +67,8 @@ objects:
       clusterDeploymentSelector:
         matchLabels:
           api.openshift.com/managed: 'true'
-        matchExpressions:
-          - key: api.openshift.com/fedramp
-            operator: NotIn
-            values:
-              - 'true'
-          - key: ext-hypershift.openshift.io/cluster-type
-            operator: In
-            values:
-              - management-cluster
-              - service-cluster
-          - key: ext-hypershift.openshift.io/cluster-region
-            operator: In
-            values:
-              - ${REGION}
-          - key: ext-hypershift.openshift.io/cluster-sector
-            operator: In
-            values:
-              - ${SECTOR}
-          - key: api.openshift.com/short-name
-            operator: In
-            values:
-              - hs-mc-o2d6208f0
-              - hs-sc-o2d61voi0
+        matchExpressions: |-
+          ${MATCH_EXPRESSION}
 
       resources:
       - apiVersion: v1
