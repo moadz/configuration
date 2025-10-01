@@ -562,6 +562,42 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				},
 			},
 		},
+		&monitoringv1.ServiceMonitor{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.coreos.com/v1",
+				Kind:       "ServiceMonitor",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "thanos-ruler",
+				Namespace: openshiftCustomerMonitoringNamespace,
+				Labels: map[string]string{
+					"app.kubernetes.io/component":  "rule-evaluation-engine",
+					"app.kubernetes.io/managed-by": "thanos-operator",
+					"app.kubernetes.io/name":       "thanos-ruler",
+					"app.kubernetes.io/part-of":    "thanos",
+				},
+			},
+			Spec: monitoringv1.ServiceMonitorSpec{
+				Endpoints: []monitoringv1.Endpoint{
+					{
+						Interval: interval30s,
+						Path:     metricsPath,
+						Port:     "http",
+					},
+				},
+				NamespaceSelector: monitoringv1.NamespaceSelector{
+					MatchNames: []string{namespace},
+				},
+				Selector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app.kubernetes.io/component":  "rule-evaluation-engine",
+						"app.kubernetes.io/managed-by": "thanos-operator",
+						"app.kubernetes.io/name":       "thanos-ruler",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+			},
+		},
 	}
 	for _, obj := range objs {
 		obj.(*monitoringv1.ServiceMonitor).ObjectMeta.Labels["prometheus"] = "app-sre"
