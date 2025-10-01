@@ -99,10 +99,10 @@ objects:
             enableRemoteWriteReceiver: true
             scrapeInterval: 60s
             externalLabels:
-              mc_name: '{{ fromCDLabel "api.openshift.com/name" }}'
-              _mc_id: '{{ fromCDLabel "api.openshift.com/id" }}'
-              region: '{{ fromCDLabel "ext-hypershift.openshift.io/cluster-region" }}'
-              sector: '{{ fromCDLabel "ext-hypershift.openshift.io/cluster-sector" }}'
+              mc_name: "{{ fromCDLabel \"api.openshift.com/name\" }}"
+              _mc_id: "{{ fromCDLabel \"api.openshift.com/id\" }}"
+              region: "{{ fromCDLabel \"ext-hypershift.openshift.io/cluster-region\" }}"
+              sector: "{{ fromCDLabel \"ext-hypershift.openshift.io/cluster-sector\" }}"
               env: ${RHOBS_ENV}
             remoteWrite:
               - name: RHOBS
