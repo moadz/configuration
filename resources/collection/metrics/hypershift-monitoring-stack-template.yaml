@@ -71,7 +71,7 @@ objects:
       - apiVersion: v1
         kind: Secret
         metadata:
-          name: rhobs-hcp-write-credentials
+          name: ${RHOBS_SECRET_NAME}
           namespace: ${NAMESPACE}
         type: Opaque
         stringData:
