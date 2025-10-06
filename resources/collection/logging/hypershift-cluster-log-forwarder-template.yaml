@@ -105,6 +105,7 @@ objects:
             - name: logging-to-loki
               inputRefs:
                 - application
+                - infrastructure
               outputRefs:
                 - loki-remote
           outputs:
