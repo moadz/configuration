@@ -14,7 +14,7 @@ objects:
     limits:
       global:
         ingestion:
-          ingestionBurstSize: 16
+          ingestionBurstSize: 256
           ingestionRate: 12
         queries:
           queryTimeout: 5m
