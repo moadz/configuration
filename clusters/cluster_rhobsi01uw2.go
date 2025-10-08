@@ -62,7 +62,8 @@ func rhobsi01uw2TemplateMaps() TemplateMaps {
 	lokiOverrides := LokiOverridesMap{
 		LokiConfig: LokiOverrides{
 			LokiLimitOverrides: LokiLimitOverrides{
-				QueryTimeout: "5m",
+				IngestionRateLimitMB: 20,
+				QueryTimeout:         "5m",
 			},
 		},
 	}

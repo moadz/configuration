@@ -15,7 +15,7 @@ objects:
       global:
         ingestion:
           ingestionBurstSize: 256
-          ingestionRate: 12
+          ingestionRate: 20
         queries:
           queryTimeout: 5m
     managementState: Managed
