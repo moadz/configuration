@@ -61,11 +61,6 @@ objects:
             operator: In
             values:
               - ${SECTOR}
-          - key: api.openshift.com/short-name
-            operator: In
-            values:
-              - hs-mc-o2d6208f0
-              - hs-sc-o2d61voi0
 
       resources:
       - apiVersion: v1
