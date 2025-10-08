@@ -99,9 +99,8 @@ objects:
             enableRemoteWriteReceiver: true
             scrapeInterval: 60s
             externalLabels:
-              name: "{{ fromCDLabel \"api.openshift.com/name\" }}"
-              _id: "{{ fromCDLabel \"api.openshift.com/id\" }}"
-              type: "{{ fromCDLabel \"ext-hypershift.openshift.io/cluster-type\" }}"
+              mc_name: "{{ fromCDLabel \"api.openshift.com/name\" }}"
+              _mc_id: "{{ fromCDLabel \"api.openshift.com/id\" }}"
               region: "{{ fromCDLabel \"ext-hypershift.openshift.io/cluster-region\" }}"
               sector: "{{ fromCDLabel \"ext-hypershift.openshift.io/cluster-sector\" }}"
               env: ${RHOBS_ENV}
@@ -130,7 +129,7 @@ objects:
                 metadataConfig:
                   send: false
                 writeRelabelConfigs:
-                  - sourceLabels: [ __name__ ]
+                  - sourceLabels: [ __name__, source ]
                     action: keep
                     separator: ;
                     # We filter MC metrics based on their names
@@ -212,14 +211,10 @@ objects:
                   # Otherwise, use MC
                   - action: replace
                     regex: $^
-                    replacement: "{{ fromCDLabel \"ext-hypershift.openshift.io/cluster-type\" }}"
+                    replacement: MC
                     sourceLabels:
                       - source
                     targetLabel: source
-                  - action: keep
-                    regex: '^(service-cluster|management-cluster|DP)$'
-                    sourceLabels:
-                      - source
           resources:
             requests:
               cpu: 500m
@@ -266,7 +261,7 @@ objects:
               interval: 30s
               relabelings:
                 - targetLabel: source
-                  replacement: "{{ fromCDLabel \"ext-hypershift.openshift.io/cluster-type\" }}"
+                  replacement: MC
               port: web
               scheme: https
               path: "/federate"
