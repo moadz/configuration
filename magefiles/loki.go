@@ -52,7 +52,6 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 			Namespace: namespace,
 		},
 		Spec: lokiv1.LokiStackSpec{
-
 			Limits: &lokiv1.LimitsSpec{
 				Global: &lokiv1.LimitsTemplateSpec{
 					IngestionLimits: &lokiv1.IngestionLimitSpec{
@@ -61,6 +60,32 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 					},
 					QueryLimits: &lokiv1.QueryLimitSpec{
 						QueryTimeout: overrides.LokiOverrides[clusters.LokiConfig].QueryTimeout,
+					},
+					OTLP: &lokiv1.GlobalOTLPSpec{
+						OTLPSpec: lokiv1.OTLPSpec{
+							ResourceAttributes: &lokiv1.OTLPResourceAttributesSpec{
+								Attributes: []lokiv1.OTLPResourceAttributesConfigSpec{
+									{
+										Action: lokiv1.OTLPAttributeActionIndexLabel,
+										Attributes: []string{
+											"k8s.container.name",
+											"k8s.cronjob.name",
+											"k8s.daemonset.name",
+											"k8s.deployment.name",
+											"k8s.job.name",
+											"k8s.namespace.name",
+											"k8s.node.name",
+											"k8s.pod.name",
+											"k8s.statefulset.name",
+											"openshift.cluster.uid",
+											"openshift.log.source",
+											"openshift.log.type",
+											"service.name",
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
