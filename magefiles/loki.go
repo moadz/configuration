@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/bwplotka/mimic/encoding"
-	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
+	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	templatev1 "github.com/openshift/api/template/v1"
 	"github.com/rhobs/configuration/clusters"
@@ -61,28 +61,47 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 					QueryLimits: &lokiv1.QueryLimitSpec{
 						QueryTimeout: overrides.LokiOverrides[clusters.LokiConfig].QueryTimeout,
 					},
-					OTLP: &lokiv1.GlobalOTLPSpec{
-						OTLPSpec: lokiv1.OTLPSpec{
-							ResourceAttributes: &lokiv1.OTLPResourceAttributesSpec{
-								Attributes: []lokiv1.OTLPResourceAttributesConfigSpec{
-									{
-										Action: lokiv1.OTLPAttributeActionIndexLabel,
-										Attributes: []string{
-											"k8s.container.name",
-											"k8s.cronjob.name",
-											"k8s.daemonset.name",
-											"k8s.deployment.name",
-											"k8s.job.name",
-											"k8s.namespace.name",
-											"k8s.node.name",
-											"k8s.pod.name",
-											"k8s.statefulset.name",
-											"openshift.cluster.uid",
-											"openshift.log.source",
-											"openshift.log.type",
-											"service.name",
-										},
-									},
+					OTLP: &lokiv1.OTLPSpec{
+						StreamLabels: &lokiv1.OTLPStreamLabelSpec{
+							ResourceAttributes: []lokiv1.OTLPAttributeReference{
+								{
+									Name: "k8s.container.name",
+								},
+								{
+									Name: "k8s.cronjob.name",
+								},
+								{
+									Name: "k8s.daemonset.name",
+								},
+								{
+									Name: "k8s.deployment.name",
+								},
+								{
+									Name: "k8s.job.name",
+								},
+								{
+									Name: "k8s.namespace.name",
+								},
+								{
+									Name: "k8s.node.name",
+								},
+								{
+									Name: "k8s.pod.name",
+								},
+								{
+									Name: "k8s.statefulset.name",
+								},
+								{
+									Name: "openshift.cluster.uid",
+								},
+								{
+									Name: "openshift.log.source",
+								},
+								{
+									Name: "openshift.log.type",
+								},
+								{
+									Name: "service.name",
 								},
 							},
 						},
