@@ -188,6 +188,7 @@ objects:
                       sre:apiserver_up;.*|\
                       sre:apiserver_request:total;.*|\
                       sre:apiserver_request:duration_seconds_bucket;.*|\
+                      sre:node_request_serving:info;.*|\
                       vector_component_sent_events_total;.*|\
                       probe_success;.*|\
                       certmanager_certificate_ready_status;.*|\
