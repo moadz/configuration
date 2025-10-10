@@ -134,6 +134,8 @@ objects:
           - --whitelist={__name__="cluster:kubelet_volume_stats_used_bytes:provisioner:sum"}
           - --whitelist={__name__="cluster:log_collected_bytes_total:sum"}
           - --whitelist={__name__="cluster:log_logged_bytes_total:sum"}
+          - --whitelist={__name__="cluster:mcd_nodes_with_unsupported_packages:count"}
+          - --whitelist={__name__="cluster:mcd_total_unsupported_packages:sum"}
           - --whitelist={__name__="cluster:memory_usage_bytes:sum"}
           - --whitelist={__name__="cluster:network_attachment_definition_enabled_instance_up:max"}
           - --whitelist={__name__="cluster:network_attachment_definition_instances:max"}
@@ -437,6 +439,8 @@ objects:
           - --whitelist={__name__="cluster:kubelet_volume_stats_used_bytes:provisioner:sum"}
           - --whitelist={__name__="cluster:log_collected_bytes_total:sum"}
           - --whitelist={__name__="cluster:log_logged_bytes_total:sum"}
+          - --whitelist={__name__="cluster:mcd_nodes_with_unsupported_packages:count"}
+          - --whitelist={__name__="cluster:mcd_total_unsupported_packages:sum"}
           - --whitelist={__name__="cluster:memory_usage_bytes:sum"}
           - --whitelist={__name__="cluster:network_attachment_definition_enabled_instance_up:max"}
           - --whitelist={__name__="cluster:network_attachment_definition_instances:max"}
