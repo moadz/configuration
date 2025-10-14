@@ -272,6 +272,7 @@ objects:
                   kube_deployment_status_replicas_ready|\
                   kube_deployment_status_replicas_unavailable|\
                   kube_deployment_status_replicas_updated|\
+                  kube_namespace_labels|\
                   kube_pod_deletion_timestamp|\
                   kube_pod_info|\
                   kube_pod_resource_limit|\
