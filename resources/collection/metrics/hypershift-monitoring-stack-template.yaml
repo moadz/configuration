@@ -229,7 +229,7 @@ objects:
           name: cluster-monitoring-view
         subjects:
           - kind: ServiceAccount
-            name: hypershift-monitoring-stack-prometheus
+            name: rhobs-hypershift-monitoring-stack-prometheus
             namespace: openshift-observability-operator
 
         # Service monitor to federate Management Cluster CMO metrics
