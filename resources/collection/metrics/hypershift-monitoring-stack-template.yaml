@@ -124,11 +124,19 @@ objects:
                 metadataConfig:
                   send: false
                 writeRelabelConfigs:
-                  # Keep only CPU metrics from ocm-* namespaces for now to populate Central Rosa HCP dashboard
+                  # Rule 1: mark the CPU metrics we actually want to keep
                   - source_labels: [__name__, namespace]
                     separator: ;
                     regex: "^container_cpu_usage_seconds_total;ocm-.*"
-                    action: keep
+                    target_label: _allow
+                    replacement: "yes"
+                    action: replace
+
+                  # Rule 2: drop CPU metrics that weren't marked
+                  - source_labels: [__name__, _allow]
+                    separator: ;
+                    regex: "^container_cpu_usage_seconds_total;$"
+                    action: drop
                   - sourceLabels: [ __name__, source ]
                     action: keep
                     separator: ;
