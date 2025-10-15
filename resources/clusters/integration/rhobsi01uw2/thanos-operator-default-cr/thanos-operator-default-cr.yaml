@@ -365,7 +365,19 @@ objects:
     version: a5a425269814420c179d51a69a2017ff197baa2e
     webConfig:
       prefixHeader: X-Forwarded-Prefix
-  status: {}
+  status:
+    querierStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
+    queryFrontendStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosReceive
   metadata:
@@ -526,10 +538,16 @@ objects:
           cpu: 200m
           memory: 512Mi
         requests:
-          cpu: 100m
-          memory: 256Mi
+          cpu: "1"
+          memory: 5Gi
       version: a5a425269814420c179d51a69a2017ff197baa2e
-  status: {}
+  status:
+    routerStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosRuler
   metadata:
@@ -625,6 +643,9 @@ objects:
     ruleConfigSelector:
       matchLabels:
         operator.thanos.io/rule-file: "true"
+    ruleTenancyConfig:
+      tenantLabel: tenant_id
+      tenantValueLabel: operator.thanos.io/tenant
     storageSize: 10Gi
     version: a5a425269814420c179d51a69a2017ff197baa2e
   status: {}

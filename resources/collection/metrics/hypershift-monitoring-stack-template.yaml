@@ -124,9 +124,9 @@ objects:
                 metadataConfig:
                   send: false
                 writeRelabelConfigs:
-                  # Drop container_cpu_usage_seconds_total metrics from non-ocm namespaces
+                  # Drop container_cpu_usage_seconds_total and container_memory_rss metrics from non-ocm namespaces
                   - action: drop
-                    regex: container_cpu_usage_seconds_total;(|[^o].*|o[^c].*|oc[^m].*|ocm[^-].*)
+                    regex: (container_cpu_usage_seconds_total|container_memory_rss);(|[^o].*|o[^c].*|oc[^m].*|ocm[^-].*)
                     sourceLabels: [__name__, namespace]
                     # We filter MC metrics based on their names
                     # and
@@ -157,6 +157,7 @@ objects:
                       cluster_autoscaler_failed_scale_ups_total;.*|\
                       cluster_operator_up;.*|\
                       container_cpu_usage_seconds_total;.*|\
+                      container_memory_rss;.*|\
                       etcd_mvcc_db_total_size_in_bytes;.*|\
                       etcd_server_has_leader;.*|\
                       etcd_server_is_leader;.*|\
