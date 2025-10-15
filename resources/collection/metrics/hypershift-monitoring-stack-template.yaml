@@ -124,6 +124,11 @@ objects:
                 metadataConfig:
                   send: false
                 writeRelabelConfigs:
+                  # Keep only CPU metrics from ocm-* namespaces for now to populate Central Rosa HCP dashboard
+                  - source_labels: [__name__, namespace]
+                    separator: ;
+                    regex: "^container_cpu_usage_seconds_total;ocm-.*"
+                    action: keep
                   - sourceLabels: [ __name__, source ]
                     action: keep
                     separator: ;
@@ -153,6 +158,7 @@ objects:
                       cluster_autoscaler_errors_total;.*|\
                       cluster_autoscaler_failed_scale_ups_total;.*|\
                       cluster_operator_up;.*|\
+                      container_cpu_usage_seconds_total;.*|\
                       etcd_mvcc_db_total_size_in_bytes;.*|\
                       etcd_server_has_leader;.*|\
                       etcd_server_is_leader;.*|\
