@@ -124,27 +124,16 @@ objects:
                 metadataConfig:
                   send: false
                 writeRelabelConfigs:
-                  # Rule 1: mark the CPU metrics we actually want to keep
-                  - source_labels: [__name__, namespace]
-                    separator: ;
-                    regex: "^container_cpu_usage_seconds_total;ocm-.*"
-                    target_label: _allow
-                    replacement: "yes"
-                    action: replace
-
-                  # Rule 2: drop CPU metrics that weren't marked
-                  - source_labels: [__name__, _allow]
-                    separator: ;
-                    regex: "^container_cpu_usage_seconds_total;$"
-                    action: drop
-                  - source_labels: [ __name__, source ]
-                    action: keep
-                    separator: ;
+                  # Drop container_cpu_usage_seconds_total metrics from non-ocm namespaces
+                  - action: drop
+                    regex: container_cpu_usage_seconds_total;(|[^o].*|o[^c].*|oc[^m].*|ocm[^-].*)
+                    sourceLabels: [__name__, namespace]
                     # We filter MC metrics based on their names
                     # and
                     # We forward all metrics with the source label DP as the filtering happens in preceding DP-> MC forwarding side step
                     # We forward all metrics with the source label MC, MC metrics are filtered in the federation service monitor
                     # As `sourceLabels: [__name__, source]` results in a concatenation fo the two labels followed by a regexp match with the below, the HCP metrics look like `apiserver_audit_event_total;`, and DP metrics look like `dp_metric_name;DP`, hence the `;.*` and `.*;DP` in the below regexp.
+                  - sourceLabels: [__name__, source]
                     regex: "(\
                       apiserver_audit_error_total;.*|\
                       apiserver_audit_event_total;.*|\
