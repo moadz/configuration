@@ -307,10 +307,6 @@ func DefaultBaseTemplate() TemplateMaps {
 				},
 			},
 			ReceiveRouter: {
-				Limits: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("200m"),
-					corev1.ResourceMemory: resource.MustParse("512Mi"),
-				},
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:    resource.MustParse("1"),
 					corev1.ResourceMemory: resource.MustParse("5Gi"),
