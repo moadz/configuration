@@ -29,7 +29,7 @@ objects:
     metadata:
       labels:
         managed.openshift.io/osd: 'true'
-      name: rhobs-logs-token-refresher
+      name: rhobs-logs-event-router
     spec:
       resourceApplyMode: Sync
       clusterDeploymentSelector:
