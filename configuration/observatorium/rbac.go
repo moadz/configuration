@@ -340,7 +340,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 		tenant:              telemeterTenant,
 		signals:             []Resource{MetricsResource},
 		perms:               []rbac.Permission{rbac.Write}, // Write only
-		envs:                []env{stagingEnv},
+		envs:                []env{stagingEnv, productionEnv},
 		skipConventionCheck: true,
 	})
 
