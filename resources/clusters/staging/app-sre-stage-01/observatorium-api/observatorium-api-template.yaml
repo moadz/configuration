@@ -432,7 +432,7 @@ objects:
           - --rbac.config=/etc/observatorium/rbac.yaml
           - --tenants.config=/etc/observatorium/tenants.yaml
           - --server.read-timeout=5m
-          image: quay.io/redhat-user-workloads/rhobs-mco-tenant/observatorium-api:9aada65247a07782465beb500323a0e18d7e3d05
+          image: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-obs-api:9011fb0ead0c0a7d248cd11945a321fc48df8707
           livenessProbe:
             failureThreshold: 10
             httpGet:

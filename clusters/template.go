@@ -449,7 +449,7 @@ var StageImages = ParamMap[string]{
 	"KUBE_RBAC_PROXY":            "registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:98455d503b797b6b02edcfd37045c8fab0796b95ee5cf4cfe73b221a07e805f0",
 	ApiCache:                     memcachedImage,
 	MemcachedExporter:            memcachedExporterImage,
-	ObservatoriumAPI:             "quay.io/redhat-user-workloads/rhobs-mco-tenant/observatorium-api:9aada65247a07782465beb500323a0e18d7e3d05",
+	ObservatoriumAPI:             fmt.Sprintf("%s:%s", ObservatoriumImage, ObservatoriumVersion),
 	SyntheticsAPI:                fmt.Sprintf("%s:%s", syntheticsApiImage, syntheticsApiVersionStage),
 	OpaAMS:                       "quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-opa-ams:69db2e0545d9e04fd18f2230c1d59ad2766cf65c",
 }
@@ -774,7 +774,7 @@ var ProductionImages = ParamMap[string]{
 	"KUBE_RBAC_PROXY":          "registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:98455d503b797b6b02edcfd37045c8fab0796b95ee5cf4cfe73b221a07e805f0",
 	ApiCache:                   memcachedImage,
 	MemcachedExporter:          memcachedExporterImage,
-	ObservatoriumAPI:           "quay.io/redhat-user-workloads/rhobs-mco-tenant/observatorium-api:9aada65247a07782465beb500323a0e18d7e3d05",
+	ObservatoriumAPI:           fmt.Sprintf("%s:%s", ObservatoriumImage, ObservatoriumVersion),
 	SyntheticsAPI:              fmt.Sprintf("%s:%s", syntheticsApiImage, syntheticsApiVersionProd),
 	Jaeger:                     "registry.redhat.io/rhosdt/jaeger-agent-rhel8:1.57.0-10",
 }
