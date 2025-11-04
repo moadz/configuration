@@ -96,11 +96,26 @@ objects:
         spec:
           serviceAccount:
             name: rhobs-logs
+          inputs:
+          - name: eventrouter
+            application:
+              includes:
+                - container: kube-eventrouter
+          filters:
+            - name: parse-json
+              type: parse
           pipelines:
             - name: logging-to-loki
               inputRefs:
                 - application
                 - infrastructure
+              outputRefs:
+                - loki-remote
+            - name: eventrouter-to-loki
+              filterRefs:
+                - parse-json
+              inputRefs:
+                - eventrouter
               outputRefs:
                 - loki-remote
           outputs:
