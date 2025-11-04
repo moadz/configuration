@@ -94,36 +94,15 @@ objects:
           annotations:
             observability.openshift.io/tech-preview-otlp-output: "enabled"
         spec:
-          filters:
-            - name: parse-json
-              type: parse
           serviceAccount:
             name: rhobs-logs
-          inputs:
-            - application:
-                includes:
-                  - container: kube-eventrouter
-                name: eventrouter
-                type: application
-            - application:
-                excludes:
-                  - container: kube-eventrouter
-                name: application-custom
-                type: application
           pipelines:
             - name: logging-to-loki
               inputRefs:
-                - application-custom
+                - application
                 - infrastructure
               outputRefs:
                 - loki-remote
-            - name: eventrouter-to-loki
-              inputRefs:
-                - eventrouter
-              outputRefs:
-                - loki-remote
-              filterRefs:
-                - parse-json
           outputs:
             - name: loki-remote
               type: otlp
