@@ -102,6 +102,12 @@ objects:
                   - container: kube-eventrouter
                     namespace: openshift-logging
               type: application
+            - name: custom-application
+              application:
+                excludes:
+                  - container: kube-eventrouter
+                    namespace: openshift-logging
+              type: application
           serviceAccount:
             name: rhobs-logs
           filters:
@@ -116,7 +122,7 @@ objects:
                 - cluster-id-filter
               name: logging-to-loki
               inputRefs:
-                - application
+                - custom-application
                 - infrastructure
               outputRefs:
                 - loki-remote
