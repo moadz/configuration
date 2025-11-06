@@ -21,6 +21,7 @@ objects:
     name: rhobs-logs-cluster-log-forwarder
   spec:
     resourceApplyMode: Sync
+    enableResourceTemplates: true
     clusterDeploymentSelector:
       matchLabels:
         api.openshift.com/managed: 'true'
