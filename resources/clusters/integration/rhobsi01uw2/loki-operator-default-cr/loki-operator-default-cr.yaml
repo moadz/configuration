@@ -29,7 +29,7 @@ objects:
             - name: k8s.pod.name
             - name: k8s.statefulset.name
             - name: openshift.cluster.uid
-            - name: openshift.label.cluster.name
+            - name: openshift.label.cluster_name
             - name: openshift.log.source
             - name: openshift.log.type
             - name: service.name

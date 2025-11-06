@@ -95,7 +95,7 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 									Name: "openshift.cluster.uid",
 								},
 								{
-									Name: "openshift.label.cluster.name",
+									Name: "openshift.label.cluster_name",
 								},
 								{
 									Name: "openshift.log.source",
