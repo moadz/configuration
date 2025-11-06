@@ -113,7 +113,7 @@ objects:
           filters:
             - name: cluster-id-filter
               openshiftLabels:
-                cluster_id: "{{ fromCDLabel \"api.openshift.com/name\" }}"
+                cluster_name: "{{ fromCDLabel \"api.openshift.com/name\" }}"
               type: openshiftLabels
             - name: parse-json
               type: parse
