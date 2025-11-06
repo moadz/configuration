@@ -101,6 +101,7 @@ objects:
                 includes:
                   - container: kube-eventrouter
                     namespace: openshift-logging
+              type: application
           serviceAccount:
             name: rhobs-logs
           filters:
