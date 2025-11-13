@@ -15,7 +15,7 @@ local telemeter = (import 'telemeter.libsonnet') {
       telemeterForwardURL: '${TELEMETER_FORWARD_URL}',
 
       whitelist+: (import '../configuration/telemeter/metrics.json') + (import '../configuration/telemeter-rosa/metrics.json'),
-      elideLabels+: [],
+      elideLabels+: ['prometheus_replica'],
       resourceLimits:: {
         cpu: '${TELEMETER_SERVER_CPU_LIMIT}',
         memory: '${TELEMETER_SERVER_MEMORY_LIMIT}',
