@@ -504,7 +504,7 @@ objects:
               secretKeyRef:
                 key: client-secret
                 name: observatorium-api
-          image: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-opa-ams:69db2e0545d9e04fd18f2230c1d59ad2766cf65c
+          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-opa-ams:da95dce02a3be7dade09199ce5a9d91a5ac6a878
           livenessProbe:
             failureThreshold: 10
             httpGet:
