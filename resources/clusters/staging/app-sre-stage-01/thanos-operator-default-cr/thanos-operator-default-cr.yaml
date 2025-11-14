@@ -62,7 +62,7 @@ objects:
         requests:
           cpu: 32m
           memory: 64Mi
-    baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
+    baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
     blockConfig:
       blockDiscoveryStrategy: concurrent
       blockFilesConcurrency: 1
@@ -105,7 +105,7 @@ objects:
     storeLimitsOptions: {}
     timeRangeConfig:
       maxTime: -22h
-    version: a5a425269814420c179d51a69a2017ff197baa2e
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosCompact
@@ -208,7 +208,7 @@ objects:
     - name: tls
       secret:
         secretName: compact-tls
-    baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
+    baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
     compactConfig:
       compactConcurrency: 1
     debugConfig:
@@ -240,7 +240,7 @@ objects:
       oneHour: 365d
       raw: 365d
     storageSize: 10Gi
-    version: a5a425269814420c179d51a69a2017ff197baa2e
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosQuery
@@ -252,7 +252,7 @@ objects:
     name: rhobs
     namespace: rhobs-stage
   spec:
-    baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
+    baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
     customStoreLabelSelector:
       matchLabels:
         app.kubernetes.io/part-of: thanos
@@ -308,7 +308,7 @@ objects:
       - name: tls
         secret:
           secretName: query-frontend-tls
-      baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
+      baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
       compressResponses: true
       imagePullPolicy: IfNotPresent
       labelsDefaultTimeRange: 336h
@@ -334,7 +334,7 @@ objects:
         requests:
           cpu: 100m
           memory: 256Mi
-      version: a5a425269814420c179d51a69a2017ff197baa2e
+      version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     replicaLabels:
     - prometheus_replica
     - replica
@@ -362,7 +362,7 @@ objects:
       - "30"
       - "60"
       - "120"
-    version: a5a425269814420c179d51a69a2017ff197baa2e
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     webConfig:
       prefixHeader: X-Forwarded-Prefix
   status:
@@ -446,7 +446,7 @@ objects:
         optional: false
       hashrings:
       - asyncForwardWorkerCount: 50
-        baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
+        baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
         externalLabels:
           replica: $(POD_NAME)
         imagePullPolicy: IfNotPresent
@@ -472,7 +472,7 @@ objects:
         tooFarInFutureTimeWindow: 5m
         tsdbConfig:
           retention: 1d
-        version: a5a425269814420c179d51a69a2017ff197baa2e
+        version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     routerSpec:
       additionalArgs:
       - |-
@@ -525,7 +525,7 @@ objects:
           requests:
             cpu: 32m
             memory: 64Mi
-      baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
+      baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
       externalLabels:
         receive: "true"
       imagePullPolicy: IfNotPresent
@@ -540,7 +540,7 @@ objects:
         requests:
           cpu: 100m
           memory: 256Mi
-      version: a5a425269814420c179d51a69a2017ff197baa2e
+      version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status:
     routerStatus:
       availableReplicas: 0
@@ -609,7 +609,7 @@ objects:
     alertLabelDrop:
     - rule_replica
     alertmanagerURL: dnssrv+http://alertmanager-cluster.rhobs-stage.svc.cluster.local:9093
-    baseImage: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos
+    baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
     defaultObjectStorageConfig:
       key: thanos.yaml
       name: default-thanos-bucket
@@ -647,7 +647,7 @@ objects:
       tenantLabel: tenant_id
       tenantValueLabel: operator.thanos.io/tenant
     storageSize: 10Gi
-    version: a5a425269814420c179d51a69a2017ff197baa2e
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: route.openshift.io/v1
   kind: Route
