@@ -277,7 +277,19 @@ objects:
     version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     webConfig:
       prefixHeader: X-Forwarded-Prefix
-  status: {}
+  status:
+    querierStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
+    queryFrontendStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosCompact
   metadata:

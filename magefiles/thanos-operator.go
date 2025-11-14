@@ -24,9 +24,9 @@ import (
 const (
 	crdTemplateDir = "bundle"
 
-	CRDRefProd        = "71ea6c8b40cc5dc1fab7ac5b39f77472339bd845"
-	CRDRefStage       = "3bec3a3b8ff2f7a63fc1eb2166c57df119ce423d"
-	CRDRefIntegration = "3bec3a3b8ff2f7a63fc1eb2166c57df119ce423d"
+	CRDRefProd        = "e28d488b9a7cc217e30d01603559a3a6b87d4289"
+	CRDRefStage       = "e28d488b9a7cc217e30d01603559a3a6b87d4289"
+	CRDRefIntegration = "e28d488b9a7cc217e30d01603559a3a6b87d4289"
 )
 
 // ThanosOperatorCRDS Generates the CRDs for the Thanos operator.
@@ -34,24 +34,24 @@ const (
 // https://github.com/thanos-community/thanos-operator/tree/main/config/crd/bases
 func (b Build) ThanosOperatorCRDS(config clusters.ClusterConfig) error {
 	gen := b.generator(config, "thanos-operator-crds")
-	return crds(gen, clusters.ProductionMaps)
+	return crds(gen)
 }
 
 // CRDS Generates the CRDs for the Thanos operator.
 // This is synced from the latest upstream ref at:
 // https://github.com/thanos-community/thanos-operator/tree/main/config/crd/bases
 func (p Production) CRDS() error {
-	return crds(p.generator(crdTemplateDir), clusters.ProductionMaps)
+	return crds(p.generator(crdTemplateDir))
 }
 
 // CRDS Generates the CRDs for the Thanos operator.
 // This is synced from the latest upstream ref at:
 // https://github.com/thanos-community/thanos-operator/tree/main/config/crd/bases
 func (s Stage) CRDS() error {
-	return crds(s.generator(crdTemplateDir), clusters.StageMaps)
+	return crds(s.generator(crdTemplateDir))
 }
 
-func crds(gen *mimic.Generator, templates clusters.TemplateMaps) error {
+func crds(gen *mimic.Generator) error {
 	const (
 		compact   = "thanoscompacts.yaml"
 		queries   = "thanosqueries.yaml"
