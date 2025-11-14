@@ -67,7 +67,7 @@ objects:
     storeLimitsOptions: {}
     timeRangeConfig:
       maxTime: -22h
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosCompact
@@ -113,7 +113,7 @@ objects:
     storageSize: 3000Gi
     timeRangeConfig:
       maxTime: -120d
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosCompact
@@ -159,7 +159,7 @@ objects:
     storageSize: 3000Gi
     timeRangeConfig:
       minTime: -61d
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosQuery
@@ -249,7 +249,7 @@ objects:
         requests:
           cpu: 100m
           memory: 500Mi
-      version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+      version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     replicaLabels:
     - prometheus_replica
     - replica
@@ -274,7 +274,7 @@ objects:
       - "30"
       - "60"
       - "120"
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     webConfig:
       prefixHeader: X-Forwarded-Prefix
   status: {}
@@ -324,7 +324,7 @@ objects:
         value: '!true'
       shardName: rules
     storageSize: 500Gi
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosStore
@@ -419,7 +419,7 @@ objects:
     storeLimitsOptions: {}
     timeRangeConfig:
       minTime: -336h
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosStore
@@ -487,7 +487,7 @@ objects:
     timeRangeConfig:
       maxTime: -336h
       minTime: -2160h
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosStore
@@ -553,7 +553,7 @@ objects:
     timeRangeConfig:
       maxTime: -2160h
       minTime: -8760h
-    version: 03c9fefbda1b33830a950bd28484fa0a1e039555
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: route.openshift.io/v1
   kind: Route
