@@ -197,13 +197,13 @@ func TemplateFn[T any](param string, m ParamMap[T]) T {
 }
 
 const (
-	thanosImage        = "quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos"
-	thanosVersionStage = "a5a425269814420c179d51a69a2017ff197baa2e"
-	thanosVersionProd  = "a5a425269814420c179d51a69a2017ff197baa2e"
+	thanosImage        = "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos"
+	thanosVersionStage = "358a4a4341684ca1f199b6780891f4d09d5ca458"
+	thanosVersionProd  = "358a4a4341684ca1f199b6780891f4d09d5ca458"
 
-	thanosOperatorImage        = "quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos-operator"
-	thanosOperatorVersionStage = "6498eed03b49b29f5a768dd203f61314083702f7"
-	thanosOperatorVersionProd  = "bd364e71543440e27f12ccf41f206ee5d1302215"
+	thanosOperatorImage        = "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator"
+	thanosOperatorVersionStage = "d4ab5437b2d988fa31db741f53c9462f66327785"
+	thanosOperatorVersionProd  = "d4ab5437b2d988fa31db741f53c9462f66327785"
 )
 
 const (
@@ -219,8 +219,8 @@ const (
 )
 
 const (
-	ObservatoriumImage   = "quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-obs-api"
-	ObservatoriumVersion = "9011fb0ead0c0a7d248cd11945a321fc48df8707"
+	ObservatoriumImage   = "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api"
+	ObservatoriumVersion = "210d0f7ddfd29f43068cb0060c32ff47cb9ca41a"
 )
 
 // Template key constants - exportable template parameter names
@@ -451,7 +451,7 @@ var StageImages = ParamMap[string]{
 	MemcachedExporter:            memcachedExporterImage,
 	ObservatoriumAPI:             fmt.Sprintf("%s:%s", ObservatoriumImage, ObservatoriumVersion),
 	SyntheticsAPI:                fmt.Sprintf("%s:%s", syntheticsApiImage, syntheticsApiVersionStage),
-	OpaAMS:                       "quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-opa-ams:69db2e0545d9e04fd18f2230c1d59ad2766cf65c",
+	OpaAMS:                       "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-opa-ams:da95dce02a3be7dade09199ce5a9d91a5ac6a878",
 }
 
 // Stage images.
