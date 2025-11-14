@@ -124,6 +124,7 @@ objects:
               inputRefs:
                 - custom-application
                 - infrastructure
+                - audit
               outputRefs:
                 - loki-remote
             - filterRefs:
