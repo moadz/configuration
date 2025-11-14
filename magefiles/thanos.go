@@ -69,7 +69,7 @@ func (p Production) Thanos() {
 	var objs []runtime.Object
 
 	tmpAdditionalQueryArgs := []string{
-		`--rule=dnssrv+_grpc._tcp.observatorium-thanos-rule.observatorium-metrics-production.svc.cluster.local`,
+		`--endpoint=dnssrv+_grpc._tcp.observatorium-thanos-rule.observatorium-metrics-production.svc.cluster.local`,
 		`--endpoint=dnssrv+_grpc._tcp.observatorium-thanos-receive-default.observatorium-metrics-production.svc.cluster.local`,
 	}
 

@@ -172,7 +172,7 @@ objects:
     namespace: rhobs-production
   spec:
     additionalArgs:
-    - --rule=dnssrv+_grpc._tcp.observatorium-thanos-rule.observatorium-metrics-production.svc.cluster.local
+    - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-rule.observatorium-metrics-production.svc.cluster.local
     - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-receive-default.observatorium-metrics-production.svc.cluster.local
     baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
     customStoreLabelSelector:
