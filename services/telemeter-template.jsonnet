@@ -72,6 +72,7 @@ local oauthProxy = import './sidecars/oauth-proxy.libsonnet';
 local tr = (import 'github.com/observatorium/token-refresher/jsonnet/lib/token-refresher.libsonnet')({
   name: 'telemeter-token-refresher',
   namespace: '${NAMESPACE}',
+  image: '${TOKEN_REFRESHER_IMAGE}',
   version: '${TOKEN_REFRESHER_IMAGE_TAG}',
   url: 'http://observatorium-observatorium-api.${OBSERVATORIUM_NAMESPACE}.svc:8080/api/metrics/v1/telemeter',
   secretName: '${TOKEN_REFRESHER_SECRET_NAME}',
@@ -187,6 +188,7 @@ local tr = (import 'github.com/observatorium/token-refresher/jsonnet/lib/token-r
     { name: 'TELEMETER_SERVER_MEMORY_LIMIT', value: '1Gi' },
     { name: 'TELEMETER_SERVER_MEMORY_REQUEST', value: '500Mi' },
     { name: 'TELEMETER_SERVER_TOKEN_EXPIRE_SECONDS', value: '3600' },
+    { name: 'TOKEN_REFRESHER_IMAGE', value: 'quay.io/observatorium/token-refresher' },
     { name: 'TOKEN_REFRESHER_IMAGE_TAG', value: 'master-2021-03-05-b34376b' },
     { name: 'TOKEN_REFRESHER_LOG_LEVEL', value: 'info' },
     { name: 'TOKEN_REFRESHER_SECRET_NAME', value: 'token-refresher-oidc' },
