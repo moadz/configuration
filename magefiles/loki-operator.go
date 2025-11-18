@@ -21,8 +21,9 @@ import (
 )
 
 const (
-	lokiOperatorImage = "quay.io/redhat-user-workloads/obs-logging-tenant/loki-operator-v6-3"
-	lokiRef           = "ab233daeab6b9808a6c216c75cc5db449486f87e"
+	lokiOperatorImage    = "registry.redhat.io/openshift-logging/loki-rhel9-operator"
+	lokiOperatorImageSHA = "sha256:4638c948401d1086a89c8c0516f789d7cd2a3991ac76d67e2371fff6370bb6dc"
+	lokiRef              = "b4098ba6ff9b94d589cbb005531d10e090cd4026"
 )
 
 // LokiOperatorCRDS Generates the CRDs for the Loki operator.
@@ -131,7 +132,7 @@ func NewControllerManagerDeployment(namespace string) *appsv1.Deployment {
 					NodeSelector:       map[string]string{"kubernetes.io/os": "linux"},
 					Containers: []corev1.Container{{
 						Name:            "manager",
-						Image:           fmt.Sprintf("%s:%s", lokiOperatorImage, lokiRef),
+						Image:           fmt.Sprintf("%s@%s", lokiOperatorImage, lokiOperatorImageSHA),
 						ImagePullPolicy: corev1.PullIfNotPresent,
 						Command:         []string{"/manager"},
 						Ports:           []corev1.ContainerPort{{Name: "metrics", ContainerPort: 8080}},

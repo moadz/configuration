@@ -401,7 +401,7 @@ objects:
             value: registry.redhat.io/openshift-logging/opa-openshift-rhel9@sha256:06602373b99d694a83b845e9cc6746a4f37a7a6ca6943356fea6ee6dbbccda35
           - name: OPERATOR_CONDITION_NAME
             value: loki-operator.v6.3.0
-          image: quay.io/redhat-user-workloads/obs-logging-tenant/loki-operator-v6-3:ab233daeab6b9808a6c216c75cc5db449486f87e
+          image: registry.redhat.io/openshift-logging/loki-rhel9-operator@sha256:4638c948401d1086a89c8c0516f789d7cd2a3991ac76d67e2371fff6370bb6dc
           imagePullPolicy: IfNotPresent
           name: manager
           ports:
