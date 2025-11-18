@@ -35,6 +35,7 @@ type LokiOverrides struct {
 type LokiLimitOverrides struct {
 	IngestionRateLimitMB int32
 	IngestionBurstSizeMB int32
+	MaxLineSize          int32
 
 	QueryTimeout string
 }
@@ -408,7 +409,8 @@ func DefaultBaseTemplate() TemplateMaps {
 			LokiConfig: LokiOverrides{
 				LokiLimitOverrides: LokiLimitOverrides{
 					IngestionRateLimitMB: 12,
-					IngestionBurstSizeMB: 256, // workaround for LOG-6817, OTLP configuration appears to be sending unbounded-large requests
+					IngestionBurstSizeMB: 256,        // workaround for LOG-6817, OTLP configuration appears to be sending unbounded-large requests
+					MaxLineSize:          384 * 1024, // increased from default of 256K to accommodate audit logs
 					QueryTimeout:         "3m",
 				},
 				Router: LokiComponentSpec{
