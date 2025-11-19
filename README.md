@@ -6,7 +6,8 @@ See our [website](https://rhobs-handbook.netlify.app/) for more information abou
 
 ## Requirements
 
-* Go 1.17+
+* Go
+* [Mage](https://magefile.org/) (`go install github.com/magefile/mage@latest`)
 
 ### macOS
 
@@ -14,6 +15,37 @@ See our [website](https://rhobs-handbook.netlify.app/) for more information abou
 * gnu-sed
 
 Both can be installed using Homebrew: `brew install gnu-sed findutils`. Afterwards, update the `SED` and `XARGS` variables in the Makefile to use `gsed` and `gxargs` or replace them in your environment.
+
+## Building RHOBS Cells with Mage
+
+This repository leans heavily on [Mage](https://magefile.org/) to build various components of RHOBS. You can find the available Mage targets by running:
+
+```bash
+mage -l
+```
+
+### Synchronizing Operators
+
+Because we ship operators and their Custom Resource Definitions (CRDs) as part of our RHOBS service, 
+we need to keep them in sync with the versions deployed in our clusters. 
+We are further complicated by the reqirement to ship images built on Konflux so we need to maintain a mapping between 
+upstream operator versions and our Konflux-built images.
+
+To facilitate this, we provide a Mage target `mage sync:operator` that automates the synchronization process.
+This allows us to keep the image versions in sync with the CRDs they support.
+
+The target requires two parameters:
+1. `operator`: The name of the operator to synchronize and should be one of (`thanos`).
+2. The commit hash for the fork we want to sync to or "latest" to sync to the latest commit on the supported branch.
+
+For `thanos`, this is the commit hash on https://github.com/rhobs/rhobs-konflux-thanos-operator
+An example is shown below:
+
+```bash
+mage sync:operator thanos latest
+```
+This will update some internal configuration and sync the dependency in go modules.
+You can now proceed to build for a specific environment using `mage build:environment <env>`.
 
 ## Usage
 
@@ -76,22 +108,6 @@ $JB update https://github.com/thanos-io/kube-thanos/jsonnet/kube-thanos@main
 
 # Update all dependancies to master and sets the new hashes in `jsonnetfile.lock.json`.
 $JB update
-```
-
-## Testing cluster
-
-The purpose of [RHOBS testing cluster](https://console-openshift-console.apps.rhobs-testing.qqzf.p1.openshiftapps.com/dashboards) is to
-experiment before changes are rolled out to staging and production environments. The objects in the cluster are managed by app-interface, however the testing cluster uses a different set of namespaces - `observatorium{-logs,-metrics,-traces}-testing`.
-
-Changes can be applied to the cluster manually, however they will be overridden by app-interface during the next deployment cycle.
-
-### Refresh token
-
-The refresh token can be obtained via [token-refresher](https://github.com/observatorium/token-refresher).
-
-```bash
-./token-refresher --url=https://observatorium.apps.rhobs-testing.qqzf.p1.openshiftapps.com  --oidc.client-id=observatorium-rhobs-testing  --oidc.client-secret=<token> --log.level=debug --oidc.issuer-url=https://sso.redhat.com/auth/realms/redhat-external --oidc.audience=observatorium-telemeter-testing --file /tmp/token
-cat /tmp/token
 ```
 
 ## App Interface

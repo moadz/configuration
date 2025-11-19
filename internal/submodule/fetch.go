@@ -3,6 +3,7 @@ package submodule
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -414,4 +415,29 @@ func (i Info) fetchFileContent(repoURL, commit, filePath string) ([]byte, error)
 		return nil, fmt.Errorf("failed to read file content: %w", err)
 	}
 	return body, nil
+}
+
+type gitHubCommit struct {
+	SHA string `json:"sha"`
+}
+
+func GithubLatestCommit(apiURL string) (string, error) {
+	url := fmt.Sprintf("%s/commits/main", apiURL)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("GitHub API returned status %d", resp.StatusCode)
+	}
+
+	var commit gitHubCommit
+	if err := json.NewDecoder(resp.Body).Decode(&commit); err != nil {
+		return "", err
+	}
+
+	return commit.SHA, nil
 }
