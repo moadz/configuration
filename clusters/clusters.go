@@ -100,21 +100,60 @@ const (
 
 // DefaultBuildSteps returns the default build pipeline for clusters
 func DefaultBuildSteps() []string {
+	var steps []string
+	steps = append(steps, DefaultMetricsBuildSteps()...)
+	steps = append(steps, DefaultLoggingBuildSteps()...)
+	steps = append(steps, DefaultSyntheticsBuildSteps()...)
+
+	steps = append(steps,
+		StepServiceMonitors, // Monitoring setup
+		StepAlertmanager,    // Alerting configuration
+		StepSecrets,         // Secrets last
+		StepMemcached,       // Memcached configuration
+		StepGateway,         // Gateway configuration
+		StepThanosRules,     // Thanos metamonitoring Rules configuration last}
+	)
+	return steps
+}
+
+func DefaultMetricsBuildSteps() []string {
 	return []string{
 		StepThanosOperatorCRDS, // Core components first
 		StepThanosOperator,     // Custom Resource Definitions
 		StepDefaultThanosStack, // ThanosOperator deployment
-		StepServiceMonitors,    // Monitoring setup
+	}
+}
+
+func DefaultLoggingBuildSteps() []string {
+	return []string{
 		StepLokiOperatorCRDS,
 		StepLokiOperator,
 		StepDefaultLokiStack,
-		StepAlertmanager,  // Alerting configuration
-		StepSecrets,       // Secrets last
-		StepMemcached,     // Memcached configuration
-		StepGateway,       // Gateway configuration
-		StepSyntheticsApi, // Synthetics API configuration
-		StepThanosRules,   // Thanos metamonitoring Rules configuration
 	}
+}
+
+func DefaultSyntheticsBuildSteps() []string {
+	return []string{
+		StepSyntheticsApi,
+	}
+}
+
+// Prune is a utility function to remove specified steps from a list
+func Prune(from []string, prune ...[]string) []string {
+	pruneMap := make(map[string]struct{})
+	for _, p := range prune {
+		for _, step := range p {
+			pruneMap[step] = struct{}{}
+		}
+	}
+
+	var result []string
+	for _, step := range from {
+		if _, shouldPrune := pruneMap[step]; !shouldPrune {
+			result = append(result, step)
+		}
+	}
+	return result
 }
 
 // RegisterCluster registers a cluster configuration with validation

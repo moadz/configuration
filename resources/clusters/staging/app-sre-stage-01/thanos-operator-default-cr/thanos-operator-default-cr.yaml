@@ -460,8 +460,8 @@ objects:
         replicas: 3
         resourceRequirements:
           requests:
-            cpu: "4"
-            memory: 28Gi
+            cpu: "2"
+            memory: 15Gi
         storageSize: 10Gi
         storeLimitsOptions: {}
         tenancyConfig:
@@ -534,12 +534,9 @@ objects:
       replicas: 1
       replicationFactor: 3
       resourceRequirements:
-        limits:
-          cpu: 200m
-          memory: 512Mi
         requests:
-          cpu: 100m
-          memory: 256Mi
+          cpu: "1"
+          memory: 5Gi
       version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status:
     routerStatus:

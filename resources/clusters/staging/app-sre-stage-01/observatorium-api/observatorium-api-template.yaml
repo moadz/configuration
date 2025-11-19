@@ -195,6 +195,32 @@ objects:
         subjects:
         - kind: user
           name: service-account-plmshift
+      - name: 9baf25c1-f61e-4b0d-b3a5-41802dbc061e
+        roles:
+        - telemeter-metrics-read
+        subjects:
+        - kind: user
+          name: service-account-9baf25c1-f61e-4b0d-b3a5-41802dbc061e
+      - name: cefb23fb-d0a2-4c8f-9180-d95c259e79a3
+        roles:
+        - telemeter-metrics-read
+        subjects:
+        - kind: user
+          name: service-account-cefb23fb-d0a2-4c8f-9180-d95c259e79a3
+      - name: 875c08bc-d313-417f-a044-295212338e81
+        roles:
+        - telemeter-metrics-write
+        subjects:
+        - kind: user
+          name: service-account-875c08bc-d313-417f-a044-295212338e81-staging
+        - kind: user
+          name: service-account-875c08bc-d313-417f-a044-295212338e81
+      - name: 4cbd24b0-3aed-4b03-839a-f4515b199a5d
+        roles:
+        - telemeter-metrics-write
+        subjects:
+        - kind: user
+          name: service-account-4cbd24b0-3aed-4b03-839a-f4515b199a5d
       - name: observatorium-rhtap
         roles:
         - rhtap-metrics-read
@@ -371,7 +397,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-stage
 - apiVersion: apps/v1
@@ -383,7 +409,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-stage
   spec:
@@ -407,7 +433,7 @@ objects:
           app.kubernetes.io/instance: rhobs
           app.kubernetes.io/name: observatorium-api
           app.kubernetes.io/part-of: rhobs
-          app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
+          app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
       spec:
         affinity:
           podAntiAffinity:
@@ -425,13 +451,18 @@ objects:
         - args:
           - --web.listen=0.0.0.0:8080
           - --web.internal.listen=0.0.0.0:8081
-          - --log.level=debug
+          - --log.level=info
           - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-stage.svc.cluster.local:9090
           - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-stage.svc.cluster.local:19291
+          - --logs.read.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-stage.svc.cluster.local:3100
+          - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-stage.svc.cluster.local:3100
+          - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-stage.svc.cluster.local:3100
           - --metrics.alertmanager.endpoint=http://alertmanager.rhobs-stage.svc.cluster.local:9093
           - --rbac.config=/etc/observatorium/rbac.yaml
           - --tenants.config=/etc/observatorium/tenants.yaml
+          - --logs.write-timeout=4m0s
           - --server.read-timeout=5m
+          - --probes.endpoint=http://synthetics-api.rhobs-stage.svc.cluster.local:8080
           image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
           livenessProbe:
             failureThreshold: 10
@@ -455,13 +486,7 @@ objects:
               port: 8081
               scheme: HTTP
             periodSeconds: 5
-          resources:
-            limits:
-              cpu: "1"
-              memory: 2Gi
-            requests:
-              cpu: 100m
-              memory: 100Mi
+          resources: {}
           volumeMounts:
           - mountPath: /etc/observatorium/rbac.yaml
             name: rbac
@@ -471,123 +496,6 @@ objects:
             name: tenants
             readOnly: true
             subPath: tenants.yaml
-        - args:
-          - --web.listen=127.0.0.1:8082
-          - --web.internal.listen=0.0.0.0:8083
-          - --web.healthchecks.url=http://127.0.0.1:8082
-          - --log.level=warn
-          - --ams.url=https://api.openshift.com
-          - --resource-type-prefix=observatorium
-          - --oidc.client-id=$(CLIENT_ID)
-          - --oidc.client-secret=$(CLIENT_SECRET)
-          - --oidc.issuer-url=$(ISSUER_URL)
-          - --opa.package=observatorium
-          - --memcached=api-memcached.rhobs-stage.svc.cluster.local:11211
-          - --memcached.expire=300
-          - --ams.mappings=osd=${OSD_ORGANIZATION_ID}
-          - --ams.mappings=osd=${SD_OPS_ORGANIZATION_ID}
-          - --ams.mappings=cnvqe={CNVQE_ORGANIZATION_ID}
-          - --internal.tracing.endpoint=localhost:6831
-          env:
-          - name: ISSUER_URL
-            valueFrom:
-              secretKeyRef:
-                key: issuer-url
-                name: observatorium-api
-          - name: CLIENT_ID
-            valueFrom:
-              secretKeyRef:
-                key: client-id
-                name: observatorium-api
-          - name: CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                key: client-secret
-                name: observatorium-api
-          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-opa-ams:da95dce02a3be7dade09199ce5a9d91a5ac6a878
-          livenessProbe:
-            failureThreshold: 10
-            httpGet:
-              path: /live
-              port: 8083
-              scheme: HTTP
-            periodSeconds: 30
-          name: opa-ams
-          ports:
-          - containerPort: 8082
-            name: opa-ams-api
-          - containerPort: 8083
-            name: opa-ams-metrics
-          readinessProbe:
-            failureThreshold: 12
-            httpGet:
-              path: /ready
-              port: 8083
-              scheme: HTTP
-            periodSeconds: 5
-          resources:
-            limits:
-              cpu: "3"
-              memory: 1844Mi
-            requests:
-              cpu: 500m
-              memory: 100Mi
-        - args:
-          - --reporter.grpc.host-port=dns:///otel-trace-writer-collector-headless.observatorium-tools.svc:14250
-          - --reporter.type=grpc
-          - --agent.tags=pod.namespace=$(NAMESPACE),pod.name=$(POD)
-          env:
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.namespace
-          - name: POD
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.name
-          image: registry.redhat.io/rhosdt/jaeger-agent-rhel8:1.57.0-10
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /
-              port: 14271
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          name: jaeger-agent
-          ports:
-          - containerPort: 5778
-            name: configs
-            protocol: TCP
-          - containerPort: 6831
-            name: jaeger-thrift
-            protocol: TCP
-          - containerPort: 14271
-            name: metrics
-            protocol: TCP
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /
-              port: 14271
-              scheme: HTTP
-            initialDelaySeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          resources:
-            limits:
-              cpu: "1"
-              memory: 2Gi
-            requests:
-              cpu: 100m
-              memory: 100Mi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: FallbackToLogsOnError
         serviceAccountName: observatorium-api
         volumes:
         - configMap:
@@ -608,7 +516,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-stage
   stringData:
@@ -642,7 +550,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-stage
   spec:
@@ -692,7 +600,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-stage
 parameters:

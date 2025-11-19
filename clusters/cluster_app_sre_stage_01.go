@@ -18,7 +18,7 @@ func init() {
 		Tenants:     appSreStage01Tenants(),
 		RBAC:        appSreStage01RBAC(),
 		Templates:   appSreStage01TemplateMaps(),
-		BuildSteps:  DefaultBuildSteps(),
+		BuildSteps:  Prune(DefaultBuildSteps(), DefaultLoggingBuildSteps(), DefaultSyntheticsBuildSteps()),
 	})
 }
 
