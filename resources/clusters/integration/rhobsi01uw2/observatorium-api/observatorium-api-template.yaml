@@ -72,7 +72,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9011fb0ead0c0a7d248cd11945a321fc48df8707
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-int
 - apiVersion: apps/v1
@@ -84,7 +84,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9011fb0ead0c0a7d248cd11945a321fc48df8707
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-int
   spec:
@@ -108,7 +108,7 @@ objects:
           app.kubernetes.io/instance: rhobs
           app.kubernetes.io/name: observatorium-api
           app.kubernetes.io/part-of: rhobs
-          app.kubernetes.io/version: 9011fb0ead0c0a7d248cd11945a321fc48df8707
+          app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
       spec:
         affinity:
           podAntiAffinity:
@@ -191,7 +191,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9011fb0ead0c0a7d248cd11945a321fc48df8707
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-int
   stringData:
@@ -225,7 +225,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9011fb0ead0c0a7d248cd11945a321fc48df8707
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-int
   spec:
@@ -275,7 +275,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 9011fb0ead0c0a7d248cd11945a321fc48df8707
+      app.kubernetes.io/version: 210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
     name: observatorium-api
     namespace: rhobs-int
 parameters:

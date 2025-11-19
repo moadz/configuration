@@ -47,7 +47,7 @@ type gatewayConfig struct {
 
 func (b Build) Gateway(config clusters.ClusterConfig) error {
 	ns := config.Namespace
-	rbac, err := json.Marshal(config.RBAC)
+	rbac, err := json.Marshal(config.GatewayConfig.RBAC())
 	if err != nil {
 		return fmt.Errorf("failed to marshal RBAC configuration: %w", err)
 	}
@@ -56,9 +56,12 @@ func (b Build) Gateway(config clusters.ClusterConfig) error {
 		return fmt.Errorf("failed to convert RBAC configuration to YAML: %w", err)
 	}
 
-	deployment := gatewayDeployment(config.Templates, ns, config.AMSUrl)
-	probeEndpoint := fmt.Sprintf("--probes.endpoint=http://synthetics-api.%s.svc.cluster.local:8080", ns)
-	deployment.Spec.Template.Spec.Containers[0].Args = append(deployment.Spec.Template.Spec.Containers[0].Args, probeEndpoint)
+	deployment := gatewayDeployment(config.Templates, ns, config.GatewayConfig.AMSURL())
+
+	if config.GatewayConfig.SyntheticsEnabled() {
+		probeEndpoint := fmt.Sprintf("--probes.endpoint=http://synthetics-api.%s.svc.cluster.local:8080", ns)
+		deployment.Spec.Template.Spec.Containers[0].Args = append(deployment.Spec.Template.Spec.Containers[0].Args, probeEndpoint)
+	}
 
 	objs := []runtime.Object{
 		gatewayRBAC(config.Templates, ns, string(rbacYAML)),
@@ -170,8 +173,10 @@ func gatewayDeployment(m clusters.TemplateMaps, namespace, amsURL string) *appsv
 		createObservatoriumAPIContainer(m, namespace),
 	}
 
-	if _, ok := m.Images[opaAMS]; ok {
-		containers = append(containers, createOPAAMSContainer(m, namespace, amsURL))
+	if amsURL != "" {
+		if _, ok := m.Images[opaAMS]; ok {
+			containers = append(containers, createOPAAMSContainer(m, namespace, amsURL))
+		}
 	}
 
 	if _, ok := m.Images[componentJaegerAgent]; ok {
@@ -577,7 +582,7 @@ func gatewayRBAC(m clusters.TemplateMaps, namespace, contents string) *corev1.Co
 
 func createTenantSecret(config clusters.ClusterConfig, namespace string) *corev1.Secret {
 	labels, _ := gatewayLabels(config.Templates)
-	tenantsYaml, _ := yaml.Marshal(config.Tenants)
+	tenantsYaml, _ := yaml.Marshal(config.GatewayConfig.Tenants())
 
 	return &corev1.Secret{
 		TypeMeta: metav1.TypeMeta{

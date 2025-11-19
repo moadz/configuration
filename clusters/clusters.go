@@ -23,14 +23,23 @@ const (
 
 // ClusterConfig holds the configuration for a specific cluster deployment
 type ClusterConfig struct {
-	Name        ClusterName
-	Environment ClusterEnvironment
-	Namespace   string
-	Templates   TemplateMaps
-	RBAC        cfgobservatorium.ObservatoriumRBAC
-	Tenants     observatoriumapi.Tenants
-	AMSUrl      string
-	BuildSteps  []string
+	Name          ClusterName
+	Environment   ClusterEnvironment
+	Namespace     string
+	Templates     TemplateMaps
+	GatewayConfig *GatewayConfig
+	BuildSteps    []string
+}
+
+type GatewayConfig struct {
+	metricsEnabled    bool
+	logsEnabled       bool
+	syntheticsEnabled bool
+	// tracing in this instance refers to internal tracing of the gateway itself
+	tracingEnabled bool
+	amsURL         string
+	tenants        observatoriumapi.Tenants
+	rbac           cfgobservatorium.ObservatoriumRBAC
 }
 
 // String returns the string representation of ClusterName
@@ -190,4 +199,98 @@ func GetClustersByEnvironment(env ClusterEnvironment) []ClusterConfig {
 		}
 	}
 	return clusters
+}
+
+func NewGatewayConfig(options ...func(*GatewayConfig)) *GatewayConfig {
+	g := &GatewayConfig{}
+	for _, o := range options {
+		o(g)
+	}
+	return g
+}
+
+// WithMetricsEnabled enables metrics functionality for the gateway
+func WithMetricsEnabled() func(*GatewayConfig) {
+	return func(g *GatewayConfig) {
+		g.metricsEnabled = true
+	}
+}
+
+// WithLoggingEnabled enables logging functionality for the gateway
+func WithLoggingEnabled() func(*GatewayConfig) {
+	return func(g *GatewayConfig) {
+		g.logsEnabled = true
+	}
+}
+
+// WithSyntheticsEnabled enables synthetics functionality for the gateway
+func WithSyntheticsEnabled() func(*GatewayConfig) {
+	return func(g *GatewayConfig) {
+		g.syntheticsEnabled = true
+	}
+}
+
+// WithTracingEnabled enables internal tracing for the gateway itself
+func WithTracingEnabled() func(*GatewayConfig) {
+	return func(g *GatewayConfig) {
+		g.tracingEnabled = true
+	}
+}
+
+// WithAMS configures the Account Management Service URL for the gateway
+func WithAMS(url string) func(*GatewayConfig) {
+	return func(g *GatewayConfig) {
+		g.amsURL = url
+	}
+}
+
+// WithTenants configures the tenant definitions for multi-tenancy support
+func WithTenants(tenants observatoriumapi.Tenants) func(*GatewayConfig) {
+	return func(g *GatewayConfig) {
+		g.tenants = tenants
+	}
+}
+
+// WithRBAC configures role-based access control settings for the gateway
+func WithRBAC(rbac cfgobservatorium.ObservatoriumRBAC) func(*GatewayConfig) {
+	return func(g *GatewayConfig) {
+		g.rbac = rbac
+	}
+}
+
+// Getter methods for GatewayConfig fields
+
+// MetricsEnabled returns whether metrics are enabled for the gateway
+func (g *GatewayConfig) MetricsEnabled() bool {
+	return g.metricsEnabled
+}
+
+// LogsEnabled returns whether logs are enabled for the gateway
+func (g *GatewayConfig) LogsEnabled() bool {
+	return g.logsEnabled
+}
+
+// SyntheticsEnabled returns whether synthetics are enabled for the gateway
+func (g *GatewayConfig) SyntheticsEnabled() bool {
+	return g.syntheticsEnabled
+}
+
+// TracingEnabled returns whether tracing is enabled for the gateway
+func (g *GatewayConfig) TracingEnabled() bool {
+	return g.tracingEnabled
+}
+
+// AMSURL returns the AMS URL for the gateway
+func (g *GatewayConfig) AMSURL() string {
+	return g.amsURL
+}
+
+// Tenants returns the tenants configuration for the gateway
+func (g *GatewayConfig) Tenants() observatoriumapi.Tenants {
+	return g.tenants
+}
+
+// RBAC returns the RBAC configuration for the gateway
+func (g *GatewayConfig) RBAC() cfgobservatorium.ObservatoriumRBAC {
+	return g.rbac
 }

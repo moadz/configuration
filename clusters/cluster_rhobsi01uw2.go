@@ -15,11 +15,16 @@ func init() {
 		Name:        ClusterRHOBSUSWestIntegration,
 		Environment: EnvironmentIntegration,
 		Namespace:   "rhobs-int",
-		AMSUrl:      "https://api.openshift.com",
-		RBAC:        rhobsi01uw2RBAC(),
-		Tenants:     rhobsi01uw2Tenants(),
-		Templates:   rhobsi01uw2TemplateMaps(),
-		BuildSteps:  rhobsi01uw2BuildSteps(),
+		GatewayConfig: NewGatewayConfig(
+			WithMetricsEnabled(),
+			WithLoggingEnabled(),
+			WithSyntheticsEnabled(),
+			WithTracingEnabled(),
+			WithTenants(rhobsi01uw2Tenants()),
+			WithRBAC(rhobsi01uw2RBAC()),
+		),
+		Templates:  rhobsi01uw2TemplateMaps(),
+		BuildSteps: rhobsi01uw2BuildSteps(),
 	})
 }
 

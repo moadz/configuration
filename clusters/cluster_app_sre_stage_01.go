@@ -14,11 +14,15 @@ func init() {
 		Name:        ClusterAppSREStage01,
 		Environment: EnvironmentStaging,
 		Namespace:   "rhobs-stage",
-		AMSUrl:      "https://api.openshift.com",
-		Tenants:     appSreStage01Tenants(),
-		RBAC:        appSreStage01RBAC(),
-		Templates:   appSreStage01TemplateMaps(),
-		BuildSteps:  Prune(DefaultBuildSteps(), DefaultLoggingBuildSteps(), DefaultSyntheticsBuildSteps()),
+		GatewayConfig: NewGatewayConfig(
+			WithMetricsEnabled(),
+			WithAMS("https://api.stage.openshift.com"),
+			WithTenants(appSreStage01Tenants()),
+			WithRBAC(appSreStage01RBAC()),
+			WithTracingEnabled(),
+		),
+		Templates:  appSreStage01TemplateMaps(),
+		BuildSteps: Prune(DefaultBuildSteps(), DefaultLoggingBuildSteps(), DefaultSyntheticsBuildSteps()),
 	})
 }
 

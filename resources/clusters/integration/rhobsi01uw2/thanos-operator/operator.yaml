@@ -110,7 +110,7 @@ objects:
           - --feature-gate.enable-prometheus-operator-crds=false
           command:
           - /manager
-          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator:d4ab5437b2d988fa31db741f53c9462f66327785
+          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator:162f6696a7da75b49201018715e54a2dc35d6d59
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
