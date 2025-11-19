@@ -127,16 +127,16 @@ objects:
           - --web.listen=0.0.0.0:8080
           - --web.internal.listen=0.0.0.0:8081
           - --log.level=info
-          - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-int.svc.cluster.local:9090
-          - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-int.svc.cluster.local:19291
-          - --logs.read.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
-          - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
-          - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-int.svc.cluster.local:3100
           - --metrics.alertmanager.endpoint=http://alertmanager.rhobs-int.svc.cluster.local:9093
           - --rbac.config=/etc/observatorium/rbac.yaml
           - --tenants.config=/etc/observatorium/tenants.yaml
           - --logs.write-timeout=4m0s
           - --server.read-timeout=5m
+          - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-int.svc.cluster.local:9090
+          - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-int.svc.cluster.local:19291
+          - --logs.read.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
+          - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
+          - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-int.svc.cluster.local:3100
           - --probes.endpoint=http://synthetics-api.rhobs-int.svc.cluster.local:8080
           image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
           livenessProbe:
@@ -199,23 +199,15 @@ objects:
     client-secret: ${CLIENT_SECRET}
     issuer-url: https://sso.redhat.com/auth/realms/redhat-external
     tenants.yaml: |
-      Tenants:
-      - Authenticator: null
-        ID: EFD08939-FE1D-41A1-A28A-BE9A9BC68003
-        MTLS: null
-        Name: hcp
-        OIDC:
-          ClientID: ${CLIENT_ID}
-          ClientSecret: ${CLIENT_SECRET}
-          GroupClaim: ""
-          IssuerCAPath: ""
-          IssuerRawCA: null
-          IssuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          RedirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/odfms/callback
-          UsernameClaim: preferred_username
-        OPA: null
-        OpenShift: null
-        RateLimits: null
+      tenants:
+      - name: hcp
+        id: EFD08939-FE1D-41A1-A28A-BE9A9BC68003
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/odfms/callback
+          usernameClaim: preferred_username
 - apiVersion: v1
   kind: Service
   metadata:
@@ -249,14 +241,6 @@ objects:
       port: 8080
       protocol: TCP
       targetPort: 8080
-    - name: opa-ams-api
-      port: 8082
-      protocol: TCP
-      targetPort: 8082
-    - name: opa-ams-metrics
-      port: 8083
-      protocol: TCP
-      targetPort: 8083
     selector:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs

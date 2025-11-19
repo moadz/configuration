@@ -24,10 +24,10 @@ objects:
       port: internal
     - interval: 30s
       path: /metrics
-      port: opa-ams-metrics
+      port: metrics
     - interval: 30s
       path: /metrics
-      port: metrics
+      port: opa-ams-metrics
     namespaceSelector:
       matchNames:
       - rhobs-production

@@ -3,15 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
 	"github.com/ghodss/yaml"
+	observatoriumapi "github.com/observatorium/observatorium/configuration_go/abstr/kubernetes/observatorium/api"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	templatev1 "github.com/openshift/api/template/v1"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
 	cfgobservatorium "github.com/rhobs/configuration/configuration/observatorium"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,6 +49,13 @@ type gatewayConfig struct {
 }
 
 func (b Build) Gateway(config clusters.ClusterConfig) error {
+	fn := func() *mimic.Generator {
+		return b.generator(config, gatewayName)
+	}
+	return gatewayNew(config, fn)
+}
+
+func gatewayNew(config clusters.ClusterConfig, fn builderBuilderGenFunc) error {
 	ns := config.Namespace
 	rbac, err := json.Marshal(config.GatewayConfig.RBAC())
 	if err != nil {
@@ -56,103 +66,75 @@ func (b Build) Gateway(config clusters.ClusterConfig) error {
 		return fmt.Errorf("failed to convert RBAC configuration to YAML: %w", err)
 	}
 
-	deployment := gatewayDeployment(config.Templates, ns, config.GatewayConfig.AMSURL())
-
-	if config.GatewayConfig.SyntheticsEnabled() {
-		probeEndpoint := fmt.Sprintf("--probes.endpoint=http://synthetics-api.%s.svc.cluster.local:8080", ns)
-		deployment.Spec.Template.Spec.Containers[0].Args = append(deployment.Spec.Template.Spec.Containers[0].Args, probeEndpoint)
-	}
+	deployment := gatewayDeployment(config.Templates, ns, config.GatewayConfig)
 
 	objs := []runtime.Object{
 		gatewayRBAC(config.Templates, ns, string(rbacYAML)),
 		deployment,
-		createGatewayService(config.Templates, ns),
+		createGatewayService(config.Templates, ns, config.GatewayConfig),
 		createTenantSecret(config, ns),
 		createGatewayServiceAccount(config.Templates, ns),
 	}
-	gen := b.generator(config, gatewayName)
+
 	template := openshift.WrapInTemplate(objs, metav1.ObjectMeta{
 		Name: gatewayName,
 	}, gatewayTemplateParams)
 	enc := encoding.GhodssYAML(template)
+	gen := fn()
 	gen.Add(gatewayTemplate, enc)
 	gen.Generate()
 
 	sms := []runtime.Object{
-		gatewayServiceMonitor(clusters.StageMaps, ns),
+		gatewayServiceMonitor(clusters.StageMaps, ns, config.GatewayConfig),
 	}
-	gen = b.generator(config, gatewayName)
+
 	template = openshift.WrapInTemplate(sms, metav1.ObjectMeta{
 		Name: gatewayName + "-service-monitor",
 	}, nil)
+	gen = fn()
 	gen.Add("service-monitor-"+gatewayTemplate, encoding.GhodssYAML(template))
 	gen.Generate()
 
 	return nil
 }
 
+// quick workaround to bridge us between cell approach and old approach for now
+type builderBuilderGenFunc func() *mimic.Generator
+
 // Gateway Generates the Observatorium API Gateway configuration for the stage environment.
 func (s Stage) Gateway() error {
-	templates := clusters.StageMaps
-	conf := gatewayConfig{
-		namespace: s.namespace(),
-		generator: s.generator,
-		amsURL:    "https://api.stage.openshift.com",
-		m:         templates,
-		tenants:   stageGatewayTenants(templates, s.namespace()),
+	conf := clusters.ClusterConfig{
+		Namespace: s.namespace(),
+		Templates: clusters.StageMaps,
+		GatewayConfig: clusters.NewGatewayConfig(
+			clusters.WithMetricsEnabled(),
+			clusters.WithRBAC(*cfgobservatorium.GenerateRBAC()),
+			clusters.WithAMS("https://api.stage.openshift.com"),
+			clusters.WithTenants(stageGatewayTenants()),
+		),
 	}
-	return gateway(conf)
+	fn := func() *mimic.Generator {
+		return s.generator(gatewayName)
+	}
+	return gatewayNew(conf, fn)
 }
 
 // Gateway Generates the Observatorium API Gateway configuration for the production environment.
 func (p Production) Gateway() error {
-	templates := clusters.ProductionMaps
-	conf := gatewayConfig{
-		namespace: p.namespace(),
-		generator: p.generator,
-		amsURL:    "https://api.openshift.com",
-		m:         templates,
-		tenants:   prodGatewayTenants(templates, p.namespace()),
+	conf := clusters.ClusterConfig{
+		Namespace: p.namespace(),
+		Templates: clusters.ProductionMaps,
+		GatewayConfig: clusters.NewGatewayConfig(
+			clusters.WithMetricsEnabled(),
+			clusters.WithRBAC(*cfgobservatorium.GenerateRBAC()),
+			clusters.WithAMS("https://api.openshift.com"),
+			clusters.WithTenants(prodGatewayTenants()),
+		),
 	}
-	return gateway(conf)
-}
-
-func gateway(c gatewayConfig) error {
-	ns := c.namespace
-	b, err := json.Marshal(cfgobservatorium.GenerateRBAC())
-	if err != nil {
-		return fmt.Errorf("failed to marshal RBAC configuration: %w", err)
+	fn := func() *mimic.Generator {
+		return p.generator(gatewayName)
 	}
-	rbacYAML, err := yaml.JSONToYAML(b)
-	if err != nil {
-		return fmt.Errorf("failed to convert RBAC configuration to YAML: %w", err)
-	}
-
-	objs := []runtime.Object{
-		gatewayRBAC(clusters.StageMaps, ns, string(rbacYAML)),
-		gatewayDeployment(clusters.StageMaps, ns, c.amsURL),
-		createGatewayService(clusters.StageMaps, ns),
-		c.tenants,
-	}
-	gen := c.generator(gatewayName)
-	template := openshift.WrapInTemplate(objs, metav1.ObjectMeta{
-		Name: gatewayName,
-	}, gatewayTemplateParams)
-	enc := encoding.GhodssYAML(template)
-	gen.Add(gatewayTemplate, enc)
-	gen.Generate()
-
-	sms := []runtime.Object{
-		gatewayServiceMonitor(clusters.StageMaps, ns),
-	}
-	gen = c.generator(gatewayName)
-	template = openshift.WrapInTemplate(sms, metav1.ObjectMeta{
-		Name: gatewayName + "-service-monitor",
-	}, nil)
-	gen.Add("service-monitor-"+gatewayTemplate, encoding.GhodssYAML(template))
-	gen.Generate()
-
-	return nil
+	return gatewayNew(conf, fn)
 }
 
 func gatewayLabels(m clusters.TemplateMaps) (labels map[string]string, selectorLabels map[string]string) {
@@ -168,19 +150,21 @@ func gatewayLabels(m clusters.TemplateMaps) (labels map[string]string, selectorL
 	return metaLabels, selectorLabels
 }
 
-func gatewayDeployment(m clusters.TemplateMaps, namespace, amsURL string) *appsv1.Deployment {
+func gatewayDeployment(m clusters.TemplateMaps, namespace string, conf *clusters.GatewayConfig) *appsv1.Deployment {
 	containers := []corev1.Container{
-		createObservatoriumAPIContainer(m, namespace),
+		createObservatoriumAPIContainer(m, namespace, conf),
 	}
 
-	if amsURL != "" {
+	if conf.AMSURL() != "" {
 		if _, ok := m.Images[opaAMS]; ok {
-			containers = append(containers, createOPAAMSContainer(m, namespace, amsURL))
+			containers = append(containers, createOPAAMSContainer(m, namespace, conf.AMSURL()))
 		}
 	}
 
-	if _, ok := m.Images[componentJaegerAgent]; ok {
-		containers = append(containers, createJaegerAgentContainer(m))
+	if conf.TracingEnabled() {
+		if _, ok := m.Images[componentJaegerAgent]; ok {
+			containers = append(containers, createJaegerAgentContainer(m))
+		}
 	}
 
 	metaLabels, selectorLabels := gatewayLabels(m)
@@ -261,26 +245,44 @@ func gatewayDeployment(m clusters.TemplateMaps, namespace, amsURL string) *appsv
 	}
 }
 
-func createObservatoriumAPIContainer(m clusters.TemplateMaps, namespace string) corev1.Container {
+func createObservatoriumAPIContainer(m clusters.TemplateMaps, namespace string, conf *clusters.GatewayConfig) corev1.Container {
 	logLevel := clusters.TemplateFn(clusters.ObservatoriumAPI, m.LogLevels)
-	return corev1.Container{
-		Name:  "observatorium-api",
-		Image: clusters.TemplateFn(clusters.ObservatoriumAPI, m.Images),
-		Args: []string{
-			"--web.listen=0.0.0.0:8080",
-			"--web.internal.listen=0.0.0.0:8081",
-			fmt.Sprintf("--log.level=%s", logLevel),
+	args := []string{
+		"--web.listen=0.0.0.0:8080",
+		"--web.internal.listen=0.0.0.0:8081",
+		fmt.Sprintf("--log.level=%s", logLevel),
+		fmt.Sprintf("--metrics.alertmanager.endpoint=http://%s.%s.svc.cluster.local:9093", alertManagerName, namespace),
+		"--rbac.config=/etc/observatorium/rbac.yaml",
+		"--tenants.config=/etc/observatorium/tenants.yaml",
+		"--server.read-timeout=5m",
+	}
+
+	if conf.MetricsEnabled() {
+		args = append(args,
 			fmt.Sprintf("--metrics.read.endpoint=http://%s.%s.svc.cluster.local:9090", qfeService, namespace),
 			fmt.Sprintf("--metrics.write.endpoint=http://%s.%s.svc.cluster.local:19291", routerService, namespace),
+		)
+	}
+
+	if conf.LogsEnabled() {
+		args = append(args,
+			"--logs.write-timeout=4m0s",
 			fmt.Sprintf("--logs.read.endpoint=http://%s.%s.svc.cluster.local:3100", logsQfeService, namespace),
 			fmt.Sprintf("--logs.tail.endpoint=http://%s.%s.svc.cluster.local:3100", logsQfeService, namespace),
 			fmt.Sprintf("--logs.write.endpoint=http://%s.%s.svc.cluster.local:3100", logsRouterService, namespace),
-			fmt.Sprintf("--metrics.alertmanager.endpoint=http://%s.%s.svc.cluster.local:9093", alertManagerName, namespace),
-			"--rbac.config=/etc/observatorium/rbac.yaml",
-			"--tenants.config=/etc/observatorium/tenants.yaml",
-			"--logs.write-timeout=4m0s",
-			"--server.read-timeout=5m",
-		},
+		)
+	}
+
+	if conf.SyntheticsEnabled() {
+		args = append(args,
+			fmt.Sprintf("--probes.endpoint=http://synthetics-api.%s.svc.cluster.local:8080", namespace),
+		)
+	}
+
+	return corev1.Container{
+		Name:  "observatorium-api",
+		Image: clusters.TemplateFn(clusters.ObservatoriumAPI, m.Images),
+		Args:  args,
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc-public", ContainerPort: 8090},
 			{Name: "internal", ContainerPort: 8081},
@@ -481,8 +483,50 @@ func createJaegerAgentContainer(m clusters.TemplateMaps) corev1.Container {
 	}
 }
 
-func createGatewayService(m clusters.TemplateMaps, namespace string) *corev1.Service {
+func createGatewayService(m clusters.TemplateMaps, namespace string, conf *clusters.GatewayConfig) *corev1.Service {
 	labels, selectorLabels := gatewayLabels(m)
+	ports := []corev1.ServicePort{
+		{
+			Name:        "grpc-public",
+			Protocol:    corev1.ProtocolTCP,
+			AppProtocol: stringPtr("h2c"),
+			Port:        8090,
+			TargetPort:  intstr.FromInt32(8090),
+		},
+		{
+			Name:        "internal",
+			Protocol:    corev1.ProtocolTCP,
+			AppProtocol: stringPtr("http"),
+			Port:        8081,
+			TargetPort:  intstr.FromInt32(8081),
+		},
+		{
+			Name:        "public",
+			Protocol:    corev1.ProtocolTCP,
+			AppProtocol: stringPtr("http"),
+			Port:        8080,
+			TargetPort:  intstr.FromInt32(8080),
+		},
+	}
+
+	if conf.AMSURL() != "" {
+		amsPorts := []corev1.ServicePort{
+			{
+				Name:       "opa-ams-api",
+				Protocol:   corev1.ProtocolTCP,
+				Port:       8082,
+				TargetPort: intstr.FromInt32(8082),
+			},
+			{
+				Name:       "opa-ams-metrics",
+				Protocol:   corev1.ProtocolTCP,
+				Port:       8083,
+				TargetPort: intstr.FromInt32(8083),
+			},
+		}
+		ports = append(ports, amsPorts...)
+	}
+
 	return &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
@@ -499,42 +543,8 @@ func createGatewayService(m clusters.TemplateMaps, namespace string) *corev1.Ser
 			InternalTrafficPolicy: &[]corev1.ServiceInternalTrafficPolicyType{corev1.ServiceInternalTrafficPolicyCluster}[0],
 			IPFamilyPolicy:        &[]corev1.IPFamilyPolicyType{corev1.IPFamilyPolicySingleStack}[0],
 			IPFamilies:            []corev1.IPFamily{corev1.IPv4Protocol},
-			Ports: []corev1.ServicePort{
-				{
-					Name:        "grpc-public",
-					Protocol:    corev1.ProtocolTCP,
-					AppProtocol: stringPtr("h2c"),
-					Port:        8090,
-					TargetPort:  intstr.FromInt32(8090),
-				},
-				{
-					Name:        "internal",
-					Protocol:    corev1.ProtocolTCP,
-					AppProtocol: stringPtr("http"),
-					Port:        8081,
-					TargetPort:  intstr.FromInt32(8081),
-				},
-				{
-					Name:        "public",
-					Protocol:    corev1.ProtocolTCP,
-					AppProtocol: stringPtr("http"),
-					Port:        8080,
-					TargetPort:  intstr.FromInt32(8080),
-				},
-				{
-					Name:       "opa-ams-api",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       8082,
-					TargetPort: intstr.FromInt32(8082),
-				},
-				{
-					Name:       "opa-ams-metrics",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       8083,
-					TargetPort: intstr.FromInt32(8083),
-				},
-			},
-			Selector: selectorLabels,
+			Ports:                 ports,
+			Selector:              selectorLabels,
 		},
 	}
 }
@@ -582,7 +592,6 @@ func gatewayRBAC(m clusters.TemplateMaps, namespace, contents string) *corev1.Co
 
 func createTenantSecret(config clusters.ClusterConfig, namespace string) *corev1.Secret {
 	labels, _ := gatewayLabels(config.Templates)
-	tenantsYaml, _ := yaml.Marshal(config.GatewayConfig.Tenants())
 
 	return &corev1.Secret{
 		TypeMeta: metav1.TypeMeta{
@@ -601,295 +610,354 @@ func createTenantSecret(config clusters.ClusterConfig, namespace string) *corev1
 			"client-id":     "${CLIENT_ID}",
 			"client-secret": "${CLIENT_SECRET}",
 			"issuer-url":    "https://sso.redhat.com/auth/realms/redhat-external",
-			"tenants.yaml":  string(tenantsYaml),
+			"tenants.yaml":  config.GatewayConfig.Tenants().String(),
 		},
 	}
 }
 
-func stageGatewayTenants(templates clusters.TemplateMaps, namespace string) *corev1.Secret {
-	labels, _ := gatewayLabels(templates)
-	return &corev1.Secret{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Secret",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      gatewayName,
-			Namespace: namespace,
-			Labels:    labels,
-			Annotations: map[string]string{
-				"qontract.recycle": "true",
+func stageGatewayTenants() observatoriumapi.Tenants {
+	return observatoriumapi.Tenants{
+		Tenants: []observatoriumapi.Tenant{
+			{
+				Name: "rhobs",
+				ID:   "0fc2b00e-201b-4c17-b9f2-19d91adc4fd2",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium.api.stage.openshift.com/oidc/rhobs/callback",
+					UsernameClaim: "preferred_username",
+					GroupClaim:    "email",
+				},
 			},
-		},
-		StringData: map[string]string{
-			"client-id":     "${CLIENT_ID}",
-			"client-secret": "${CLIENT_SECRET}",
-			"issuer-url":    "https://sso.redhat.com/auth/realms/redhat-external",
-			"tenants.yaml": `tenants:
-      - id: 0fc2b00e-201b-4c17-b9f2-19d91adc4fd2
-        name: rhobs
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium.api.stage.openshift.com/oidc/rhobs/callback
-          usernameClaim: preferred_username
-          groupClaim: email
-      - id: 770c1124-6ae8-4324-a9d4-9ce08590094b
-        name: osd
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/osd/callback
-          usernameClaim: preferred_username
-        opa:
-          url: http://127.0.0.1:8082/v1/data/observatorium/allow
-        rateLimits:
-        - endpoint: /api/metrics/v1/.+/api/v1/receive
-          limit: 10000
-          window: 30s
-      - id: 1b9b6e43-9128-4bbf-bfff-3c120bbe6f11
-        name: rhacs
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhacs/callback
-          usernameClaim: preferred_username
-      - id: 9ca26972-4328-4fe3-92db-31302013d03f
-        name: cnvqe
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/cnvqe/callback
-          usernameClaim: preferred_username
-      - id: 37b8fd3f-56ff-4b64-8272-917c9b0d1623
-        name: psiocp
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/psiocp/callback
-          usernameClaim: preferred_username
-      - id: 8ace13a2-1c72-4559-b43d-ab43e32a255a
-        name: rhods
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhods/callback
-          usernameClaim: preferred_username
-      - id: 99c885bc-2d64-4c4d-b55e-8bf30d98c657
-        name: odfms
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/odfms/callback
-          usernameClaim: preferred_username
-      - id: d17ea8ce-d4c6-42ef-b259-7d10c9227e93
-        name: reference-addon
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/reference-addon/callback
-          usernameClaim: preferred_username
-      - id: AC879303-C60F-4D0D-A6D5-A485CFD638B8
-        name: dptp
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/dptp/callback
-          usernameClaim: preferred_username
-      - id: 3833951d-bede-4a53-85e5-f73f4913973f
-        name: appsre
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/appsre/callback
-          usernameClaim: preferred_username
-      - id: 0031e8d6-e50a-47ea-aecb-c7e0bd84b3f1
-        name: rhtap
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhtap/callback
-          usernameClaim: preferred_username
-      - id: 72e6f641-b2e2-47eb-bbc2-fee3c8fbda26
-        name: rhel
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhel/callback
-          usernameClaim: preferred_username
-        rateLimits:
-        - endpoint: '/api/metrics/v1/rhel/api/v1/receive'
-          limit: 10000
-          window: 30s
-      - id: FB870BF3-9F3A-44FF-9BF7-D7A047A52F43
-        name: telemeter
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium.api.stage.openshift.com/oidc/telemeter/callback
-          usernameClaim: preferred_username
-      - id: B5B43A0A-3BC5-4D8D-BAAB-E424A835AA7D
-        name: ros
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium.api.stage.openshift.com/oidc/telemeter/callback
-          usernameClaim: preferred_username
-`,
+			{
+				Name: "osd",
+				ID:   "770c1124-6ae8-4324-a9d4-9ce08590094b",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/osd/callback",
+					UsernameClaim: "preferred_username",
+				},
+				OPA: &observatoriumapi.TenantOPA{
+					URL: "http://127.0.0.1:8082/v1/data/observatorium/allow",
+				},
+				RateLimits: []observatoriumapi.TenantRateLimits{
+					{
+						Endpoint: "/api/metrics/v1/.+/api/v1/receive",
+						Limit:    10000,
+						Window:   time.Second * 30,
+					},
+				},
+			},
+			{
+				Name: "rhacs",
+				ID:   "1b9b6e43-9128-4bbf-bfff-3c120bbe6f11",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/rhacs/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "cnvqe",
+				ID:   "9ca26972-4328-4fe3-92db-31302013d03f",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/cnvqe/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "psiocp",
+				ID:   "37b8fd3f-56ff-4b64-8272-917c9b0d1623",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/psiocp/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "rhods",
+				ID:   "8ace13a2-1c72-4559-b43d-ab43e32a255a",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/rhods/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "odfms",
+				ID:   "99c885bc-2d64-4c4d-b55e-8bf30d98c657",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/odfms/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "reference-addon",
+				ID:   "d17ea8ce-d4c6-42ef-b259-7d10c9227e93",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/reference-addon/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "dptp",
+				ID:   "AC879303-C60F-4D0D-A6D5-A485CFD638B8",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/dptp/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "appsre",
+				ID:   "3833951d-bede-4a53-85e5-f73f4913973f",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/appsre/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "rhtap",
+				ID:   "0031e8d6-e50a-47ea-aecb-c7e0bd84b3f1",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/rhtap/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "rhel",
+				ID:   "72e6f641-b2e2-47eb-bbc2-fee3c8fbda26",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/rhel/callback",
+					UsernameClaim: "preferred_username",
+				},
+				RateLimits: []observatoriumapi.TenantRateLimits{
+					{
+						Endpoint: "/api/metrics/v1/rhel/api/v1/receive",
+						Limit:    10000,
+						Window:   time.Second * 30,
+					},
+				},
+			},
+			{
+				Name: "telemeter",
+				ID:   "FB870BF3-9F3A-44FF-9BF7-D7A047A52F43",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium.api.stage.openshift.com/oidc/telemeter/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "ros",
+				ID:   "B5B43A0A-3BC5-4D8D-BAAB-E424A835AA7D",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium.api.stage.openshift.com/oidc/telemeter/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
 		},
 	}
 }
 
-func prodGatewayTenants(templates clusters.TemplateMaps, namespace string) *corev1.Secret {
-	labels, _ := gatewayLabels(templates)
-	return &corev1.Secret{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Secret",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      gatewayName,
-			Namespace: namespace,
-			Labels:    labels,
-			Annotations: map[string]string{
-				"qontract.recycle": "true",
+func prodGatewayTenants() observatoriumapi.Tenants {
+	return observatoriumapi.Tenants{
+		Tenants: []observatoriumapi.Tenant{
+			{
+				Name: "rhobs",
+				ID:   "0fc2b00e-201b-4c17-b9f2-19d91adc4fd2",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium.api.openshift.com/oidc/rhobs/callback",
+					UsernameClaim: "preferred_username",
+					GroupClaim:    "email",
+				},
 			},
-		},
-		StringData: map[string]string{
-			"client-id":     "${CLIENT_ID}",
-			"client-secret": "${CLIENT_SECRET}",
-			"issuer-url":    "https://sso.redhat.com/auth/realms/redhat-external",
-			"tenants.yaml": `tenants:
-      - id: 0fc2b00e-201b-4c17-b9f2-19d91adc4fd2
-        name: rhobs
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium.api.openshift.com/oidc/rhobs/callback
-          usernameClaim: preferred_username
-          groupClaim: email
-      - id: 770c1124-6ae8-4324-a9d4-9ce08590094b
-        name: osd
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/osd/callback
-          usernameClaim: preferred_username
-        opa:
-          url: http://127.0.0.1:8082/v1/data/observatorium/allow
-        rateLimits:
-        - endpoint: /api/metrics/v1/.+/api/v1/receive
-          limit: 10000
-          window: 30s
-      - id: 1b9b6e43-9128-4bbf-bfff-3c120bbe6f11
-        name: rhacs
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/rhacs/callback
-          usernameClaim: preferred_username
-      - id: 9ca26972-4328-4fe3-92db-31302013d03f
-        name: cnvqe
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/cnvqe/callback
-          usernameClaim: preferred_username
-      - id: 37b8fd3f-56ff-4b64-8272-917c9b0d1623
-        name: psiocp
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/psiocp/callback
-          usernameClaim: preferred_username
-      - id: 8ace13a2-1c72-4559-b43d-ab43e32a255a
-        name: rhods
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/rhods/callback
-          usernameClaim: preferred_username
-      - id: 99c885bc-2d64-4c4d-b55e-8bf30d98c657
-        name: odfms
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/odfms/callback
-          usernameClaim: preferred_username
-      - id: d17ea8ce-d4c6-42ef-b259-7d10c9227e93
-        name: reference-addon
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/reference-addon/callback
-          usernameClaim: preferred_username
-      - id: AC879303-C60F-4D0D-A6D5-A485CFD638B8
-        name: dptp
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/dptp/callback
-          usernameClaim: preferred_username
-      - id: 3833951d-bede-4a53-85e5-f73f4913973f
-        name: appsre
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/appsre/callback
-          usernameClaim: preferred_username
-      - id: 0031e8d6-e50a-47ea-aecb-c7e0bd84b3f1
-        name: rhtap
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/rhtap/callback
-          usernameClaim: preferred_username
-      - id: 72e6f641-b2e2-47eb-bbc2-fee3c8fbda26
-        name: rhel
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium-mst.api.openshift.com/oidc/rhel/callback
-          usernameClaim: preferred_username
-        rateLimits:
-        - endpoint: '/api/metrics/v1/rhel/api/v1/receive'
-          limit: 10000
-          window: 30s
-      - id: FB870BF3-9F3A-44FF-9BF7-D7A047A52F43
-        name: telemeter
-        oidc:
-          clientID: ${CLIENT_ID}
-          clientSecret: ${CLIENT_SECRET}
-          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-          redirectURL: https://observatorium.api.openshift.com/oidc/telemeter/callback
-          usernameClaim: preferred_username
-`,
+			{
+				Name: "osd",
+				ID:   "770c1124-6ae8-4324-a9d4-9ce08590094b",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/osd/callback",
+					UsernameClaim: "preferred_username",
+				},
+				OPA: &observatoriumapi.TenantOPA{
+					URL: "http://127.0.0.1:8082/v1/data/observatorium/allow",
+				},
+				RateLimits: []observatoriumapi.TenantRateLimits{
+					{
+						Endpoint: "/api/metrics/v1/.+/api/v1/receive",
+						Limit:    10000,
+						Window:   time.Second * 30,
+					},
+				},
+			},
+			{
+				Name: "rhacs",
+				ID:   "1b9b6e43-9128-4bbf-bfff-3c120bbe6f11",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/rhacs/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "cnvqe",
+				ID:   "9ca26972-4328-4fe3-92db-31302013d03f",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/cnvqe/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "psiocp",
+				ID:   "37b8fd3f-56ff-4b64-8272-917c9b0d1623",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/psiocp/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "rhods",
+				ID:   "8ace13a2-1c72-4559-b43d-ab43e32a255a",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/rhods/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "odfms",
+				ID:   "99c885bc-2d64-4c4d-b55e-8bf30d98c657",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/odfms/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "reference-addon",
+				ID:   "d17ea8ce-d4c6-42ef-b259-7d10c9227e93",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/reference-addon/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "dptp",
+				ID:   "AC879303-C60F-4D0D-A6D5-A485CFD638B8",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/dptp/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "appsre",
+				ID:   "3833951d-bede-4a53-85e5-f73f4913973f",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/appsre/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "rhtap",
+				ID:   "0031e8d6-e50a-47ea-aecb-c7e0bd84b3f1",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/rhtap/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
+			{
+				Name: "rhel",
+				ID:   "72e6f641-b2e2-47eb-bbc2-fee3c8fbda26",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium-mst.api.openshift.com/oidc/rhel/callback",
+					UsernameClaim: "preferred_username",
+				},
+				RateLimits: []observatoriumapi.TenantRateLimits{
+					{
+						Endpoint: "/api/metrics/v1/rhel/api/v1/receive",
+						Limit:    10000,
+						Window:   time.Second * 30,
+					},
+				},
+			},
+			{
+				Name: "telemeter",
+				ID:   "FB870BF3-9F3A-44FF-9BF7-D7A047A52F43",
+				OIDC: &observatoriumapi.TenantOIDC{
+					ClientID:      "${CLIENT_ID}",
+					ClientSecret:  "${CLIENT_SECRET}",
+					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
+					RedirectURL:   "https://observatorium.api.openshift.com/oidc/telemeter/callback",
+					UsernameClaim: "preferred_username",
+				},
+			},
 		},
 	}
 }
@@ -917,9 +985,30 @@ var gatewayTemplateParams = []templatev1.Parameter{
 	},
 }
 
-func gatewayServiceMonitor(m clusters.TemplateMaps, matchNS string) *monitoringv1.ServiceMonitor {
+func gatewayServiceMonitor(m clusters.TemplateMaps, matchNS string, conf *clusters.GatewayConfig) *monitoringv1.ServiceMonitor {
 	labels, selectorLabels := gatewayLabels(m)
 	labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
+	endpoints := []monitoringv1.Endpoint{
+		{
+			Port:     "internal",
+			Path:     "/metrics",
+			Interval: "30s",
+		},
+		{
+			Port:     "metrics",
+			Path:     "/metrics",
+			Interval: "30s",
+		},
+	}
+
+	if conf.AMSURL() != "" {
+		endpoints = append(endpoints, monitoringv1.Endpoint{
+			Port:     "opa-ams-metrics",
+			Path:     "/metrics",
+			Interval: "30s",
+		})
+	}
+
 	return &monitoringv1.ServiceMonitor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "rhobs-gateway",
@@ -931,23 +1020,7 @@ func gatewayServiceMonitor(m clusters.TemplateMaps, matchNS string) *monitoringv
 			APIVersion: "monitoring.coreos.com/v1",
 		},
 		Spec: monitoringv1.ServiceMonitorSpec{
-			Endpoints: []monitoringv1.Endpoint{
-				{
-					Port:     "internal",
-					Path:     "/metrics",
-					Interval: "30s",
-				},
-				{
-					Port:     "opa-ams-metrics",
-					Path:     "/metrics",
-					Interval: "30s",
-				},
-				{
-					Port:     "metrics",
-					Path:     "/metrics",
-					Interval: "30s",
-				},
-			},
+			Endpoints: endpoints,
 			Selector: metav1.LabelSelector{
 				MatchLabels: selectorLabels,
 			},

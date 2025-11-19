@@ -213,6 +213,8 @@ objects:
         subjects:
         - kind: user
           name: service-account-875c08bc-d313-417f-a044-295212338e81-staging
+        - kind: user
+          name: service-account-875c08bc-d313-417f-a044-295212338e81
       - name: 4cbd24b0-3aed-4b03-839a-f4515b199a5d
         roles:
         - telemeter-metrics-write
@@ -450,12 +452,12 @@ objects:
           - --web.listen=0.0.0.0:8080
           - --web.internal.listen=0.0.0.0:8081
           - --log.level=debug
-          - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-stage.svc.cluster.local:9090
-          - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-stage.svc.cluster.local:19291
           - --metrics.alertmanager.endpoint=http://alertmanager.rhobs-stage.svc.cluster.local:9093
           - --rbac.config=/etc/observatorium/rbac.yaml
           - --tenants.config=/etc/observatorium/tenants.yaml
           - --server.read-timeout=5m
+          - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-stage.svc.cluster.local:9090
+          - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-stage.svc.cluster.local:19291
           image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
           livenessProbe:
             failureThreshold: 10
@@ -556,62 +558,6 @@ objects:
             requests:
               cpu: 500m
               memory: 100Mi
-        - args:
-          - --reporter.grpc.host-port=dns:///otel-trace-writer-collector-headless.observatorium-tools.svc:14250
-          - --reporter.type=grpc
-          - --agent.tags=pod.namespace=$(NAMESPACE),pod.name=$(POD)
-          env:
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.namespace
-          - name: POD
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.name
-          image: registry.redhat.io/rhosdt/jaeger-agent-rhel8:1.57.0-10
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /
-              port: 14271
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          name: jaeger-agent
-          ports:
-          - containerPort: 5778
-            name: configs
-            protocol: TCP
-          - containerPort: 6831
-            name: jaeger-thrift
-            protocol: TCP
-          - containerPort: 14271
-            name: metrics
-            protocol: TCP
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /
-              port: 14271
-              scheme: HTTP
-            initialDelaySeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          resources:
-            limits:
-              cpu: "1"
-              memory: 2Gi
-            requests:
-              cpu: 100m
-              memory: 100Mi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: FallbackToLogsOnError
         serviceAccountName: observatorium-api
         volumes:
         - configMap:
@@ -641,129 +587,129 @@ objects:
     issuer-url: https://sso.redhat.com/auth/realms/redhat-external
     tenants.yaml: |
       tenants:
-            - id: 0fc2b00e-201b-4c17-b9f2-19d91adc4fd2
-              name: rhobs
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium.api.stage.openshift.com/oidc/rhobs/callback
-                usernameClaim: preferred_username
-                groupClaim: email
-            - id: 770c1124-6ae8-4324-a9d4-9ce08590094b
-              name: osd
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/osd/callback
-                usernameClaim: preferred_username
-              opa:
-                url: http://127.0.0.1:8082/v1/data/observatorium/allow
-              rateLimits:
-              - endpoint: /api/metrics/v1/.+/api/v1/receive
-                limit: 10000
-                window: 30s
-            - id: 1b9b6e43-9128-4bbf-bfff-3c120bbe6f11
-              name: rhacs
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhacs/callback
-                usernameClaim: preferred_username
-            - id: 9ca26972-4328-4fe3-92db-31302013d03f
-              name: cnvqe
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/cnvqe/callback
-                usernameClaim: preferred_username
-            - id: 37b8fd3f-56ff-4b64-8272-917c9b0d1623
-              name: psiocp
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/psiocp/callback
-                usernameClaim: preferred_username
-            - id: 8ace13a2-1c72-4559-b43d-ab43e32a255a
-              name: rhods
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhods/callback
-                usernameClaim: preferred_username
-            - id: 99c885bc-2d64-4c4d-b55e-8bf30d98c657
-              name: odfms
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/odfms/callback
-                usernameClaim: preferred_username
-            - id: d17ea8ce-d4c6-42ef-b259-7d10c9227e93
-              name: reference-addon
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/reference-addon/callback
-                usernameClaim: preferred_username
-            - id: AC879303-C60F-4D0D-A6D5-A485CFD638B8
-              name: dptp
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/dptp/callback
-                usernameClaim: preferred_username
-            - id: 3833951d-bede-4a53-85e5-f73f4913973f
-              name: appsre
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/appsre/callback
-                usernameClaim: preferred_username
-            - id: 0031e8d6-e50a-47ea-aecb-c7e0bd84b3f1
-              name: rhtap
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhtap/callback
-                usernameClaim: preferred_username
-            - id: 72e6f641-b2e2-47eb-bbc2-fee3c8fbda26
-              name: rhel
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhel/callback
-                usernameClaim: preferred_username
-              rateLimits:
-              - endpoint: '/api/metrics/v1/rhel/api/v1/receive'
-                limit: 10000
-                window: 30s
-            - id: FB870BF3-9F3A-44FF-9BF7-D7A047A52F43
-              name: telemeter
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium.api.stage.openshift.com/oidc/telemeter/callback
-                usernameClaim: preferred_username
-            - id: B5B43A0A-3BC5-4D8D-BAAB-E424A835AA7D
-              name: ros
-              oidc:
-                clientID: ${CLIENT_ID}
-                clientSecret: ${CLIENT_SECRET}
-                issuerURL: https://sso.redhat.com/auth/realms/redhat-external
-                redirectURL: https://observatorium.api.stage.openshift.com/oidc/telemeter/callback
-                usernameClaim: preferred_username
+      - name: rhobs
+        id: 0fc2b00e-201b-4c17-b9f2-19d91adc4fd2
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          groupClaim: email
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium.api.stage.openshift.com/oidc/rhobs/callback
+          usernameClaim: preferred_username
+      - name: osd
+        id: 770c1124-6ae8-4324-a9d4-9ce08590094b
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/osd/callback
+          usernameClaim: preferred_username
+        opa:
+          url: http://127.0.0.1:8082/v1/data/observatorium/allow
+        rateLimits:
+        - endpoint: /api/metrics/v1/.+/api/v1/receive
+          limit: 10000
+          window: 30s
+      - name: rhacs
+        id: 1b9b6e43-9128-4bbf-bfff-3c120bbe6f11
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhacs/callback
+          usernameClaim: preferred_username
+      - name: cnvqe
+        id: 9ca26972-4328-4fe3-92db-31302013d03f
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/cnvqe/callback
+          usernameClaim: preferred_username
+      - name: psiocp
+        id: 37b8fd3f-56ff-4b64-8272-917c9b0d1623
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/psiocp/callback
+          usernameClaim: preferred_username
+      - name: rhods
+        id: 8ace13a2-1c72-4559-b43d-ab43e32a255a
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhods/callback
+          usernameClaim: preferred_username
+      - name: odfms
+        id: 99c885bc-2d64-4c4d-b55e-8bf30d98c657
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/odfms/callback
+          usernameClaim: preferred_username
+      - name: reference-addon
+        id: d17ea8ce-d4c6-42ef-b259-7d10c9227e93
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/reference-addon/callback
+          usernameClaim: preferred_username
+      - name: dptp
+        id: AC879303-C60F-4D0D-A6D5-A485CFD638B8
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/dptp/callback
+          usernameClaim: preferred_username
+      - name: appsre
+        id: 3833951d-bede-4a53-85e5-f73f4913973f
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/appsre/callback
+          usernameClaim: preferred_username
+      - name: rhtap
+        id: 0031e8d6-e50a-47ea-aecb-c7e0bd84b3f1
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhtap/callback
+          usernameClaim: preferred_username
+      - name: rhel
+        id: 72e6f641-b2e2-47eb-bbc2-fee3c8fbda26
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium-mst.api.stage.openshift.com/oidc/rhel/callback
+          usernameClaim: preferred_username
+        rateLimits:
+        - endpoint: /api/metrics/v1/rhel/api/v1/receive
+          limit: 10000
+          window: 30s
+      - name: telemeter
+        id: FB870BF3-9F3A-44FF-9BF7-D7A047A52F43
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium.api.stage.openshift.com/oidc/telemeter/callback
+          usernameClaim: preferred_username
+      - name: ros
+        id: B5B43A0A-3BC5-4D8D-BAAB-E424A835AA7D
+        oidc:
+          clientID: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+          issuerURL: https://sso.redhat.com/auth/realms/redhat-external
+          redirectURL: https://observatorium.api.stage.openshift.com/oidc/telemeter/callback
+          usernameClaim: preferred_username
 - apiVersion: v1
   kind: Service
   metadata:
@@ -814,6 +760,18 @@ objects:
     type: ClusterIP
   status:
     loadBalancer: {}
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    creationTimestamp: null
+    labels:
+      app.kubernetes.io/component: api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: observatorium-api
+      app.kubernetes.io/part-of: rhobs
+      app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
+    name: observatorium-api
+    namespace: rhobs-stage
 parameters:
 - description: Organization ID for OSD
   name: OSD_ORGANIZATION_ID

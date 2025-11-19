@@ -24,9 +24,6 @@ objects:
       port: internal
     - interval: 30s
       path: /metrics
-      port: opa-ams-metrics
-    - interval: 30s
-      path: /metrics
       port: metrics
     namespaceSelector:
       matchNames:
