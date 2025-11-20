@@ -130,10 +130,10 @@ objects:
           - --metrics.alertmanager.endpoint=http://alertmanager.rhobs-int.svc.cluster.local:9093
           - --rbac.config=/etc/observatorium/rbac.yaml
           - --tenants.config=/etc/observatorium/tenants.yaml
-          - --logs.write-timeout=4m0s
           - --server.read-timeout=5m
           - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-int.svc.cluster.local:9090
           - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-int.svc.cluster.local:19291
+          - --logs.write-timeout=4m0s
           - --logs.read.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
           - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
           - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-int.svc.cluster.local:3100

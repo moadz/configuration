@@ -65,7 +65,7 @@ go-format: $(GOIMPORTS) $(GOLANGCI_LINT)
 .PHONY: validate
 validate: $(OC)
 	@echo ">>>>> Validating OpenShift Templates"
-	find . -type f \( -name '*template.yaml' \) ! -name 'hypershift-token-refresher-template.yaml' ! -name 'hypershift-cluster-log-forwarder-template.yaml' | $(XARGS) -I{} $(OC) process -f {} --local -o yaml > /dev/null
+	find . -type f \( -name '*template.yaml' \) ! -name 'hypershift-token-refresher-template.yaml' ! -name 'hypershift-cluster-log-forwarder-template.yaml' ! -name 'hypershift-monitoring-stack-template.yaml' | $(XARGS) -I{} $(OC) process -f {} --local -o yaml > /dev/null
 
 .PHONY: prometheusrules
 prometheusrules: resources/observability/prometheusrules
