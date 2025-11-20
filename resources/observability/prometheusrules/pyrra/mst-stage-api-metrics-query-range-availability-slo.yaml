@@ -6,7 +6,6 @@ metadata:
     pyrra.dev/message: API /query_range handler is burning too much error budget to
       guarantee availability SLOs.
     pyrra.dev/runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
-  creationTimestamp: null
   labels:
     instance: mst-stage
     pyrra.dev/service: observatorium-api

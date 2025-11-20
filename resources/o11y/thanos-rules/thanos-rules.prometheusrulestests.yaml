@@ -1,0 +1,943 @@
+---
+$schema: /app-interface/prometheus-rule-test-1.yml
+
+rule_files:
+- /resources/o11y/thanos-rules/thanos-rules.yaml
+
+evaluation_interval: 1m
+
+tests:
+# Test ThanosCompactIsDown
+- interval: 1m
+  input_series:
+  - series: up{job="thanos-compact", namespace="observatorium"}
+    values: '1 1 1 1 1 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosCompactIsDown
+  - eval_time: 10m
+    alertname: ThanosCompactIsDown
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: ThanosCompact has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactisdown
+        summary: Thanos component has disappeared from {{$labels.namespace}}.
+
+# Test ThanosQueryIsDown
+- interval: 1m
+  input_series:
+  - series: up{job="thanos-query", namespace="observatorium"}
+    values: '1 1 1 1 1 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosQueryIsDown
+  - eval_time: 10m
+    alertname: ThanosQueryIsDown
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: ThanosQuery has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryisdown
+        summary: Thanos component has disappeared from {{$labels.namespace}}.
+
+# Test ThanosReceiveRouterIsDown
+- interval: 1m
+  input_series:
+  - series: up{job="thanos-receive-router", namespace="observatorium"}
+    values: '1 1 1 1 1 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveRouterIsDown
+  - eval_time: 10m
+    alertname: ThanosReceiveRouterIsDown
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: ThanosReceiveRouter has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveisdown
+        summary: Thanos component has disappeared from {{$labels.namespace}}.
+
+# Test ThanosReceiveIngesterIsDown
+- interval: 1m
+  input_series:
+  - series: up{job="thanos-receive-ingester", namespace="observatorium"}
+    values: '1 1 1 1 1 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveIngesterIsDown
+  - eval_time: 10m
+    alertname: ThanosReceiveIngesterIsDown
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: ThanosReceiveIngester has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveisdown
+        summary: Thanos component has disappeared from {{$labels.namespace}}.
+
+# Test ThanosRuleIsDown
+- interval: 1m
+  input_series:
+  - series: up{job="thanos-ruler", namespace="observatorium"}
+    values: '1 1 1 1 1 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosRuleIsDown
+  - eval_time: 10m
+    alertname: ThanosRuleIsDown
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: ThanosRule has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleisdown
+        summary: Thanos component has disappeared from {{$labels.namespace}}.
+
+# Test ThanosStoreIsDown
+- interval: 1m
+  input_series:
+  - series: up{job="thanos-store", namespace="observatorium"}
+    values: '1 1 1 1 1 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosStoreIsDown
+  - eval_time: 10m
+    alertname: ThanosStoreIsDown
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: ThanosStore has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoreisdown
+        summary: Thanos component has disappeared from {{$labels.namespace}}.
+
+# Test ThanosCompactMultipleRunning
+- interval: 1m
+  input_series:
+  - series: up{job="thanos-compact", namespace="observatorium", instance="thanos-compact-0"}
+    values: '1 1 1 1 1 2 2 2 2 2 2'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosCompactMultipleRunning
+  - eval_time: 10m
+    alertname: ThanosCompactMultipleRunning
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-compact
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: No more than one Thanos Compact instance should be running at once. There are 2 in observatorium instances running.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactmultiplerunning
+        summary: Thanos Compact has multiple instances running.
+
+# Test ThanosCompactHalted
+- interval: 1m
+  input_series:
+  - series: thanos_compact_halted{job="thanos-compact", namespace="observatorium"}
+    values: '0 0 0 0 0 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosCompactHalted
+  - eval_time: 10m
+    alertname: ThanosCompactHalted
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        job: thanos-compact
+        namespace: observatorium
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Compact thanos-compact in observatorium has failed to run and now is halted.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompacthalted
+        summary: Thanos Compact has failed to run and is now halted.
+
+# Test ThanosCompactHighCompactionFailures
+- interval: 1m
+  input_series:
+  - series: thanos_compact_group_compactions_failures_total{job="thanos-compact", namespace="observatorium"}
+    values: '0+1x20'
+  - series: thanos_compact_group_compactions_total{job="thanos-compact", namespace="observatorium"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: ThanosCompactHighCompactionFailures
+  - eval_time: 20m
+    alertname: ThanosCompactHighCompactionFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-compact
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Compact thanos-compact in observatorium is failing to execute 10% of compactions.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompacthighcompactionfailures
+        summary: Thanos Compact is failing to execute compactions.
+
+# Test ThanosCompactBucketHighOperationFailures
+- interval: 1m
+  input_series:
+  - series: thanos_objstore_bucket_operation_failures_total{job="thanos-compact", namespace="observatorium"}
+    values: '0+1x20'
+  - series: thanos_objstore_bucket_operations_total{job="thanos-compact", namespace="observatorium"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: ThanosCompactBucketHighOperationFailures
+  - eval_time: 20m
+    alertname: ThanosCompactBucketHighOperationFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-compact
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Compact thanos-compact in observatorium Bucket is failing to execute 10% of operations.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactbuckethighoperationfailures
+        summary: Thanos Compact Bucket is having a high number of operation failures.
+
+# Test ThanosCompactHasNotRun
+- interval: 1m
+  input_series:
+  - series: thanos_objstore_bucket_last_successful_upload_time{job="thanos-compact", namespace="observatorium"}
+    values: '1000000 1000000 1000000 1000000 1000000 1000000 1000000 1000000 1000000 1000000'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosCompactHasNotRun
+  - eval_time: 10m
+    alertname: ThanosCompactHasNotRun
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-compact
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Compact thanos-compact in observatorium has not uploaded anything for 24 hours.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompacthasnotrun
+        summary: Thanos Compact has not uploaded anything for last 24 hours.
+
+# Test ThanosQueryHttpRequestQueryErrorRateHigh
+- interval: 1m
+  input_series:
+  - series: http_requests_total{code="500", handler="query", job="thanos-query", namespace="observatorium"}
+    values: '0+1x20'
+  - series: http_requests_total{code="200", handler="query", job="thanos-query", namespace="observatorium"}
+    values: '0+9x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosQueryHttpRequestQueryErrorRateHigh
+  - eval_time: 10m
+    alertname: ThanosQueryHttpRequestQueryErrorRateHigh
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        namespace: observatorium
+        job: thanos-query
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Query thanos-query in observatorium is failing to handle 10% of "query" requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryhttprequestqueryerrorratehigh
+        summary: Thanos Query is failing to handle requests.
+
+# Test ThanosQueryGrpcServerErrorRate
+- interval: 1m
+  input_series:
+  - series: grpc_server_handled_total{grpc_code="Internal", job="thanos-query", namespace="observatorium"}
+    values: '0+1x20'
+  - series: grpc_server_started_total{job="thanos-query", namespace="observatorium"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosQueryGrpcServerErrorRate
+  - eval_time: 10m
+    alertname: ThanosQueryGrpcServerErrorRate
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-query
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Query thanos-query in observatorium is failing to handle 10% of requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosquerygrpcservererrorrate
+        summary: Thanos Query is failing to handle requests.
+
+# Test ThanosQueryGrpcClientErrorRate
+- interval: 1m
+  input_series:
+  - series: grpc_client_handled_total{grpc_code="Internal", job="thanos-query", namespace="observatorium"}
+    values: '0+1x20'
+  - series: grpc_client_started_total{job="thanos-query", namespace="observatorium"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosQueryGrpcClientErrorRate
+  - eval_time: 10m
+    alertname: ThanosQueryGrpcClientErrorRate
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-query
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Query thanos-query in observatorium is failing to send 10% of requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosquerygrpcclienterrorrate
+        summary: Thanos Query is failing to send requests.
+
+# Test ThanosQueryHighDNSFailures
+- interval: 1m
+  input_series:
+  - series: thanos_query_store_apis_dns_failures_total{job="thanos-query", namespace="observatorium"}
+    values: '0+1x20'
+  - series: thanos_query_store_apis_dns_lookups_total{job="thanos-query", namespace="observatorium"}
+    values: '0+50x20'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: ThanosQueryHighDNSFailures
+  - eval_time: 20m
+    alertname: ThanosQueryHighDNSFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-query
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Query thanos-query in observatorium have 2% of failing DNS queries for store endpoints.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryhighdnsfailures
+        summary: Thanos Query is having high number of DNS failures.
+
+# Test ThanosQueryInstantLatencyHigh
+- interval: 1m
+  input_series:
+  - series: http_request_duration_seconds_bucket{handler="query", job="thanos-query", namespace="observatorium", le="1"}
+    values: '0+0x20'
+  - series: http_request_duration_seconds_bucket{handler="query", job="thanos-query", namespace="observatorium", le="10"}
+    values: '0+0x20'
+  - series: http_request_duration_seconds_bucket{handler="query", job="thanos-query", namespace="observatorium", le="90"}
+    values: '0+1x20'
+  - series: http_request_duration_seconds_bucket{handler="query", job="thanos-query", namespace="observatorium", le="+Inf"}
+    values: '0+2x20'
+  - series: http_request_duration_seconds_count{handler="query", job="thanos-query", namespace="observatorium"}
+    values: '0+2x20'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: ThanosQueryInstantLatencyHigh
+  - eval_time: 15m
+    alertname: ThanosQueryInstantLatencyHigh
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        namespace: observatorium
+        job: thanos-query
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Query thanos-query in observatorium has a 99th percentile latency of 135 seconds for instant queries.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryinstantlatencyhigh
+        summary: Thanos Query has high latency for queries.
+
+# Test ThanosReceiveHttpRequestErrorRateHigh
+- interval: 1m
+  input_series:
+  - series: http_requests_total{code="500", handler="receive", job="thanos-receive-router", namespace="observatorium"}
+    values: '0+1x20'
+  - series: http_requests_total{code="200", handler="receive", job="thanos-receive-router", namespace="observatorium"}
+    values: '0+9x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveHttpRequestErrorRateHigh
+  - eval_time: 10m
+    alertname: ThanosReceiveHttpRequestErrorRateHigh
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        namespace: observatorium
+        job: thanos-receive-router
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-router in observatorium is failing to handle 10% of requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehttprequesterrorratehigh
+        summary: Thanos Receive is failing to handle requests.
+
+# Test ThanosReceiveHttpRequestLatencyHigh
+- interval: 1m
+  input_series:
+  - series: http_request_duration_seconds_bucket{handler="receive", job="thanos-receive-router", namespace="observatorium", le="1"}
+    values: '0+0x20'
+  - series: http_request_duration_seconds_bucket{handler="receive", job="thanos-receive-router", namespace="observatorium", le="10"}
+    values: '0+1x20'
+  - series: http_request_duration_seconds_bucket{handler="receive", job="thanos-receive-router", namespace="observatorium", le="+Inf"}
+    values: '0+2x20'
+  - series: http_request_duration_seconds_count{handler="receive", job="thanos-receive-router", namespace="observatorium"}
+    values: '0+2x20'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: ThanosReceiveHttpRequestLatencyHigh
+  - eval_time: 15m
+    alertname: ThanosReceiveHttpRequestLatencyHigh
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        namespace: observatorium
+        job: thanos-receive-router
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-router in observatorium has a 99th percentile latency of 15 seconds for requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehttprequestlatencyhigh
+        summary: Thanos Receive has high HTTP requests latency.
+
+# Test ThanosReceiveHighReplicationFailures
+- interval: 1m
+  input_series:
+  - series: thanos_receive_replication_factor{job="thanos-receive-router", namespace="observatorium"}
+    values: '3+0x20'
+  - series: thanos_receive_replications_total{job="thanos-receive-router", namespace="observatorium", result="error"}
+    values: '0+3x20'
+  - series: thanos_receive_replications_total{job="thanos-receive-router", namespace="observatorium", result="success"}
+    values: '0+7x20'
+  - series: thanos_receive_hashring_nodes{job="thanos-receive-router", namespace="observatorium"}
+    values: '5+0x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveHighReplicationFailures
+  - eval_time: 10m
+    alertname: ThanosReceiveHighReplicationFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-receive-router
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-router in observatorium is failing to replicate 60% of requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehighreplicationfailures
+        summary: Thanos Receive is having high number of replication failures.
+
+# Test ThanosReceiveHighForwardRequestFailures
+- interval: 1m
+  input_series:
+  - series: thanos_receive_forward_requests_total{job="thanos-receive-router", namespace="observatorium", result="error"}
+    values: '0+3x20'
+  - series: thanos_receive_forward_requests_total{job="thanos-receive-router", namespace="observatorium", result="success"}
+    values: '0+7x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveHighForwardRequestFailures
+  - eval_time: 10m
+    alertname: ThanosReceiveHighForwardRequestFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        namespace: observatorium
+        job: thanos-receive-router
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-router in observatorium is failing to forward 30% of requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehighforwardrequestfailures
+        summary: Thanos Receive is failing to forward requests.
+
+# Test ThanosReceiveHighHashringFileRefreshFailures
+- interval: 1m
+  input_series:
+  - series: thanos_receive_hashrings_file_errors_total{job="thanos-receive-router", namespace="observatorium"}
+    values: '0+1x20'
+  - series: thanos_receive_hashrings_file_refreshes_total{job="thanos-receive-router", namespace="observatorium"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: ThanosReceiveHighHashringFileRefreshFailures
+  - eval_time: 20m
+    alertname: ThanosReceiveHighHashringFileRefreshFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-receive-router
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-router in observatorium is failing to refresh hashring file, 0.1 of attempts failed.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehighhashringfilerefreshfailures
+        summary: Thanos Receive is failing to refresh hasring file.
+
+# Test ThanosReceiveConfigReloadFailure
+- interval: 1m
+  input_series:
+  - series: thanos_receive_config_last_reload_successful{job="thanos-receive-router", namespace="observatorium"}
+    values: '1 1 1 1 1 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveConfigReloadFailure
+  - eval_time: 10m
+    alertname: ThanosReceiveConfigReloadFailure
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-receive-router
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-router in observatorium has not been able to reload hashring configurations.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveconfigreloadfailure
+        summary: Thanos Receive is failing to reload hashring configurations.
+
+# Test ThanosReceiveNoUpload
+- interval: 1m
+  input_series:
+  - series: up{job="thanos-receive-ingester", namespace="observatorium", instance="thanos-receive-0"}
+    values: '1+0x200'
+  - series: thanos_shipper_uploads_total{job="thanos-receive-ingester", namespace="observatorium", instance="thanos-receive-0"}
+    values: '0+0x200'
+  alert_rule_test:
+  - eval_time: 2h
+    alertname: ThanosReceiveNoUpload
+  - eval_time: 4h
+    alertname: ThanosReceiveNoUpload
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        job: thanos-receive-ingester
+        namespace: observatorium
+        instance: thanos-receive-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-0 in observatorium has not uploaded latest data to object storage.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivenoupload
+        summary: Thanos Receive has not uploaded latest data to object storage.
+
+# Test ThanosReceiveLimitsConfigReloadFailure
+- interval: 1m
+  input_series:
+  - series: thanos_receive_limits_config_reload_err_total{job="thanos-receive-router", namespace="observatorium"}
+    values: '0+1x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveLimitsConfigReloadFailure
+  - eval_time: 10m
+    alertname: ThanosReceiveLimitsConfigReloadFailure
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-receive-router
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-router in observatorium has not been able to reload the limits configuration.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivelimitsconfigreloadfailure
+        summary: Thanos Receive has not been able to reload the limits configuration.
+
+# Test ThanosReceiveLimitsHighMetaMonitoringQueriesFailureRate
+- interval: 1m
+  input_series:
+  - series: thanos_receive_metamonitoring_failed_queries_total{job="thanos-receive-router", namespace="observatorium"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveLimitsHighMetaMonitoringQueriesFailureRate
+  - eval_time: 10m
+    alertname: ThanosReceiveLimitsHighMetaMonitoringQueriesFailureRate
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-receive-router
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive thanos-receive-router in observatorium is failing for 250% of meta monitoring queries.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivelimitshighmetamonitoringqueriesfailurerate
+        summary: Thanos Receive has not been able to update the number of head series.
+
+# Test ThanosReceiveTenantLimitedByHeadSeries
+- interval: 1m
+  input_series:
+  - series: thanos_receive_head_series_limited_requests_total{job="thanos-receive-router", namespace="observatorium", tenant="tenant-a"}
+    values: '0+1x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosReceiveTenantLimitedByHeadSeries
+  - eval_time: 10m
+    alertname: ThanosReceiveTenantLimitedByHeadSeries
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-receive-router
+        tenant: tenant-a
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Receive tenant tenant-a in observatorium is limited by head series.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivetenantlimitedbyheadseries
+        summary: Thanos Receive tenant is limited by head series.
+
+# Test ThanosStoreGrpcErrorRate
+- interval: 1m
+  input_series:
+  - series: grpc_server_handled_total{grpc_code="Internal", job="thanos-store", namespace="observatorium"}
+    values: '0+1x20'
+  - series: grpc_server_started_total{job="thanos-store", namespace="observatorium"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosStoreGrpcErrorRate
+  - eval_time: 10m
+    alertname: ThanosStoreGrpcErrorRate
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-store
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Store thanos-store in observatorium is failing to handle 10% of requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoregrpcerrorrate
+        summary: Thanos Store is failing to handle gRPC requests.
+
+# Test ThanosStoreBucketHighOperationFailures
+- interval: 1m
+  input_series:
+  - series: thanos_objstore_bucket_operation_failures_total{job="thanos-store", namespace="observatorium"}
+    values: '0+1x20'
+  - series: thanos_objstore_bucket_operations_total{job="thanos-store", namespace="observatorium"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: ThanosStoreBucketHighOperationFailures
+  - eval_time: 20m
+    alertname: ThanosStoreBucketHighOperationFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-store
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Store thanos-store in observatorium Bucket is failing to execute 10% of operations.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstorebuckethighoperationfailures
+        summary: Thanos Store Bucket is failing to execute operations.
+
+# Test ThanosStoreObjstoreOperationLatencyHigh
+- interval: 1m
+  input_series:
+  - series: thanos_objstore_bucket_operation_duration_seconds_bucket{job="thanos-store", namespace="observatorium", le="1"}
+    values: '0+0x20'
+  - series: thanos_objstore_bucket_operation_duration_seconds_bucket{job="thanos-store", namespace="observatorium", le="7"}
+    values: '0+1x20'
+  - series: thanos_objstore_bucket_operation_duration_seconds_bucket{job="thanos-store", namespace="observatorium", le="+Inf"}
+    values: '0+2x20'
+  - series: thanos_objstore_bucket_operation_duration_seconds_count{job="thanos-store", namespace="observatorium"}
+    values: '0+2x20'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: ThanosStoreObjstoreOperationLatencyHigh
+  - eval_time: 15m
+    alertname: ThanosStoreObjstoreOperationLatencyHigh
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        namespace: observatorium
+        job: thanos-store
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Store thanos-store in observatorium Bucket has a 99th percentile latency of 10.5 seconds for the bucket operations.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoreobjstoreoperationlatencyhigh
+        summary: Thanos Store is having high latency for bucket operations.
+
+# Test ThanosRuleQueueIsDroppingAlerts
+- interval: 1m
+  input_series:
+  - series: thanos_alert_queue_alerts_dropped_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+1x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosRuleQueueIsDroppingAlerts
+  - eval_time: 10m
+    alertname: ThanosRuleQueueIsDroppingAlerts
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler-0 in observatorium is failing to queue rulehelpers.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulequeueisdroppingalerts
+        summary: Thanos Rule is failing to queue rulehelpers.
+
+# Test ThanosRuleSenderIsFailingAlerts
+- interval: 1m
+  input_series:
+  - series: thanos_alert_sender_alerts_dropped_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+1x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosRuleSenderIsFailingAlerts
+  - eval_time: 10m
+    alertname: ThanosRuleSenderIsFailingAlerts
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler-0 in observatorium is failing to send alerts to alertmanager.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulesenderisfailingalerts
+        summary: Thanos Rule is failing to send alerts to alertmanager.
+
+# Test ThanosRuleHighRuleEvaluationFailures
+- interval: 1m
+  input_series:
+  - series: prometheus_rule_evaluation_failures_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+1x20'
+  - series: prometheus_rule_evaluations_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosRuleHighRuleEvaluationFailures
+  - eval_time: 10m
+    alertname: ThanosRuleHighRuleEvaluationFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler-0 in observatorium is failing to evaluate rules.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulehighruleevaluationfailures
+        summary: Thanos Rule is failing to evaluate rules.
+
+# Test ThanosRuleHighRuleEvaluationWarnings
+- interval: 1m
+  input_series:
+  - series: thanos_rule_evaluation_with_warnings_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+1x20'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: ThanosRuleHighRuleEvaluationWarnings
+  - eval_time: 20m
+    alertname: ThanosRuleHighRuleEvaluationWarnings
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler-0 in observatorium has high number of evaluation warnings.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulehighruleevaluationwarnings
+        summary: Thanos Rule has high number of evaluation warnings.
+
+# Test ThanosRuleRuleEvaluationLatencyHigh
+- interval: 1m
+  input_series:
+  - series: prometheus_rule_group_last_duration_seconds{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0", rule_group="test-group"}
+    values: '10 10 10 10 10 20 20 20 20 20 20'
+  - series: prometheus_rule_group_interval_seconds{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0", rule_group="test-group"}
+    values: '15 15 15 15 15 15 15 15 15 15 15'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosRuleRuleEvaluationLatencyHigh
+  - eval_time: 10m
+    alertname: ThanosRuleRuleEvaluationLatencyHigh
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+        rule_group: test-group
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler-0 in observatorium has higher evaluation latency than interval for test-group.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleruleevaluationlatencyhigh
+        summary: Thanos Rule has high rule evaluation latency.
+
+# Test ThanosRuleGrpcErrorRate
+- interval: 1m
+  input_series:
+  - series: grpc_server_handled_total{grpc_code="Internal", job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+1x20'
+  - series: grpc_server_started_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosRuleGrpcErrorRate
+  - eval_time: 10m
+    alertname: ThanosRuleGrpcErrorRate
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler in observatorium is failing to handle 10% of requests.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulegrpcerrorrate
+        summary: Thanos Rule is failing to handle grpc requests.
+
+# Test ThanosRuleConfigReloadFailure
+- interval: 1m
+  input_series:
+  - series: thanos_rule_config_last_reload_successful{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '1 1 1 1 1 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosRuleConfigReloadFailure
+  - eval_time: 10m
+    alertname: ThanosRuleConfigReloadFailure
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler in observatorium has not been able to reload its configuration.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleconfigreloadfailure
+        summary: Thanos Rule has not been able to reload configuration.
+
+# Test ThanosRuleQueryHighDNSFailures
+- interval: 1m
+  input_series:
+  - series: thanos_rule_query_apis_dns_failures_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+1x20'
+  - series: thanos_rule_query_apis_dns_lookups_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+50x20'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: ThanosRuleQueryHighDNSFailures
+  - eval_time: 20m
+    alertname: ThanosRuleQueryHighDNSFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler in observatorium has 2% of failing DNS queries for query endpoints.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulequeryhighdnsfailures
+        summary: Thanos Rule is having high number of DNS failures.
+
+# Test ThanosRuleAlertmanagerHighDNSFailures
+- interval: 1m
+  input_series:
+  - series: thanos_rule_alertmanagers_dns_failures_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+1x20'
+  - series: thanos_rule_alertmanagers_dns_lookups_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '0+50x20'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: ThanosRuleAlertmanagerHighDNSFailures
+  - eval_time: 20m
+    alertname: ThanosRuleAlertmanagerHighDNSFailures
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: medium
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler-0 in observatorium has 2% of failing DNS queries for Alertmanager endpoints.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulealertmanagerhighdnsfailures
+        summary: Thanos Rule is having high number of DNS failures.
+
+# Test ThanosRuleNoEvaluationFor10Intervals
+- interval: 1m
+  input_series:
+  - series: prometheus_rule_group_last_evaluation_timestamp_seconds{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0", group="test-group"}
+    values: '1000000 1000000 1000000 1000000 1000000 1000000 1000000 1000000 1000000 1000000'
+  - series: prometheus_rule_group_interval_seconds{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0", group="test-group"}
+    values: '60 60 60 60 60 60 60 60 60 60'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosRuleNoEvaluationFor10Intervals
+  - eval_time: 10m
+    alertname: ThanosRuleNoEvaluationFor10Intervals
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: high
+        job: thanos-ruler
+        namespace: observatorium
+        instance: thanos-ruler-0
+        group: test-group
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Thanos Rule thanos-ruler in observatorium has rule groups that did not evaluate for at least 10x of their expected interval.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulenoevaluationfor10intervals
+        summary: Thanos Rule has rule groups that did not evaluate for 10 intervals.
+
+# Test ThanosNoRuleEvaluations
+- interval: 1m
+  input_series:
+  - series: prometheus_rule_evaluations_total{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '10 10 10 10 10 10 10 10 10 10'
+  - series: thanos_rule_loaded_rules{job="thanos-ruler", namespace="observatorium", instance="thanos-ruler-0"}
+    values: '5 5 5 5 5 5 5 5 5 5'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: ThanosNoRuleEvaluations
+  - eval_time: 10m
+    alertname: ThanosNoRuleEvaluations

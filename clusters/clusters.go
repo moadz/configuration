@@ -103,8 +103,6 @@ const (
 	StepMemcached    = "memcached"
 
 	StepSyntheticsApi = "synthetics-api"
-
-	StepThanosRules = "thanos-rules"
 )
 
 // DefaultBuildSteps returns the default build pipeline for clusters
@@ -120,7 +118,6 @@ func DefaultBuildSteps() []string {
 		StepSecrets,         // Secrets last
 		StepMemcached,       // Memcached configuration
 		StepGateway,         // Gateway configuration
-		StepThanosRules,     // Thanos metamonitoring Rules configuration last}
 	)
 	return steps
 }

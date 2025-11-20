@@ -6,7 +6,6 @@ metadata:
     pyrra.dev/message: API /query endpoint for rules evaluation is burning too much
       error budget for 100M samples, to guarantee latency SLOs.
     pyrra.dev/runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsRuleReadLatency10MErrorBudgetBurning
-  creationTimestamp: null
   labels:
     instance: telemeter-production
     pyrra.dev/service: observatorium-api

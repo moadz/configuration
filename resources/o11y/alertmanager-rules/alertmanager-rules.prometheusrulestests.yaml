@@ -1,0 +1,220 @@
+---
+$schema: /app-interface/prometheus-rule-test-1.yml
+
+rule_files:
+- /resources/o11y/alertmanager-rules/alertmanager-rules.yaml
+
+evaluation_interval: 1m
+
+tests:
+# Test AlertmanagerFailedReload
+- interval: 1m
+  input_series:
+  - series: alertmanager_config_last_reload_successful{job="alertmanager", instance="alertmanager-0"}
+    values: '1 1 0 0 0 0 0 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: AlertmanagerFailedReload
+  - eval_time: 10m
+    alertname: AlertmanagerFailedReload
+  - eval_time: 12m
+    alertname: AlertmanagerFailedReload
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: critical
+        job: alertmanager
+        instance: alertmanager-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Configuration has failed to load for alertmanager-0.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerfailedreload
+        summary: Reloading an Alertmanager configuration has failed.
+
+# Test AlertmanagerMembersInconsistent
+- interval: 1m
+  input_series:
+  - series: alertmanager_cluster_members{job="alertmanager", instance="alertmanager-0"}
+    values: '3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2'
+  - series: alertmanager_cluster_members{job="alertmanager", instance="alertmanager-1"}
+    values: '3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3'
+  - series: alertmanager_cluster_members{job="alertmanager", instance="alertmanager-2"}
+    values: '3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: AlertmanagerMembersInconsistent
+  - eval_time: 20m
+    alertname: AlertmanagerMembersInconsistent
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: critical
+        job: alertmanager
+        instance: alertmanager-0
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Alertmanager alertmanager-0 has only found 2 members of the alertmanager cluster.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagermembersinconsistent
+        summary: A member of an Alertmanager cluster has not found all other cluster members.
+
+# Test AlertmanagerFailedToSendAlerts
+- interval: 1m
+  input_series:
+  - series: alertmanager_notifications_failed_total{job="alertmanager", instance="alertmanager-0", integration="slack", reason="timeout"}
+    values: '0+1x20'
+  - series: alertmanager_notifications_total{job="alertmanager", instance="alertmanager-0", integration="slack"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: AlertmanagerFailedToSendAlerts
+  - eval_time: 20m
+    alertname: AlertmanagerFailedToSendAlerts
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: warning
+        job: alertmanager
+        instance: alertmanager-0
+        integration: slack
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Alertmanager alertmanager-0 failed to send 10% of notifications to slack.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerfailedtosendalerts
+        summary: An Alertmanager instance failed to send notifications.
+
+# Test AlertmanagerClusterFailedToSendAlerts (critical integrations)
+- interval: 1m
+  input_series:
+  - series: alertmanager_notifications_failed_total{job="alertmanager", instance="alertmanager-0", integration="pagerduty", reason="timeout"}
+    values: '0+1x20'
+  - series: alertmanager_notifications_total{job="alertmanager", instance="alertmanager-0", integration="pagerduty"}
+    values: '0+10x20'
+  - series: alertmanager_notifications_failed_total{job="alertmanager", instance="alertmanager-1", integration="pagerduty", reason="timeout"}
+    values: '0+1x20'
+  - series: alertmanager_notifications_total{job="alertmanager", instance="alertmanager-1", integration="pagerduty"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: AlertmanagerClusterFailedToSendAlerts
+  - eval_time: 20m
+    alertname: AlertmanagerClusterFailedToSendAlerts
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: critical
+        job: alertmanager
+        integration: pagerduty
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: The minimum notification failure rate to pagerduty sent from any instance in the alertmanager cluster is 10%.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerclusterfailedtosendalerts
+        summary: All Alertmanager instances in a cluster failed to send notifications to a critical integration.
+
+# Test AlertmanagerClusterFailedToSendAlerts (non-critical integrations)
+- interval: 1m
+  input_series:
+  - series: alertmanager_notifications_failed_total{job="alertmanager", instance="alertmanager-0", integration="sns", reason="timeout"}
+    values: '0+1x20'
+  - series: alertmanager_notifications_total{job="alertmanager", instance="alertmanager-0", integration="sns"}
+    values: '0+10x20'
+  - series: alertmanager_notifications_failed_total{job="alertmanager", instance="alertmanager-1", integration="sns", reason="timeout"}
+    values: '0+1x20'
+  - series: alertmanager_notifications_total{job="alertmanager", instance="alertmanager-1", integration="sns"}
+    values: '0+10x20'
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: AlertmanagerClusterFailedToSendAlerts
+  - eval_time: 20m
+    alertname: AlertmanagerClusterFailedToSendAlerts
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: warning
+        job: alertmanager
+        integration: sns
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: The minimum notification failure rate to sns sent from any instance in the alertmanager cluster is 10%.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerclusterfailedtosendalertsnonCrit
+        summary: All Alertmanager instances in a cluster failed to send notifications to a non-critical integration.
+
+# Test AlertmanagerConfigInconsistent
+- interval: 1m
+  input_series:
+  - series: alertmanager_config_hash{job="alertmanager", instance="alertmanager-0"}
+    values: '12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345'
+  - series: alertmanager_config_hash{job="alertmanager", instance="alertmanager-1"}
+    values: '12345 12345 12345 12345 12345 67890 67890 67890 67890 67890 67890 67890 67890 67890 67890 67890 67890 67890 67890 67890 67890 67890'
+  - series: alertmanager_config_hash{job="alertmanager", instance="alertmanager-2"}
+    values: '12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345 12345'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: AlertmanagerConfigInconsistent
+  - eval_time: 25m
+    alertname: AlertmanagerConfigInconsistent
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: critical
+        job: alertmanager
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: Alertmanager instances within the alertmanager cluster have different configurations.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerconfiginconsistent
+        summary: Alertmanager instances within the same cluster have different configurations.
+
+# Test AlertmanagerClusterDown
+- interval: 1m
+  input_series:
+  - series: up{job="alertmanager", instance="alertmanager-0"}
+    values: '1 1 1 1 1 0 0 0 0 0 0 0 0 0 0'
+  - series: up{job="alertmanager", instance="alertmanager-1"}
+    values: '1 1 1 1 1 0 0 0 0 0 0 0 0 0 0'
+  - series: up{job="alertmanager", instance="alertmanager-2"}
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 7m
+    alertname: AlertmanagerClusterDown
+  - eval_time: 12m
+    alertname: AlertmanagerClusterDown
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: critical
+        job: alertmanager
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: '66.67% of Alertmanager instances within the alertmanager cluster have been up for less than half of the last 5m.'
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerclusterdown
+        summary: Half or more of the Alertmanager instances within the same cluster are down.
+
+# Test AlertmanagerClusterCrashlooping
+- interval: 1m
+  input_series:
+  - series: process_start_time_seconds{job="alertmanager", instance="alertmanager-0"}
+    values: '1000 1000 1000 1000 1000 2000 3000 4000 5000 6000 7000 7000 7000 7000 7000'
+  - series: process_start_time_seconds{job="alertmanager", instance="alertmanager-1"}
+    values: '1000 1000 1000 1000 1000 2000 3000 4000 5000 6000 7000 7000 7000 7000 7000'
+  - series: process_start_time_seconds{job="alertmanager", instance="alertmanager-2"}
+    values: '1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000'
+  - series: up{job="alertmanager", instance="alertmanager-0"}
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: up{job="alertmanager", instance="alertmanager-1"}
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: up{job="alertmanager", instance="alertmanager-2"}
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: AlertmanagerClusterCrashlooping
+  - eval_time: 15m
+    alertname: AlertmanagerClusterCrashlooping
+    exp_alerts:
+    - exp_labels:
+        service: rhobs.regional
+        severity: critical
+        job: alertmanager
+      exp_annotations:
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        description: '66.67% of Alertmanager instances within the alertmanager cluster have restarted at least 5 times in the last 10m.'
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerclustercrashlooping
+        summary: Half or more of the Alertmanager instances within the same cluster are crashlooping.

@@ -6,7 +6,6 @@ metadata:
     pyrra.dev/message: Thanos Ruler /reload endpoint is burning too much error budget
       to guarantee availability SLOs.
     pyrra.dev/runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIRulesSyncAvailabilityErrorBudgetBurning
-  creationTimestamp: null
   labels:
     instance: mst-production
     pyrra.dev/service: observatorium-api

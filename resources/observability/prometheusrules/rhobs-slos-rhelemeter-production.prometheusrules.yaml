@@ -3,7 +3,6 @@ $schema: /openshift/prometheus-rule-1.yml
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  creationTimestamp: null
   labels:
     prometheus: app-sre
     role: alert-rules

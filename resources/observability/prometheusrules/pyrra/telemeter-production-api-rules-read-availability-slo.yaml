@@ -6,7 +6,6 @@ metadata:
     pyrra.dev/message: API /rules endpoint is burning too much error budget to guarantee
       availability SLOs.
     pyrra.dev/runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIRulesReadAvailabilityErrorBudgetBurning
-  creationTimestamp: null
   labels:
     instance: telemeter-production
     pyrra.dev/service: observatorium-api

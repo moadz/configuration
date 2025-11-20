@@ -6,7 +6,6 @@ metadata:
     pyrra.dev/message: API /receive handler is burning too much error budget to guarantee
       latency SLOs.
     pyrra.dev/runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteLatencyErrorBudgetBurning
-  creationTimestamp: null
   labels:
     instance: telemeter-production
     pyrra.dev/service: observatorium-api

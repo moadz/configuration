@@ -23,6 +23,7 @@ const (
 	templatePath         = "resources"
 	templateServicesPath = "services"
 	templateClustersPath = "clusters"
+	templateO11yPath     = "o11y"
 )
 
 // BuildStepFunctions maps build step names to their implementation functions
@@ -74,10 +75,6 @@ var BuildStepFunctions = map[string]func(Build, clusters.ClusterConfig) error{
 		if err != nil {
 			return err
 		}
-		return nil
-	},
-	clusters.StepThanosRules: func(b Build, cfg clusters.ClusterConfig) error {
-		b.ThanosRules(cfg)
 		return nil
 	},
 }
@@ -171,6 +168,13 @@ func (Stage) Build() {
 func (Build) generator(config clusters.ClusterConfig, component string) *mimic.Generator {
 	gen := &mimic.Generator{}
 	gen = gen.With(templatePath, templateClustersPath, string(config.Environment), string(config.Name), component)
+	gen.Logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
+	return gen
+}
+
+func (Build) o11yGenerator(component string) *mimic.Generator {
+	gen := &mimic.Generator{}
+	gen = gen.With(templatePath, templateO11yPath, component)
 	gen.Logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
 	return gen
 }

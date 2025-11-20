@@ -6,7 +6,6 @@ metadata:
     pyrra.dev/message: API /query endpoint is burning too much error budget for 1M
       samples, to guarantee latency SLOs.
     pyrra.dev/runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-  creationTimestamp: null
   labels:
     instance: mst-production
     pyrra.dev/service: observatorium-api

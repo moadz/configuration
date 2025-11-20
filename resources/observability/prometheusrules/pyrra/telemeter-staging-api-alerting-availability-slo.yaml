@@ -6,7 +6,6 @@ metadata:
     pyrra.dev/message: API Thanos Rule failing to send alerts to Alertmanager and
       is burning too much error budget to guarantee availability SLOs.
     pyrra.dev/runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
-  creationTimestamp: null
   labels:
     instance: telemeter-staging
     pyrra.dev/service: observatorium-api

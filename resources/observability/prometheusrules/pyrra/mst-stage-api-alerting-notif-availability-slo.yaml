@@ -6,7 +6,6 @@ metadata:
     pyrra.dev/message: API Alertmanager failing to deliver alerts to upstream targets
       and is burning too much error budget to guarantee availability SLOs.
     pyrra.dev/runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
-  creationTimestamp: null
   labels:
     instance: mst-stage
     service: observatorium-api
