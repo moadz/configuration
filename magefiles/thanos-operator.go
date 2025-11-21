@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
@@ -13,11 +10,9 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/utils/ptr"
 )
 
@@ -58,31 +53,17 @@ func crds(gen *mimic.Generator) error {
 		receivers = "thanosreceives.yaml"
 		rulers    = "thanosrulers.yaml"
 		stores    = "thanosstores.yaml"
+		base      = "https://raw.githubusercontent.com/thanos-community/thanos-operator/" + thanosOperatorCRDRef + "/config/crd/bases/monitoring.thanos.io_"
 	)
-
-	base := "https://raw.githubusercontent.com/thanos-community/thanos-operator/" + thanosOperatorCRDRef + "/config/crd/bases/monitoring.thanos.io_"
 
 	var objs []runtime.Object
 	for _, component := range []string{compact, queries, receivers, rulers, stores} {
-		manifest := base + component
-		resp, err := http.Get(manifest)
+		crd, err := getCustomResourceDefinition(base + component)
 		if err != nil {
-			return fmt.Errorf("failed to fetch %s: %w", manifest, err)
+			return err
 		}
 
-		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("failed to fetch %s: %s", manifest, resp.Status)
-		}
-
-		var obj v1.CustomResourceDefinition
-		decoder := yaml.NewYAMLOrJSONDecoder(resp.Body, 100000)
-		err = decoder.Decode(&obj)
-		if err != nil {
-			return fmt.Errorf("failed to decode %s: %w", manifest, err)
-		}
-
-		objs = append(objs, &obj)
-		resp.Body.Close()
+		objs = append(objs, crd)
 	}
 
 	gen.Add("thanos-operator-crds.yaml", encoding.GhodssYAML(

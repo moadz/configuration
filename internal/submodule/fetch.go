@@ -32,14 +32,14 @@ type Info struct {
 	PathToYAMLS   string
 }
 
-type info struct {
+type Module struct {
 	Path   string
 	URL    string
 	Commit string
 }
 
-// Parse the Info into a git hash for the submodule
-func (i Info) Parse() (string, error) {
+// Parse the Info into a Module.
+func (i Info) Parse() (Module, error) {
 	// Use commit if specified, otherwise fall back to branch
 	ref := i.Commit
 	if ref == "" {
@@ -49,15 +49,15 @@ func (i Info) Parse() (string, error) {
 	// Always parse submodule commits to get the actual submodule commit hash
 	infos, err := getSubmoduleCommits(i.URL, ref)
 	if err != nil {
-		return "", fmt.Errorf("failed to parse submodule commits: %w", err)
+		return Module{}, fmt.Errorf("failed to parse submodule commits: %w", err)
 	}
 
-	for _, index := range infos {
-		if index.Path == i.SubmodulePath {
-			return index.Commit, nil
+	for _, module := range infos {
+		if module.Path == i.SubmodulePath {
+			return module, nil
 		}
 	}
-	return "", fmt.Errorf("failed to find submodule commit for %s", i.SubmodulePath)
+	return Module{}, fmt.Errorf("failed to find commit for submodule %q", i.SubmodulePath)
 }
 
 // FetchYAMLs fetches YAML files from the specified directory in the submodule commit and prints them
@@ -67,12 +67,12 @@ func (i Info) FetchYAMLs() ([]runtime.Object, error) {
 	}
 
 	// First get the submodule commit hash
-	commit, err := i.Parse()
+	module, err := i.Parse()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get submodule commit: %w", err)
 	}
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
-	_ = logger.Log("msg", "Got submodule commit", "commit", commit)
+	_ = logger.Log("msg", "Got submodule commit", "commit", module.Commit, "url", module.URL)
 
 	// Get the submodule URL from .gitmodules
 	submoduleURL, err := i.getSubmoduleURL()
@@ -82,7 +82,7 @@ func (i Info) FetchYAMLs() ([]runtime.Object, error) {
 	_ = logger.Log("msg", "Got submodule URL", "url", submoduleURL)
 
 	// First check root directory to see what's in the repo
-	rootFiles, err := i.fetchDirectoryContents(submoduleURL, commit, "")
+	rootFiles, err := i.fetchDirectoryContents(submoduleURL, module.Commit, "")
 	if err != nil {
 		_ = logger.Log("msg", "Failed to fetch root directory", "error", err)
 	} else {
@@ -97,7 +97,7 @@ func (i Info) FetchYAMLs() ([]runtime.Object, error) {
 	}
 
 	// First check if operator directory exists
-	operatorFiles, err := i.fetchDirectoryContents(submoduleURL, commit, "operator")
+	operatorFiles, err := i.fetchDirectoryContents(submoduleURL, module.Commit, "operator")
 	if err != nil {
 		_ = logger.Log("msg", "Failed to fetch operator directory", "error", err)
 	} else {
@@ -108,7 +108,7 @@ func (i Info) FetchYAMLs() ([]runtime.Object, error) {
 	}
 
 	// Fetch directory contents from the submodule repository
-	files, err := i.fetchDirectoryContents(submoduleURL, commit, i.PathToYAMLS)
+	files, err := i.fetchDirectoryContents(submoduleURL, module.Commit, i.PathToYAMLS)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch directory contents: %w", err)
 	}
@@ -117,7 +117,7 @@ func (i Info) FetchYAMLs() ([]runtime.Object, error) {
 	var objs []runtime.Object
 	for _, file := range files {
 		if strings.HasSuffix(strings.ToLower(file.Name), ".yaml") || strings.HasSuffix(strings.ToLower(file.Name), ".yml") {
-			content, err := i.fetchFileContent(submoduleURL, commit, file.Path)
+			content, err := i.fetchFileContent(submoduleURL, module.Commit, file.Path)
 			if err != nil {
 				_ = logger.Log("msg", "Error fetching file", "file", file.Name, "error", err)
 				continue
@@ -167,12 +167,12 @@ func fetchGitModules(repoURL, branch string) (string, int, error) {
 	url, rt := buildRawURL(repoURL, branch, ".gitmodules")
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", 0, fmt.Errorf("failed to fetch .gitmodules: %w", err)
+		return "", 0, fmt.Errorf("failed to fetch .gitmodules: %s: %w", url, err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", 0, fmt.Errorf("failed to fetch .gitmodules: status %d", resp.StatusCode)
+		return "", 0, fmt.Errorf("failed to fetch .gitmodules: %s: status %d", url, resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -183,9 +183,9 @@ func fetchGitModules(repoURL, branch string) (string, int, error) {
 	return string(body), rt, nil
 }
 
-func parseGitModules(content string) ([]info, error) {
-	var submodules []info
-	var current info
+func parseGitModules(content string) ([]Module, error) {
+	var submodules []Module
+	var current Module
 
 	scanner := bufio.NewScanner(strings.NewReader(content))
 	for scanner.Scan() {
@@ -195,7 +195,7 @@ func parseGitModules(content string) ([]info, error) {
 			if current.Path != "" {
 				submodules = append(submodules, current)
 			}
-			current = info{}
+			current = Module{}
 		} else if strings.Contains(line, "path = ") {
 			current.Path = strings.TrimSpace(strings.Split(line, "=")[1])
 		} else if strings.Contains(line, "url = ") {
@@ -266,7 +266,7 @@ func fetchSubmoduleCommit(repoType repoType, repoURL, branch, submodulePath stri
 	return "unknown", nil
 }
 
-func getSubmoduleCommits(repoURL, branch string) ([]info, error) {
+func getSubmoduleCommits(repoURL, branch string) ([]Module, error) {
 	gitmodulesContent, rt, err := fetchGitModules(repoURL, branch)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch .gitmodules: %w", err)

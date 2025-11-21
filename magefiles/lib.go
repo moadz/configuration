@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"sort"
 
 	"github.com/bwplotka/mimic/encoding"
@@ -12,8 +13,10 @@ import (
 	monv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
 const (
@@ -184,4 +187,25 @@ func deepCopyMap(m map[string]string) map[string]string {
 		result[k] = v
 	}
 	return result
+}
+
+func getCustomResourceDefinition(url string) (*v1.CustomResourceDefinition, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch %s: %w", url, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to fetch %s: %s", url, resp.Status)
+	}
+
+	var obj v1.CustomResourceDefinition
+	decoder := yaml.NewYAMLOrJSONDecoder(resp.Body, 100000)
+	err = decoder.Decode(&obj)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode %s: %w", url, err)
+	}
+
+	return &obj, nil
 }
