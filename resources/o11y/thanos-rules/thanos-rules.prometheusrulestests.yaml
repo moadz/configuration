@@ -25,7 +25,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosCompact has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactisdown
-        summary: Thanos component has disappeared from {{$labels.namespace}}.
+        message: Thanos component has disappeared from {{$labels.namespace}}.
 
 # Test ThanosQueryIsDown
 - interval: 1m
@@ -45,7 +45,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosQuery has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryisdown
-        summary: Thanos component has disappeared from {{$labels.namespace}}.
+        message: Thanos component has disappeared from {{$labels.namespace}}.
 
 # Test ThanosReceiveRouterIsDown
 - interval: 1m
@@ -65,7 +65,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosReceiveRouter has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveisdown
-        summary: Thanos component has disappeared from {{$labels.namespace}}.
+        message: Thanos component has disappeared from {{$labels.namespace}}.
 
 # Test ThanosReceiveIngesterIsDown
 - interval: 1m
@@ -85,7 +85,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosReceiveIngester has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveisdown
-        summary: Thanos component has disappeared from {{$labels.namespace}}.
+        message: Thanos component has disappeared from {{$labels.namespace}}.
 
 # Test ThanosRuleIsDown
 - interval: 1m
@@ -105,7 +105,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosRule has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleisdown
-        summary: Thanos component has disappeared from {{$labels.namespace}}.
+        message: Thanos component has disappeared from {{$labels.namespace}}.
 
 # Test ThanosStoreIsDown
 - interval: 1m
@@ -125,7 +125,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosStore has disappeared from {{$labels.namespace}}. Prometheus target for the component cannot be discovered.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoreisdown
-        summary: Thanos component has disappeared from {{$labels.namespace}}.
+        message: Thanos component has disappeared from {{$labels.namespace}}.
 
 # Test ThanosCompactMultipleRunning
 - interval: 1m
@@ -147,7 +147,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: No more than one Thanos Compact instance should be running at once. There are 2 in observatorium instances running.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactmultiplerunning
-        summary: Thanos Compact has multiple instances running.
+        message: Thanos Compact has multiple instances running.
 
 # Test ThanosCompactHalted
 - interval: 1m
@@ -169,7 +169,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Compact thanos-compact in observatorium has failed to run and now is halted.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompacthalted
-        summary: Thanos Compact has failed to run and is now halted.
+        message: Thanos Compact has failed to run and is now halted.
 
 # Test ThanosCompactHighCompactionFailures
 - interval: 1m
@@ -193,7 +193,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Compact thanos-compact in observatorium is failing to execute 10% of compactions.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompacthighcompactionfailures
-        summary: Thanos Compact is failing to execute compactions.
+        message: Thanos Compact is failing to execute compactions.
 
 # Test ThanosCompactBucketHighOperationFailures
 - interval: 1m
@@ -217,7 +217,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Compact thanos-compact in observatorium Bucket is failing to execute 10% of operations.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactbuckethighoperationfailures
-        summary: Thanos Compact Bucket is having a high number of operation failures.
+        message: Thanos Compact Bucket is having a high number of operation failures.
 
 # Test ThanosCompactHasNotRun
 - interval: 1m
@@ -239,7 +239,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Compact thanos-compact in observatorium has not uploaded anything for 24 hours.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompacthasnotrun
-        summary: Thanos Compact has not uploaded anything for last 24 hours.
+        message: Thanos Compact has not uploaded anything for last 24 hours.
 
 # Test ThanosQueryHttpRequestQueryErrorRateHigh
 - interval: 1m
@@ -263,7 +263,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Query thanos-query in observatorium is failing to handle 10% of "query" requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryhttprequestqueryerrorratehigh
-        summary: Thanos Query is failing to handle requests.
+        message: Thanos Query is failing to handle requests.
 
 # Test ThanosQueryGrpcServerErrorRate
 - interval: 1m
@@ -287,7 +287,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Query thanos-query in observatorium is failing to handle 10% of requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosquerygrpcservererrorrate
-        summary: Thanos Query is failing to handle requests.
+        message: Thanos Query is failing to handle requests.
 
 # Test ThanosQueryGrpcClientErrorRate
 - interval: 1m
@@ -311,7 +311,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Query thanos-query in observatorium is failing to send 10% of requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosquerygrpcclienterrorrate
-        summary: Thanos Query is failing to send requests.
+        message: Thanos Query is failing to send requests.
 
 # Test ThanosQueryHighDNSFailures
 - interval: 1m
@@ -335,7 +335,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Query thanos-query in observatorium have 2% of failing DNS queries for store endpoints.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryhighdnsfailures
-        summary: Thanos Query is having high number of DNS failures.
+        message: Thanos Query is having high number of DNS failures.
 
 # Test ThanosQueryInstantLatencyHigh
 - interval: 1m
@@ -365,7 +365,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Query thanos-query in observatorium has a 99th percentile latency of 135 seconds for instant queries.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryinstantlatencyhigh
-        summary: Thanos Query has high latency for queries.
+        message: Thanos Query has high latency for queries.
 
 # Test ThanosReceiveHttpRequestErrorRateHigh
 - interval: 1m
@@ -389,7 +389,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-router in observatorium is failing to handle 10% of requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehttprequesterrorratehigh
-        summary: Thanos Receive is failing to handle requests.
+        message: Thanos Receive is failing to handle requests.
 
 # Test ThanosReceiveHttpRequestLatencyHigh
 - interval: 1m
@@ -417,7 +417,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-router in observatorium has a 99th percentile latency of 15 seconds for requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehttprequestlatencyhigh
-        summary: Thanos Receive has high HTTP requests latency.
+        message: Thanos Receive has high HTTP requests latency.
 
 # Test ThanosReceiveHighReplicationFailures
 - interval: 1m
@@ -445,7 +445,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-router in observatorium is failing to replicate 60% of requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehighreplicationfailures
-        summary: Thanos Receive is having high number of replication failures.
+        message: Thanos Receive is having high number of replication failures.
 
 # Test ThanosReceiveHighForwardRequestFailures
 - interval: 1m
@@ -469,7 +469,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-router in observatorium is failing to forward 30% of requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehighforwardrequestfailures
-        summary: Thanos Receive is failing to forward requests.
+        message: Thanos Receive is failing to forward requests.
 
 # Test ThanosReceiveHighHashringFileRefreshFailures
 - interval: 1m
@@ -493,7 +493,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-router in observatorium is failing to refresh hashring file, 0.1 of attempts failed.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehighhashringfilerefreshfailures
-        summary: Thanos Receive is failing to refresh hasring file.
+        message: Thanos Receive is failing to refresh hasring file.
 
 # Test ThanosReceiveConfigReloadFailure
 - interval: 1m
@@ -515,7 +515,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-router in observatorium has not been able to reload hashring configurations.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveconfigreloadfailure
-        summary: Thanos Receive is failing to reload hashring configurations.
+        message: Thanos Receive is failing to reload hashring configurations.
 
 # Test ThanosReceiveNoUpload
 - interval: 1m
@@ -540,7 +540,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-0 in observatorium has not uploaded latest data to object storage.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivenoupload
-        summary: Thanos Receive has not uploaded latest data to object storage.
+        message: Thanos Receive has not uploaded latest data to object storage.
 
 # Test ThanosReceiveLimitsConfigReloadFailure
 - interval: 1m
@@ -562,7 +562,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-router in observatorium has not been able to reload the limits configuration.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivelimitsconfigreloadfailure
-        summary: Thanos Receive has not been able to reload the limits configuration.
+        message: Thanos Receive has not been able to reload the limits configuration.
 
 # Test ThanosReceiveLimitsHighMetaMonitoringQueriesFailureRate
 - interval: 1m
@@ -584,7 +584,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive thanos-receive-router in observatorium is failing for 250% of meta monitoring queries.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivelimitshighmetamonitoringqueriesfailurerate
-        summary: Thanos Receive has not been able to update the number of head series.
+        message: Thanos Receive has not been able to update the number of head series.
 
 # Test ThanosReceiveTenantLimitedByHeadSeries
 - interval: 1m
@@ -607,7 +607,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Receive tenant tenant-a in observatorium is limited by head series.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivetenantlimitedbyheadseries
-        summary: Thanos Receive tenant is limited by head series.
+        message: Thanos Receive tenant is limited by head series.
 
 # Test ThanosStoreGrpcErrorRate
 - interval: 1m
@@ -631,7 +631,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Store thanos-store in observatorium is failing to handle 10% of requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoregrpcerrorrate
-        summary: Thanos Store is failing to handle gRPC requests.
+        message: Thanos Store is failing to handle gRPC requests.
 
 # Test ThanosStoreBucketHighOperationFailures
 - interval: 1m
@@ -655,7 +655,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Store thanos-store in observatorium Bucket is failing to execute 10% of operations.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstorebuckethighoperationfailures
-        summary: Thanos Store Bucket is failing to execute operations.
+        message: Thanos Store Bucket is failing to execute operations.
 
 # Test ThanosStoreObjstoreOperationLatencyHigh
 - interval: 1m
@@ -683,7 +683,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Store thanos-store in observatorium Bucket has a 99th percentile latency of 10.5 seconds for the bucket operations.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoreobjstoreoperationlatencyhigh
-        summary: Thanos Store is having high latency for bucket operations.
+        message: Thanos Store is having high latency for bucket operations.
 
 # Test ThanosRuleQueueIsDroppingAlerts
 - interval: 1m
@@ -706,7 +706,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler-0 in observatorium is failing to queue rulehelpers.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulequeueisdroppingalerts
-        summary: Thanos Rule is failing to queue rulehelpers.
+        message: Thanos Rule is failing to queue rulehelpers.
 
 # Test ThanosRuleSenderIsFailingAlerts
 - interval: 1m
@@ -729,7 +729,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler-0 in observatorium is failing to send alerts to alertmanager.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulesenderisfailingalerts
-        summary: Thanos Rule is failing to send alerts to alertmanager.
+        message: Thanos Rule is failing to send alerts to alertmanager.
 
 # Test ThanosRuleHighRuleEvaluationFailures
 - interval: 1m
@@ -754,7 +754,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler-0 in observatorium is failing to evaluate rules.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulehighruleevaluationfailures
-        summary: Thanos Rule is failing to evaluate rules.
+        message: Thanos Rule is failing to evaluate rules.
 
 # Test ThanosRuleHighRuleEvaluationWarnings
 - interval: 1m
@@ -777,7 +777,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler-0 in observatorium has high number of evaluation warnings.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulehighruleevaluationwarnings
-        summary: Thanos Rule has high number of evaluation warnings.
+        message: Thanos Rule has high number of evaluation warnings.
 
 # Test ThanosRuleRuleEvaluationLatencyHigh
 - interval: 1m
@@ -803,7 +803,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler-0 in observatorium has higher evaluation latency than interval for test-group.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleruleevaluationlatencyhigh
-        summary: Thanos Rule has high rule evaluation latency.
+        message: Thanos Rule has high rule evaluation latency.
 
 # Test ThanosRuleGrpcErrorRate
 - interval: 1m
@@ -828,7 +828,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler in observatorium is failing to handle 10% of requests.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulegrpcerrorrate
-        summary: Thanos Rule is failing to handle grpc requests.
+        message: Thanos Rule is failing to handle grpc requests.
 
 # Test ThanosRuleConfigReloadFailure
 - interval: 1m
@@ -851,7 +851,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler in observatorium has not been able to reload its configuration.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleconfigreloadfailure
-        summary: Thanos Rule has not been able to reload configuration.
+        message: Thanos Rule has not been able to reload configuration.
 
 # Test ThanosRuleQueryHighDNSFailures
 - interval: 1m
@@ -876,7 +876,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler in observatorium has 2% of failing DNS queries for query endpoints.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulequeryhighdnsfailures
-        summary: Thanos Rule is having high number of DNS failures.
+        message: Thanos Rule is having high number of DNS failures.
 
 # Test ThanosRuleAlertmanagerHighDNSFailures
 - interval: 1m
@@ -901,7 +901,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler-0 in observatorium has 2% of failing DNS queries for Alertmanager endpoints.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulealertmanagerhighdnsfailures
-        summary: Thanos Rule is having high number of DNS failures.
+        message: Thanos Rule is having high number of DNS failures.
 
 # Test ThanosRuleNoEvaluationFor10Intervals
 - interval: 1m
@@ -927,7 +927,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Thanos Rule thanos-ruler in observatorium has rule groups that did not evaluate for at least 10x of their expected interval.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulenoevaluationfor10intervals
-        summary: Thanos Rule has rule groups that did not evaluate for 10 intervals.
+        message: Thanos Rule has rule groups that did not evaluate for 10 intervals.
 
 # Test ThanosNoRuleEvaluations
 - interval: 1m

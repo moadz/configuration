@@ -29,7 +29,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Configuration has failed to load for alertmanager-0.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerfailedreload
-        summary: Reloading an Alertmanager configuration has failed.
+        message: Reloading an Alertmanager configuration has failed.
 
 # Test AlertmanagerMembersInconsistent
 - interval: 1m
@@ -55,7 +55,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Alertmanager alertmanager-0 has only found 2 members of the alertmanager cluster.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagermembersinconsistent
-        summary: A member of an Alertmanager cluster has not found all other cluster members.
+        message: A member of an Alertmanager cluster has not found all other cluster members.
 
 # Test AlertmanagerFailedToSendAlerts
 - interval: 1m
@@ -80,7 +80,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Alertmanager alertmanager-0 failed to send 10% of notifications to slack.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerfailedtosendalerts
-        summary: An Alertmanager instance failed to send notifications.
+        message: An Alertmanager instance failed to send notifications.
 
 # Test AlertmanagerClusterFailedToSendAlerts (critical integrations)
 - interval: 1m
@@ -108,7 +108,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: The minimum notification failure rate to pagerduty sent from any instance in the alertmanager cluster is 10%.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerclusterfailedtosendalerts
-        summary: All Alertmanager instances in a cluster failed to send notifications to a critical integration.
+        message: All Alertmanager instances in a cluster failed to send notifications to a critical integration.
 
 # Test AlertmanagerClusterFailedToSendAlerts (non-critical integrations)
 - interval: 1m
@@ -136,7 +136,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: The minimum notification failure rate to sns sent from any instance in the alertmanager cluster is 10%.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerclusterfailedtosendalertsnonCrit
-        summary: All Alertmanager instances in a cluster failed to send notifications to a non-critical integration.
+        message: All Alertmanager instances in a cluster failed to send notifications to a non-critical integration.
 
 # Test AlertmanagerConfigInconsistent
 - interval: 1m
@@ -161,7 +161,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Alertmanager instances within the alertmanager cluster have different configurations.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerconfiginconsistent
-        summary: Alertmanager instances within the same cluster have different configurations.
+        message: Alertmanager instances within the same cluster have different configurations.
 
 # Test AlertmanagerClusterDown
 - interval: 1m
@@ -186,7 +186,7 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: '66.67% of Alertmanager instances within the alertmanager cluster have been up for less than half of the last 5m.'
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerclusterdown
-        summary: Half or more of the Alertmanager instances within the same cluster are down.
+        message: Half or more of the Alertmanager instances within the same cluster are down.
 
 # Test AlertmanagerClusterCrashlooping
 - interval: 1m
@@ -217,4 +217,4 @@ tests:
         dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: '66.67% of Alertmanager instances within the alertmanager cluster have restarted at least 5 times in the last 10m.'
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#alertmanagerclustercrashlooping
-        summary: Half or more of the Alertmanager instances within the same cluster are crashlooping.
+        message: Half or more of the Alertmanager instances within the same cluster are crashlooping.
