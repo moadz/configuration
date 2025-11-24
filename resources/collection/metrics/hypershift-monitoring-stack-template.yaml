@@ -148,6 +148,13 @@ objects:
                       apiserver_request:counts:write:total;.*|\
                       apiserver_request:counts:write:errors;.*|\
                       apiserver_request:counts:write:slow;.*|\
+                      apiserver_request:error_rate_1h;.*|\
+                      apiserver_request:error_rate_5m;.*|\
+                      apiserver_request:error_rate_6h;.*|\
+                      apiserver_request:error_rate_30m;.*|\
+                      apiserver_request:error_rate_1d;.*|\
+                      apiserver_request:error_rate_2h;.*|\
+                      apiserver_request:error_rate_3d;.*|\
                       apiserver_storage_objects;.*|\
                       apiserver_storage_size_bytes;.*|\
                       cluster_autoscaler_unschedulable_pods_count;.*|\
@@ -155,21 +162,27 @@ objects:
                       cluster_autoscaler_skipped_scale_events_count;.*|\
                       cluster_autoscaler_errors_total;.*|\
                       cluster_autoscaler_failed_scale_ups_total;.*|\
+                      cluster_autoscaler:pod_status_ready;.*|\
                       cluster_operator_up;.*|\
                       container_cpu_usage_seconds_total;.*|\
                       container_memory_rss;.*|\
+                      core_cluster_operator:down:filtered;.*|\
                       etcd_mvcc_db_total_size_in_bytes;.*|\
                       etcd_server_has_leader;.*|\
                       etcd_server_is_leader;.*|\
                       etcd_server_leader_changes_seen_total;.*|\
                       etcd_server_quota_backend_bytes;.*|\
                       etcd_disk_wal_fsync_duration_seconds_bucket;.*|\
+                      hcp_worker_nodes:available_count;.*|\
                       hypershift_hostedcluster_nodepools;.*|\
                       hypershift_hostedclusters;.*|\
                       hypershift_cluster_limited_support_enabled;.*|\
+                      hypershift_cluster_alerts_disabled;.*|\
                       hypershift_cluster_silence_alerts;.*|\
+                      hypershift_cluster_vcpus_computation_error;.*|\
                       sre:oauth:pods_up;.*|\
                       sre:oauth:deployment_pods_unavailable;.*|\
+                      sre:sre:oauth:pod_status_ready;.*|\
                       hypershift_nodepools;.*|\
                       hypershift_nodepools_size;.*|\
                       hypershift_nodepools_available_replicas;.*|\
@@ -188,12 +201,27 @@ objects:
                       hypershift_node:consumption:disk_io:in;.*|\
                       hypershift_node:not_ready;.*|\
                       hypershift_node:in_bad_condition;.*|\
+                      hypershift_node:high_usage;.*|\
+                      hypershift_node:ready;.*|\
                       ALERTS;.*|\
                       sre:node_request_serving.*;.*|\
                       sre:apiserver_up;.*|\
                       sre:apiserver_request:total;.*|\
                       sre:apiserver_request:duration_seconds_bucket;.*|\
                       sre:node_request_serving:info;.*|\
+                      sre:node_request_serving:excessive_consumption_cpu;.*|\
+                      sre:node_request_serving:excessive_consumption_memory;.*|\
+                      sre:kube_apiserver:pod_status_ready;.*|\
+                      sre:kube_apiserver:deployment_pods_unavailable;.*|\
+                      sre:openshift_apiserver:deployment_pods_unavailable;.*|\
+                      sre:openshift_apiserver:pod_status_ready;.*|\
+                      sre:kube_controller_manager:pod_status_ready;.*|\
+                      sre:kube_scheduler:pod_status_ready;.*|\
+                      sre:hcp_podmonitor_up:sum;.*|\
+                      sre:hcp_servicemonitor_up:sum;.*|\
+                      sre:nodepool:provisioning_failure_notify;.*|\
+                      sre:nodepool:all_components_available;.*|\
+                      sre:nodepool:invalid_payload_nodepool_provision_failure;.*|\
                       vector_component_sent_events_total;.*|\
                       probe_success;.*|\
                       certmanager_certificate_ready_status;.*|\
@@ -206,6 +234,12 @@ objects:
                       hypershift_operator_info;.*|\
                       hypershift_cluster_size_override_instances;.*|\
                       hypershift_cluster_waiting_initial_avaibility_duration_seconds;.*|\
+                      splunkforwarder_audit_filter_cloudwatch_configuration_invalid;.*|\
+                      splunkforwarder_audit_filter_cloudwatch_enabled;.*|\
+                      splunkforwarder_audit_filter_cloudwatch_errors_total;.*|\
+                      kube_deployment_status_replicas_available;.*|\
+                      kube_deployment_spec_replicas;.*|\
+                      kube_node_labels;.*|\
                       )"
                   # Matches 'no label'.
                   # Basically: if source is defined already (i.e on the data plane/management cluster), keep the label.
