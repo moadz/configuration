@@ -372,6 +372,8 @@ func makePrometheusRule(objs []pyrrav1alpha1.ServiceLevelObjective, name string,
 		}
 	}
 
+	grp = ReplaceSummaryWithMessage(grp)
+
 	return appInterfacePrometheusRule{
 		Schema: "/openshift/prometheus-rule-1.yml",
 		PrometheusRule: monitoringv1.PrometheusRule{

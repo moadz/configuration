@@ -21,9 +21,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: The Thanos Operator has been down for more than 5 minutes. No
           reconciliation is happening.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatordown
-        summary: Thanos resources are not being reconciled. Configuration changes
+        message: Thanos resources are not being reconciled. Configuration changes
           will not be applied.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatordown
       expr: up{job="thanos-operator-controller-manager-metrics-service"} == 0
       for: 5m
       labels:
@@ -36,9 +36,9 @@ spec:
         description: Controller {{ $labels.controller }} for resource {{ $labels.namespace
           }}/{{ $labels.resource }} has a high reconciliation error rate of {{ $value
           | humanizePercentage }} over the last 10 minutes.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorhighreconcileerrorrate
-        summary: Resources managed by this controller may not be correctly configured
+        message: Resources managed by this controller may not be correctly configured
           or updated.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorhighreconcileerrorrate
       expr: |2-
             sum by (controller) (
               rate(
@@ -64,8 +64,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Workqueue for {{ $labels.name }} has items but no reconciliations
           are happening. Controller appears stuck.
+        message: Changes to Thanos resources are not being processed.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorreconcilestuck
-        summary: Changes to Thanos resources are not being processed.
       expr: |2-
             rate(
               controller_runtime_reconcile_total{job="thanos-operator-controller-manager-metrics-service"}[10m]
@@ -85,8 +85,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Workqueue depth for {{ $labels.name }} is {{ $value }}, indicating
           the controller cannot keep up with events.
+        message: Reconciliation is falling behind. Configuration updates may be delayed.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorworkqueuegrowth
-        summary: Reconciliation is falling behind. Configuration updates may be delayed.
       expr: last_over_time(workqueue_depth{job="thanos-operator-controller-manager-metrics-service"}[5m])
         > 100
       for: 15m
@@ -100,8 +100,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: P99 reconciliation time for {{ $labels.controller }} is {{ $value
           | humanizeDuration }}, which is slow
+        message: Configuration changes are taking longer than expected to apply.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorslowreconciliation
-        summary: Configuration changes are taking longer than expected to apply.
       expr: |2-
           histogram_quantile(
             0.99,
@@ -125,9 +125,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosQuery resource {{ $labels.namespace }}/{{ $labels.resource
           }} has no store endpoints configured.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosquerynoendpointsconfigured
-        summary: Query component cannot retrieve data from any stores. Queries will
+        message: Query component cannot retrieve data from any stores. Queries will
           return no results.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosquerynoendpointsconfigured
       expr: |2-
           thanos_operator_query_endpoints_configured{job="thanos-operator-controller-manager-metrics-service"}
         ==
@@ -142,9 +142,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosQuery {{ $labels.namespace }}/{{ $labels.resource }} is
           reconciling {{ $value | humanize }} times/sec due to service events.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryservicewatchreconcilestorm
-        summary: Excessive reconciliations may indicate service churn or configuration
+        message: Excessive reconciliations may indicate service churn or configuration
           issues.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryservicewatchreconcilestorm
       expr: |2-
           rate(
             thanos_operator_query_service_event_reconciliations_total{job="thanos-operator-controller-manager-metrics-service"}[5m]
@@ -164,9 +164,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosReceive resource {{ $labels.namespace }}/{{ $labels.resource
           }} has no hashrings configured.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivenohashringsconfigured
-        summary: Receive component cannot accept remote write data without hashring
+        message: Receive component cannot accept remote write data without hashring
           configuration.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivenohashringsconfigured
       expr: |2-
           thanos_operator_receive_hashrings_configured{job="thanos-operator-controller-manager-metrics-service"}
         ==
@@ -181,9 +181,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Hashring {{ $labels.hashring }} for ThanosReceive {{ $labels.namespace
           }}/{{ $labels.resource }} has no endpoints configured.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehashringnoendpoints
-        summary: Data cannot be distributed to this hashring. Remote write data may
+        message: Data cannot be distributed to this hashring. Remote write data may
           be lost or rejected.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehashringnoendpoints
       expr: |2-
           thanos_operator_receive_hashring_endpoints_configured{job="thanos-operator-controller-manager-metrics-service"}
         ==
@@ -198,8 +198,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: The hashring configuration for ThanosReceive {{ $labels.namespace
           }}/{{ $labels.resource }} has changed.
+        message: Data distribution pattern has changed. This may cause temporary inconsistencies.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivehashringconfigurationchange
-        summary: Data distribution pattern has changed. This may cause temporary inconsistencies.
       expr: |2-
           abs(
             delta(
@@ -218,9 +218,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosReceive {{ $labels.namespace }}/{{ $labels.resource }}
           is reconciling {{ $value | humanize }} times/sec due to endpoint events.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveendpointreconcilestorm
-        summary: Excessive reconciliations may indicate endpoint churn or configuration
+        message: Excessive reconciliations may indicate endpoint churn or configuration
           issues.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveendpointreconcilestorm
       expr: |2-
           rate(
             thanos_operator_receive_endpoint_event_reconciliations_total{job="thanos-operator-controller-manager-metrics-service"}[5m]
@@ -240,9 +240,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosRuler resource {{ $labels.namespace }}/{{ $labels.resource
           }} has no query endpoints configured.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulernoqueryendpointsconfigured
-        summary: Ruler cannot query data for rule evaluation. Recording and alerting
+        message: Ruler cannot query data for rule evaluation. Recording and alerting
           rules will not work.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulernoqueryendpointsconfigured
       expr: |2-
           thanos_operator_ruler_query_endpoints_configured{job="thanos-operator-controller-manager-metrics-service"}
         ==
@@ -257,9 +257,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: No PrometheusRules found for ThanosRuler {{ $labels.namespace
           }}/{{ $labels.resource }}.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulernorulesconfigured
-        summary: No rules are being evaluated. This may be expected if no rules have
+        message: No rules are being evaluated. This may be expected if no rules have
           been defined yet.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulernorulesconfigured
       expr: thanos_operator_ruler_promrules_found{job="thanos-operator-controller-manager-metrics-service"}
         == 0
       for: 10m
@@ -272,9 +272,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosRuler controller is failing to create ConfigMaps for {{
           $labels.namespace }}/{{ $labels.resource }}.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulerconfigmapcreationfailures
-        summary: PrometheusRules cannot be loaded into the Ruler. Rules will not be
+        message: PrometheusRules cannot be loaded into the Ruler. Rules will not be
           evaluated.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulerconfigmapcreationfailures
       expr: |2-
           rate(
             thanos_operator_ruler_cfgmaps_creation_failures_total{job="thanos-operator-controller-manager-metrics-service"}[5m]
@@ -291,9 +291,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosRuler {{ $labels.namespace }}/{{ $labels.resource }} is
           creating ConfigMaps at {{ $value | humanize }}/sec.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulerhighconfigmapcreationrate
-        summary: Excessive ConfigMap updates may indicate rule churn and cause unnecessary
+        message: Excessive ConfigMap updates may indicate rule churn and cause unnecessary
           Ruler reloads.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulerhighconfigmapcreationrate
       expr: |2-
           rate(
             thanos_operator_ruler_cfgmaps_created_total{job="thanos-operator-controller-manager-metrics-service"}[5m]
@@ -310,9 +310,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosRuler {{ $labels.namespace }}/{{ $labels.resource }} is
           experiencing high reconciliation rate.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulerwatchreconcilestorm
-        summary: Excessive reconciliations may indicate resource churn or configuration
+        message: Excessive reconciliations may indicate resource churn or configuration
           issues.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulerwatchreconcilestorm
       expr: |2-
               rate(
                 thanos_operator_ruler_service_event_reconciliations_total{job="thanos-operator-controller-manager-metrics-service"}[5m]
@@ -344,9 +344,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosStore resource {{ $labels.namespace }}/{{ $labels.resource
           }} has 0 shards configured.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstenoreshardsconfigured
-        summary: This may be expected for single-instance stores. For sharded deployments,
+        message: This may be expected for single-instance stores. For sharded deployments,
           data queries may fail.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstenoreshardsconfigured
       expr: |2-
           thanos_operator_store_shards_configured{job="thanos-operator-controller-manager-metrics-service"}
         ==
@@ -361,9 +361,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosStore controller is failing to create/update shards for
           {{ $labels.namespace }}/{{ $labels.resource }}.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoreshardcreationfailures
-        summary: Store shards cannot be created. Historical data queries may be incomplete
+        message: Store shards cannot be created. Historical data queries may be incomplete
           or fail.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoreshardcreationfailures
       expr: |2-
           rate(
             thanos_operator_store_shards_creation_update_failures_total{job="thanos-operator-controller-manager-metrics-service"}[5m]
@@ -383,9 +383,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosCompact resource {{ $labels.namespace }}/{{ $labels.resource
           }} has 0 shards configured.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactnoshardsconfigured
-        summary: This may be expected for single-instance compactors. For sharded
+        message: This may be expected for single-instance compactors. For sharded
           deployments, compaction may not work.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactnoshardsconfigured
       expr: |2-
           thanos_operator_compact_shards_configured{job="thanos-operator-controller-manager-metrics-service"}
         ==
@@ -400,9 +400,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: ThanosCompact controller is failing to create/update shards for
           {{ $labels.namespace }}/{{ $labels.resource }}.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactshardcreationfailures
-        summary: Compactor shards cannot be created. Data compaction will not occur,
+        message: Compactor shards cannot be created. Data compaction will not occur,
           leading to increased storage costs and slower queries.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactshardcreationfailures
       expr: |2-
           rate(
             thanos_operator_compact_shards_creation_update_failures_total{job="thanos-operator-controller-manager-metrics-service"}[5m]
@@ -422,9 +422,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: '{{ $labels.component }} resource {{ $labels.namespace }}/{{
           $labels.resource }} has been in paused state for over 24 hours.'
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosresourcepausedforlong
-        summary: No reconciliation is happening for this resource. Configuration changes
+        message: No reconciliation is happening for this resource. Configuration changes
           are not being applied.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosresourcepausedforlong
       expr: thanos_operator_paused{job="thanos-operator-controller-manager-metrics-service"}
         == 1
       for: 24h
@@ -440,9 +440,9 @@ spec:
       annotations:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: Workqueue {{ $labels.name }} has {{ $value | humanize }} retries/sec.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorhighworkqueueretries
-        summary: Items are being retried frequently, indicating persistent errors
+        message: Items are being retried frequently, indicating persistent errors
           or resource issues.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorhighworkqueueretries
       expr: rate(workqueue_retries_total{job="thanos-operator-controller-manager-metrics-service"}[10m])
         > 0.5
       for: 15m
@@ -456,9 +456,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: P99 queue wait time for {{ $labels.name }} is {{ $value | humanizeDuration
           }}.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorlongworkqueuelatency
-        summary: Items are waiting too long in queue before processing. Reconciliation
+        message: Items are waiting too long in queue before processing. Reconciliation
           is delayed.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosoperatorlongworkqueuelatency
       expr: |2-
           histogram_quantile(
             0.99,

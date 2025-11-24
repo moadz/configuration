@@ -96,6 +96,7 @@ func ThanosPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePrometheu
 	if nonCriticalPostProcessing {
 		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
 	}
+	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
 
 	return &appInterfacePrometheusRule{
 		Schema:         schemaPath,
@@ -127,6 +128,7 @@ func ThanosOperatorPrometheusRule(nonCriticalPostProcessing bool) *appInterfaceP
 	if nonCriticalPostProcessing {
 		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
 	}
+	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
 
 	return &appInterfacePrometheusRule{
 		Schema:         schemaPath,
@@ -160,6 +162,7 @@ func AlertmanagerPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePro
 	if nonCriticalPostProcessing {
 		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
 	}
+	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
 
 	return &appInterfacePrometheusRule{
 		Schema:         schemaPath,
@@ -181,4 +184,18 @@ func RuleNonCriticalPostProcessing(rule v1.PrometheusRule) v1.PrometheusRule {
 		}
 	}
 	return rule
+}
+
+// Usually summary + description is the best practice, but this is so that we are compatible with app-interface schema.
+// To be removed once https://issues.redhat.com/browse/APPSRE-7834 is closed
+func ReplaceSummaryWithMessage(groups []v1.RuleGroup) []v1.RuleGroup {
+	for i := range groups {
+		for j := range groups[i].Rules {
+			if groups[i].Rules[j].Annotations["summary"] != "" {
+				groups[i].Rules[j].Annotations["message"] = groups[i].Rules[j].Annotations["summary"]
+				delete(groups[i].Rules[j].Annotations, "summary")
+			}
+		}
+	}
+	return groups
 }

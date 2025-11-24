@@ -25,9 +25,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
-        summary: API /receive handler is burning too much error budget to guarantee
+        message: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
       expr: absent(http_requests_total{group="metricsv1",handler="receive",job="rhobs-gateway"})
         == 1
       for: 2m
@@ -109,9 +109,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
-        summary: API /receive handler is burning too much error budget to guarantee
+        message: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate5m{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-availability-slo"}
         > (14 * (1-0.9990000000000001)) and http_requests:burnrate1h{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-availability-slo"}
         > (14 * (1-0.9990000000000001))
@@ -131,9 +131,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
-        summary: API /receive handler is burning too much error budget to guarantee
+        message: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate30m{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-availability-slo"}
         > (7 * (1-0.9990000000000001)) and http_requests:burnrate6h{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-availability-slo"}
         > (7 * (1-0.9990000000000001))
@@ -153,9 +153,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
-        summary: API /receive handler is burning too much error budget to guarantee
+        message: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate2h{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-availability-slo"}
         > (2 * (1-0.9990000000000001)) and http_requests:burnrate1d{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-availability-slo"}
         > (2 * (1-0.9990000000000001))
@@ -175,9 +175,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
-        summary: API /receive handler is burning too much error budget to guarantee
+        message: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate6h{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-availability-slo"}
         > (1 * (1-0.9990000000000001)) and http_requests:burnrate4d{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-availability-slo"}
         > (1 * (1-0.9990000000000001))
@@ -238,9 +238,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
-        summary: API /query handler is burning too much error budget to guarantee
+        message: API /query handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
       expr: absent(http_requests_total{group="metricsv1",handler="query",job="rhobs-gateway"})
         == 1
       for: 2m
@@ -322,9 +322,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
-        summary: API /query handler is burning too much error budget to guarantee
+        message: API /query handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate5m{group="metricsv1",handler="query",job="rhobs-gateway",slo="api-metrics-query-availability-slo"}
         > (14 * (1-0.9990000000000001)) and http_requests:burnrate1h{group="metricsv1",handler="query",job="rhobs-gateway",slo="api-metrics-query-availability-slo"}
         > (14 * (1-0.9990000000000001))
@@ -344,9 +344,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
-        summary: API /query handler is burning too much error budget to guarantee
+        message: API /query handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate30m{group="metricsv1",handler="query",job="rhobs-gateway",slo="api-metrics-query-availability-slo"}
         > (7 * (1-0.9990000000000001)) and http_requests:burnrate6h{group="metricsv1",handler="query",job="rhobs-gateway",slo="api-metrics-query-availability-slo"}
         > (7 * (1-0.9990000000000001))
@@ -366,9 +366,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
-        summary: API /query handler is burning too much error budget to guarantee
+        message: API /query handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate2h{group="metricsv1",handler="query",job="rhobs-gateway",slo="api-metrics-query-availability-slo"}
         > (2 * (1-0.9990000000000001)) and http_requests:burnrate1d{group="metricsv1",handler="query",job="rhobs-gateway",slo="api-metrics-query-availability-slo"}
         > (2 * (1-0.9990000000000001))
@@ -388,9 +388,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
-        summary: API /query handler is burning too much error budget to guarantee
+        message: API /query handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate6h{group="metricsv1",handler="query",job="rhobs-gateway",slo="api-metrics-query-availability-slo"}
         > (1 * (1-0.9990000000000001)) and http_requests:burnrate4d{group="metricsv1",handler="query",job="rhobs-gateway",slo="api-metrics-query-availability-slo"}
         > (1 * (1-0.9990000000000001))
@@ -451,9 +451,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
-        summary: API /query_range handler is burning too much error budget to guarantee
+        message: API /query_range handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       expr: absent(http_requests_total{group="metricsv1",handler="query_range",job="rhobs-gateway"})
         == 1
       for: 2m
@@ -535,9 +535,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
-        summary: API /query_range handler is burning too much error budget to guarantee
+        message: API /query_range handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate5m{group="metricsv1",handler="query_range",job="rhobs-gateway",slo="api-metrics-query-range-availability-slo"}
         > (14 * (1-0.9990000000000001)) and http_requests:burnrate1h{group="metricsv1",handler="query_range",job="rhobs-gateway",slo="api-metrics-query-range-availability-slo"}
         > (14 * (1-0.9990000000000001))
@@ -557,9 +557,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
-        summary: API /query_range handler is burning too much error budget to guarantee
+        message: API /query_range handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate30m{group="metricsv1",handler="query_range",job="rhobs-gateway",slo="api-metrics-query-range-availability-slo"}
         > (7 * (1-0.9990000000000001)) and http_requests:burnrate6h{group="metricsv1",handler="query_range",job="rhobs-gateway",slo="api-metrics-query-range-availability-slo"}
         > (7 * (1-0.9990000000000001))
@@ -579,9 +579,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
-        summary: API /query_range handler is burning too much error budget to guarantee
+        message: API /query_range handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate2h{group="metricsv1",handler="query_range",job="rhobs-gateway",slo="api-metrics-query-range-availability-slo"}
         > (2 * (1-0.9990000000000001)) and http_requests:burnrate1d{group="metricsv1",handler="query_range",job="rhobs-gateway",slo="api-metrics-query-range-availability-slo"}
         > (2 * (1-0.9990000000000001))
@@ -601,9 +601,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
-        summary: API /query_range handler is burning too much error budget to guarantee
+        message: API /query_range handler is burning too much error budget to guarantee
           availability SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       expr: http_requests:burnrate6h{group="metricsv1",handler="query_range",job="rhobs-gateway",slo="api-metrics-query-range-availability-slo"}
         > (1 * (1-0.9990000000000001)) and http_requests:burnrate4d{group="metricsv1",handler="query_range",job="rhobs-gateway",slo="api-metrics-query-range-availability-slo"}
         > (1 * (1-0.9990000000000001))
@@ -662,9 +662,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
-        summary: API Thanos Rule is burning too much error budget to guarantee availability
+        message: API Thanos Rule is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
       expr: absent(thanos_alert_sender_alerts_dropped_total{container="thanos-ruler"})
         == 1
       for: 2m
@@ -729,9 +729,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
-        summary: API Thanos Rule is burning too much error budget to guarantee availability
+        message: API Thanos Rule is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
       expr: thanos_alert_sender_alerts_dropped:burnrate5m{container="thanos-ruler",slo="api-alerting-availability-slo"}
         > (14 * (1-0.9990000000000001)) and thanos_alert_sender_alerts_dropped:burnrate1h{container="thanos-ruler",slo="api-alerting-availability-slo"}
         > (14 * (1-0.9990000000000001))
@@ -748,9 +748,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
-        summary: API Thanos Rule is burning too much error budget to guarantee availability
+        message: API Thanos Rule is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
       expr: thanos_alert_sender_alerts_dropped:burnrate30m{container="thanos-ruler",slo="api-alerting-availability-slo"}
         > (7 * (1-0.9990000000000001)) and thanos_alert_sender_alerts_dropped:burnrate6h{container="thanos-ruler",slo="api-alerting-availability-slo"}
         > (7 * (1-0.9990000000000001))
@@ -767,9 +767,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
-        summary: API Thanos Rule is burning too much error budget to guarantee availability
+        message: API Thanos Rule is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
       expr: thanos_alert_sender_alerts_dropped:burnrate2h{container="thanos-ruler",slo="api-alerting-availability-slo"}
         > (2 * (1-0.9990000000000001)) and thanos_alert_sender_alerts_dropped:burnrate1d{container="thanos-ruler",slo="api-alerting-availability-slo"}
         > (2 * (1-0.9990000000000001))
@@ -786,9 +786,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
-        summary: API Thanos Rule is burning too much error budget to guarantee availability
+        message: API Thanos Rule is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerAvailabilityErrorBudgetBurning
       expr: thanos_alert_sender_alerts_dropped:burnrate6h{container="thanos-ruler",slo="api-alerting-availability-slo"}
         > (1 * (1-0.9990000000000001)) and thanos_alert_sender_alerts_dropped:burnrate4d{container="thanos-ruler",slo="api-alerting-availability-slo"}
         > (1 * (1-0.9990000000000001))
@@ -843,9 +843,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
-        summary: API Alertmanager is burning too much error budget to guarantee availability
+        message: API Alertmanager is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       expr: absent(alertmanager_notifications_failed_total{job="alertmanager"}) ==
         1
       for: 2m
@@ -903,9 +903,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
-        summary: API Alertmanager is burning too much error budget to guarantee availability
+        message: API Alertmanager is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       expr: alertmanager_notifications_failed:burnrate5m{job="alertmanager",slo="api-alerting-notif-availability-slo"}
         > (14 * (1-0.9990000000000001)) and alertmanager_notifications_failed:burnrate1h{job="alertmanager",slo="api-alerting-notif-availability-slo"}
         > (14 * (1-0.9990000000000001))
@@ -922,9 +922,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
-        summary: API Alertmanager is burning too much error budget to guarantee availability
+        message: API Alertmanager is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       expr: alertmanager_notifications_failed:burnrate30m{job="alertmanager",slo="api-alerting-notif-availability-slo"}
         > (7 * (1-0.9990000000000001)) and alertmanager_notifications_failed:burnrate6h{job="alertmanager",slo="api-alerting-notif-availability-slo"}
         > (7 * (1-0.9990000000000001))
@@ -941,9 +941,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
-        summary: API Alertmanager is burning too much error budget to guarantee availability
+        message: API Alertmanager is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       expr: alertmanager_notifications_failed:burnrate2h{job="alertmanager",slo="api-alerting-notif-availability-slo"}
         > (2 * (1-0.9990000000000001)) and alertmanager_notifications_failed:burnrate1d{job="alertmanager",slo="api-alerting-notif-availability-slo"}
         > (2 * (1-0.9990000000000001))
@@ -960,9 +960,9 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
-        summary: API Alertmanager is burning too much error budget to guarantee availability
+        message: API Alertmanager is burning too much error budget to guarantee availability
           SLOs.
+        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       expr: alertmanager_notifications_failed:burnrate6h{job="alertmanager",slo="api-alerting-notif-availability-slo"}
         > (1 * (1-0.9990000000000001)) and alertmanager_notifications_failed:burnrate4d{job="alertmanager",slo="api-alerting-notif-availability-slo"}
         > (1 * (1-0.9990000000000001))
@@ -1024,8 +1024,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
+        message: API /receive handler is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteLatencyErrorBudgetBurning
-        summary: API /receive handler is burning too much latency error budget.
       expr: absent(http_request_duration_seconds_count{code=~"^2..$",group="metricsv1",handler="receive",job="rhobs-gateway"})
         == 1
       for: 2m
@@ -1041,8 +1041,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
+        message: API /receive handler is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteLatencyErrorBudgetBurning
-        summary: API /receive handler is burning too much latency error budget.
       expr: absent(http_request_duration_seconds_bucket{code=~"^2..$",group="metricsv1",handler="receive",job="rhobs-gateway",le="5"})
         == 1
       for: 2m
@@ -1131,8 +1131,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
+        message: API /receive handler is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteLatencyErrorBudgetBurning
-        summary: API /receive handler is burning too much latency error budget.
       expr: http_request_duration_seconds:burnrate5m{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-latency-slo"}
         > (14 * (1-0.9)) and http_request_duration_seconds:burnrate1h{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-latency-slo"}
         > (14 * (1-0.9))
@@ -1152,8 +1152,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
+        message: API /receive handler is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteLatencyErrorBudgetBurning
-        summary: API /receive handler is burning too much latency error budget.
       expr: http_request_duration_seconds:burnrate30m{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-latency-slo"}
         > (7 * (1-0.9)) and http_request_duration_seconds:burnrate6h{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-latency-slo"}
         > (7 * (1-0.9))
@@ -1173,8 +1173,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
+        message: API /receive handler is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteLatencyErrorBudgetBurning
-        summary: API /receive handler is burning too much latency error budget.
       expr: http_request_duration_seconds:burnrate2h{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-latency-slo"}
         > (2 * (1-0.9)) and http_request_duration_seconds:burnrate1d{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-latency-slo"}
         > (2 * (1-0.9))
@@ -1194,8 +1194,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
+        message: API /receive handler is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsWriteLatencyErrorBudgetBurning
-        summary: API /receive handler is burning too much latency error budget.
       expr: http_request_duration_seconds:burnrate6h{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-latency-slo"}
         > (1 * (1-0.9)) and http_request_duration_seconds:burnrate4d{group="metricsv1",handler="receive",job="rhobs-gateway",slo="api-metrics-write-latency-slo"}
         > (1 * (1-0.9))
@@ -1261,8 +1261,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 1M samples,
           to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: absent(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"})
         == 1
       for: 2m
@@ -1276,8 +1276,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 1M samples,
           to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: absent(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"})
         == 1
       for: 2m
@@ -1350,8 +1350,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 1M samples,
           to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate5m{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
         > (14 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1h{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
         > (14 * (1-0.9))
@@ -1369,8 +1369,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 1M samples,
           to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate30m{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
         > (7 * (1-0.9)) and up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
         > (7 * (1-0.9))
@@ -1388,8 +1388,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 1M samples,
           to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate2h{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
         > (2 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1d{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
         > (2 * (1-0.9))
@@ -1407,8 +1407,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 1M samples,
           to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
         > (1 * (1-0.9)) and up_custom_query_duration_seconds:burnrate4d{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
         > (1 * (1-0.9))
@@ -1472,8 +1472,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: absent(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"})
         == 1
       for: 2m
@@ -1487,8 +1487,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: absent(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"})
         == 1
       for: 2m
@@ -1561,8 +1561,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate5m{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
         > (14 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1h{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
         > (14 * (1-0.9))
@@ -1580,8 +1580,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate30m{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
         > (7 * (1-0.9)) and up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
         > (7 * (1-0.9))
@@ -1599,8 +1599,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate2h{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
         > (2 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1d{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
         > (2 * (1-0.9))
@@ -1618,8 +1618,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
         > (1 * (1-0.9)) and up_custom_query_duration_seconds:burnrate4d{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
         > (1 * (1-0.9))
@@ -1683,8 +1683,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: absent(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"})
         == 1
       for: 2m
@@ -1698,8 +1698,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: absent(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"})
         == 1
       for: 2m
@@ -1772,8 +1772,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate5m{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
         > (14 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1h{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
         > (14 * (1-0.9))
@@ -1791,8 +1791,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate30m{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
         > (7 * (1-0.9)) and up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
         > (7 * (1-0.9))
@@ -1810,8 +1810,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate2h{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
         > (2 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1d{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
         > (2 * (1-0.9))
@@ -1829,8 +1829,8 @@ spec:
         dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API /query endpoint is burning too much error budget for 100M
           samples, to guarantee latency SLOs.
+        message: API /query endpoint is burning too much latency error budget.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-        summary: API /query endpoint is burning too much latency error budget.
       expr: up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
         > (1 * (1-0.9)) and up_custom_query_duration_seconds:burnrate4d{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
         > (1 * (1-0.9))
