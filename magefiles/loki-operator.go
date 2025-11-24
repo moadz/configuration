@@ -20,7 +20,10 @@ import (
 )
 
 const (
+	lokiImage         = "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-loki"
 	lokiOperatorImage = "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-loki-operator"
+
+	lokiVersion = "d252736dc89f8eaad6ebd4780b800b9ca90eed42"
 
 	// LokiOperatorVersion is the image version (git sha) of the Loki Operator and is matched to a commit in
 	// the rhobs-konflux-loki-operator repository.
@@ -145,8 +148,10 @@ func NewControllerManagerDeployment(namespace string) *appsv1.Deployment {
 						Command:         []string{"/manager"},
 						Ports:           []corev1.ContainerPort{{Name: "metrics", ContainerPort: 8080}},
 						Env: []corev1.EnvVar{
-							{Name: "RELATED_IMAGE_LOKI", Value: "registry.redhat.io/openshift-logging/logging-loki-rhel9@sha256:14f37195a4957e3848690d0ffe5422be55f7599b30dfe1ee0f97eb1118a10a51"},
+							{Name: "RELATED_IMAGE_LOKI", Value: fmt.Sprintf("%s:%s", lokiImage, lokiVersion)},
+							// This component isn't currently deployed.
 							{Name: "RELATED_IMAGE_GATEWAY", Value: "registry.redhat.io/openshift-logging/lokistack-gateway-rhel9@sha256:710a1a5e486de5724469e55f29e9ff3f6cbef8cd4b2d21dfe254ede2b953c150"},
+							// This component isn't currently deployed.
 							{Name: "RELATED_IMAGE_OPA", Value: "registry.redhat.io/openshift-logging/opa-openshift-rhel9@sha256:06602373b99d694a83b845e9cc6746a4f37a7a6ca6943356fea6ee6dbbccda35"},
 							{Name: "OPERATOR_CONDITION_NAME", Value: "loki-operator.v6.3.0"},
 						},

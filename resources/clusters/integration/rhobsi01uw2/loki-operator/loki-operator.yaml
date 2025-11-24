@@ -378,7 +378,7 @@ objects:
           - /manager
           env:
           - name: RELATED_IMAGE_LOKI
-            value: registry.redhat.io/openshift-logging/logging-loki-rhel9@sha256:14f37195a4957e3848690d0ffe5422be55f7599b30dfe1ee0f97eb1118a10a51
+            value: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-loki:d252736dc89f8eaad6ebd4780b800b9ca90eed42
           - name: RELATED_IMAGE_GATEWAY
             value: registry.redhat.io/openshift-logging/lokistack-gateway-rhel9@sha256:710a1a5e486de5724469e55f29e9ff3f6cbef8cd4b2d21dfe254ede2b953c150
           - name: RELATED_IMAGE_OPA
