@@ -1,13 +1,11 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: loki-rhobs
 objects:
 - apiVersion: loki.grafana.com/v1
   kind: LokiStack
   metadata:
-    creationTimestamp: null
     name: observatorium-lokistack
     namespace: rhobs-int
   spec:

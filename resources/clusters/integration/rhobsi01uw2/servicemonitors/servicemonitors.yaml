@@ -1,13 +1,11 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: servicemonitors
 objects:
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: compactor
       app.kubernetes.io/created-by: lokistack-controller
@@ -32,11 +30,9 @@ objects:
         app.kubernetes.io/instance: observatorium-lokistack
         app.kubernetes.io/managed-by: lokistack-controller
         app.kubernetes.io/name: lokistack
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: distributor
       app.kubernetes.io/created-by: lokistack-controller
@@ -61,11 +57,9 @@ objects:
         app.kubernetes.io/instance: observatorium-lokistack
         app.kubernetes.io/managed-by: lokistack-controller
         app.kubernetes.io/name: lokistack
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: index-gateway
       app.kubernetes.io/created-by: lokistack-controller
@@ -90,11 +84,9 @@ objects:
         app.kubernetes.io/instance: observatorium-lokistack
         app.kubernetes.io/managed-by: lokistack-controller
         app.kubernetes.io/name: lokistack
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: ingester
       app.kubernetes.io/created-by: lokistack-controller
@@ -119,11 +111,9 @@ objects:
         app.kubernetes.io/instance: observatorium-lokistack
         app.kubernetes.io/managed-by: lokistack-controller
         app.kubernetes.io/name: lokistack
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: monitoring
       app.kubernetes.io/created-by: loki-operator
@@ -144,11 +134,9 @@ objects:
     selector:
       matchLabels:
         app.kubernetes.io/component: metrics
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: querier
       app.kubernetes.io/created-by: lokistack-controller
@@ -173,11 +161,9 @@ objects:
         app.kubernetes.io/instance: observatorium-lokistack
         app.kubernetes.io/managed-by: lokistack-controller
         app.kubernetes.io/name: lokistack
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: query-frontend
       app.kubernetes.io/created-by: lokistack-controller
@@ -202,11 +188,9 @@ objects:
         app.kubernetes.io/instance: observatorium-lokistack
         app.kubernetes.io/managed-by: lokistack-controller
         app.kubernetes.io/name: lokistack
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: thanos-compactor
       app.kubernetes.io/instance: thanos-compact-rhobs
@@ -233,11 +217,9 @@ objects:
         app.kubernetes.io/name: thanos-compact
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: rhobs
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: thanos-compactor
       app.kubernetes.io/instance: thanos-compact-telemeter
@@ -264,11 +246,9 @@ objects:
         app.kubernetes.io/name: thanos-compact
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: telemeter
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: monitoring
       app.kubernetes.io/created-by: thanos-operator
@@ -295,11 +275,9 @@ objects:
     selector:
       matchLabels:
         control-plane: controller-manager
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: query-frontend
       app.kubernetes.io/instance: thanos-query-frontend-rhobs
@@ -327,11 +305,9 @@ objects:
         app.kubernetes.io/name: thanos-query-frontend
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: rhobs
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: query-layer
       app.kubernetes.io/instance: thanos-query-rhobs
@@ -360,11 +336,9 @@ objects:
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: rhobs
         operator.thanos.io/query-api: "true"
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: thanos-receive-ingester
       app.kubernetes.io/instance: thanos-receive-ingester-rhobs-default
@@ -393,11 +367,9 @@ objects:
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: rhobs
         operator.thanos.io/store-api: "true"
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: thanos-receive-ingester
       app.kubernetes.io/instance: thanos-receive-ingester-rhobs-telemeter
@@ -426,11 +398,9 @@ objects:
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: rhobs
         operator.thanos.io/store-api: "true"
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: thanos-receive-router
       app.kubernetes.io/instance: thanos-receive-router-rhobs
@@ -457,11 +427,9 @@ objects:
         app.kubernetes.io/name: thanos-receive
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: rhobs
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rule-evaluation-engine
       app.kubernetes.io/managed-by: thanos-operator
@@ -484,11 +452,9 @@ objects:
         app.kubernetes.io/managed-by: thanos-operator
         app.kubernetes.io/name: thanos-ruler
         app.kubernetes.io/part-of: thanos
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: object-storage-gateway
       app.kubernetes.io/instance: thanos-store-default
@@ -518,11 +484,9 @@ objects:
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: default
         operator.thanos.io/store-api: "true"
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: object-storage-gateway
       app.kubernetes.io/instance: thanos-store-telemeter-0to2w
@@ -552,11 +516,9 @@ objects:
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: telemeter-0to2w
         operator.thanos.io/store-api: "true"
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: object-storage-gateway
       app.kubernetes.io/instance: thanos-store-telemeter-2wto90d
@@ -586,11 +548,9 @@ objects:
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: telemeter-2wto90d
         operator.thanos.io/store-api: "true"
-  status: {}
 - apiVersion: monitoring.coreos.com/v1
   kind: ServiceMonitor
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: object-storage-gateway
       app.kubernetes.io/instance: thanos-store-telemeter-90dplus
@@ -620,4 +580,3 @@ objects:
         app.kubernetes.io/part-of: thanos
         operator.thanos.io/owner: telemeter-90dplus
         operator.thanos.io/store-api: "true"
-  status: {}

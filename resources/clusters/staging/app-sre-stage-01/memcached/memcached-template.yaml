@@ -1,13 +1,11 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: memcached
 objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -38,7 +36,6 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -50,7 +47,6 @@ objects:
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -72,7 +68,6 @@ objects:
     serviceName: api-memcached
     template:
       metadata:
-        creationTimestamp: null
         labels:
           app.kubernetes.io/component: memcached
           app.kubernetes.io/instance: rhobs
@@ -127,7 +122,6 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -158,7 +152,6 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -170,7 +163,6 @@ objects:
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -192,7 +184,6 @@ objects:
     serviceName: thanos-bucket-cache
     template:
       metadata:
-        creationTimestamp: null
         labels:
           app.kubernetes.io/component: memcached
           app.kubernetes.io/instance: rhobs
@@ -247,7 +238,6 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -278,7 +268,6 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -290,7 +279,6 @@ objects:
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -312,7 +300,6 @@ objects:
     serviceName: thanos-index-cache
     template:
       metadata:
-        creationTimestamp: null
         labels:
           app.kubernetes.io/component: memcached
           app.kubernetes.io/instance: rhobs
@@ -367,7 +354,6 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -398,7 +384,6 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -410,7 +395,6 @@ objects:
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
@@ -432,7 +416,6 @@ objects:
     serviceName: thanos-query-range-cache
     template:
       metadata:
-        creationTimestamp: null
         labels:
           app.kubernetes.io/component: memcached
           app.kubernetes.io/instance: rhobs

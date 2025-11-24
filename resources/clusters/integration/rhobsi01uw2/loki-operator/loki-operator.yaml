@@ -1,13 +1,11 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: loki-operator-manager
 objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-edit: "true"
     name: loki-alertingrule-editor-role
@@ -33,7 +31,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-view: "true"
     name: loki-alertingrule-viewer-role
@@ -55,13 +52,11 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     name: loki-controller-manager-metrics-reader
     namespace: rhobs-int
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: metrics
     name: loki-controller-manager-metrics-service
@@ -79,7 +74,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
-    creationTimestamp: null
     name: loki-controller-manager-read-metrics
     namespace: rhobs-int
   roleRef:
@@ -93,13 +87,11 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     name: loki-controller-manager
     namespace: rhobs-int
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: Role
   metadata:
-    creationTimestamp: null
     name: loki-leader-election-role
     namespace: rhobs-int
   rules:
@@ -127,7 +119,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: RoleBinding
   metadata:
-    creationTimestamp: null
     name: loki-leader-election-rolebinding
     namespace: rhobs-int
   roleRef:
@@ -141,7 +132,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-edit: "true"
     name: loki-lokistack-editor-role
@@ -167,7 +157,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     name: loki-lokistack-manager
   rules:
   - nonResourceURLs:
@@ -325,7 +314,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
-    creationTimestamp: null
     name: loki-lokistack-manager
   roleRef:
     apiGroup: rbac.authorization.k8s.io
@@ -338,7 +326,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-view: "true"
     name: loki-lokistack-viewer-role
@@ -360,7 +347,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     name: loki-metrics-reader
   rules:
   - nonResourceURLs:
@@ -370,7 +356,6 @@ objects:
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
-    creationTimestamp: null
     labels:
       control-plane: controller-manager
     name: loki-operator
@@ -385,7 +370,6 @@ objects:
       metadata:
         annotations:
           kubectl.kubernetes.io/default-container: manager
-        creationTimestamp: null
         labels:
           name: loki-operator-controller-manager
       spec:
@@ -419,7 +403,6 @@ objects:
     annotations:
       include.release.openshift.io/self-managed-high-availability: "true"
       include.release.openshift.io/single-node-developer: "true"
-    creationTimestamp: null
     name: loki-prometheus
     namespace: rhobs-int
   rules:
@@ -439,7 +422,6 @@ objects:
     annotations:
       include.release.openshift.io/self-managed-high-availability: "true"
       include.release.openshift.io/single-node-developer: "true"
-    creationTimestamp: null
     name: loki-prometheus
     namespace: rhobs-int
   roleRef:
@@ -453,7 +435,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     name: loki-proxy-role
   rules:
   - apiGroups:
@@ -471,7 +452,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
-    creationTimestamp: null
     name: loki-proxy-rolebinding
     namespace: rhobs-int
   roleRef:
@@ -485,7 +465,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-edit: "true"
     name: loki-recordingrule-editor-role
@@ -511,7 +490,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-view: "true"
     name: loki-recordingrule-viewer-role
@@ -533,7 +511,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-edit: "true"
     name: loki-rulerconfig-editor-role
@@ -559,7 +536,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       rbac.authorization.k8s.io/aggregate-to-view: "true"
     name: loki-rulerconfig-viewer-role

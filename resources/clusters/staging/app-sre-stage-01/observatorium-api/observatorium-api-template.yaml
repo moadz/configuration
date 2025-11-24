@@ -1,7 +1,6 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: observatorium-api
 objects:
 - apiVersion: v1
@@ -391,7 +390,6 @@ objects:
   metadata:
     annotations:
       qontract.recycle: "true"
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
@@ -403,7 +401,6 @@ objects:
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
@@ -427,7 +424,6 @@ objects:
       type: RollingUpdate
     template:
       metadata:
-        creationTimestamp: null
         labels:
           app.kubernetes.io/component: api
           app.kubernetes.io/instance: rhobs
@@ -505,7 +501,6 @@ objects:
   metadata:
     annotations:
       qontract.recycle: "true"
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
@@ -531,7 +526,6 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
@@ -581,7 +575,6 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs

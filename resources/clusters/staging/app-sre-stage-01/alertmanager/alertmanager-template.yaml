@@ -1,13 +1,11 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: alertmanager
 objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: alertmanager
       app.kubernetes.io/instance: observatorium
@@ -35,7 +33,6 @@ objects:
     annotations:
       cert-manager.io/issuer-kind: ClusterIssuer
       cert-manager.io/issuer-name: letsencrypt-prod-http
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: alertmanager
       app.kubernetes.io/instance: observatorium
@@ -62,7 +59,6 @@ objects:
   metadata:
     annotations:
       service.alpha.openshift.io/serving-cert-secret-name: alertmanager-tls
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: alertmanager
       app.kubernetes.io/instance: observatorium
@@ -91,7 +87,6 @@ objects:
   metadata:
     annotations:
       serviceaccounts.openshift.io/oauth-redirectreference.application: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"alertmanager"}}'
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: alertmanager
       app.kubernetes.io/instance: observatorium
@@ -102,7 +97,6 @@ objects:
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: alertmanager
       app.kubernetes.io/instance: observatorium
@@ -122,7 +116,6 @@ objects:
     serviceName: alertmanager-cluster
     template:
       metadata:
-        creationTimestamp: null
         labels:
           app.kubernetes.io/component: alertmanager
           app.kubernetes.io/instance: observatorium
@@ -239,7 +232,6 @@ objects:
     updateStrategy: {}
     volumeClaimTemplates:
     - metadata:
-        creationTimestamp: null
         labels:
           app.kubernetes.io/component: alertmanager
           app.kubernetes.io/instance: observatorium

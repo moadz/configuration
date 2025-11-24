@@ -1598,7 +1598,6 @@ func defaultRulerCR(namespace string, templates clusters.TemplateMaps) runtime.O
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn(clusters.Ruler, templates.ResourceRequirements)),
 			},
-			Paused:   ptr.To(true),
 			Replicas: clusters.TemplateFn(clusters.Ruler, templates.Replicas),
 			RuleConfigSelector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{

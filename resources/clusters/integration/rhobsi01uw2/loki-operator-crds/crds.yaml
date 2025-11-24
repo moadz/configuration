@@ -1,7 +1,6 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: loki-operator-crds
 objects:
 - apiVersion: apiextensions.k8s.io/v1
@@ -9,7 +8,6 @@ objects:
   metadata:
     annotations:
       controller-gen.kubebuilder.io/version: v0.17.2
-    creationTimestamp: null
     name: alertingrules.loki.grafana.com
   spec:
     group: loki.grafana.com
@@ -355,7 +353,6 @@ objects:
   metadata:
     annotations:
       controller-gen.kubebuilder.io/version: v0.17.2
-    creationTimestamp: null
     name: lokistacks.loki.grafana.com
   spec:
     group: loki.grafana.com
@@ -5617,7 +5614,6 @@ objects:
   metadata:
     annotations:
       controller-gen.kubebuilder.io/version: v0.8.0
-    creationTimestamp: null
     name: projectconfigs.config.grafana.com
   spec:
     group: config.grafana.com
@@ -5826,7 +5822,6 @@ objects:
   metadata:
     annotations:
       controller-gen.kubebuilder.io/version: v0.17.2
-    creationTimestamp: null
     name: recordingrules.loki.grafana.com
   spec:
     group: loki.grafana.com
@@ -6145,7 +6140,6 @@ objects:
   metadata:
     annotations:
       controller-gen.kubebuilder.io/version: v0.17.2
-    creationTimestamp: null
     name: rulerconfigs.loki.grafana.com
   spec:
     group: loki.grafana.com

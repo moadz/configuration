@@ -1,13 +1,11 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: thanos-rhobs
 objects:
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosStore
   metadata:
-    creationTimestamp: null
     name: default
     namespace: rhobs-stage
   spec:
@@ -113,7 +111,6 @@ objects:
     annotations:
       service.beta.openshift.io/serving-cert-secret-name: compact-tls
       serviceaccounts.openshift.io/oauth-redirectreference.application: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-compact-rhobs"}}'
-    creationTimestamp: null
     name: rhobs
     namespace: rhobs-stage
   spec:
@@ -248,7 +245,6 @@ objects:
     annotations:
       service.beta.openshift.io/serving-cert-secret-name: query-frontend-tls
       serviceaccounts.openshift.io/oauth-redirectreference.application: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}'
-    creationTimestamp: null
     name: rhobs
     namespace: rhobs-stage
   spec:
@@ -381,7 +377,6 @@ objects:
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosReceive
   metadata:
-    creationTimestamp: null
     name: rhobs
     namespace: rhobs-stage
   spec:
@@ -548,7 +543,6 @@ objects:
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosRuler
   metadata:
-    creationTimestamp: null
     name: rhobs
     namespace: rhobs-stage
   spec:
@@ -620,7 +614,6 @@ objects:
     imagePullPolicy: IfNotPresent
     logFormat: logfmt
     logLevel: info
-    paused: true
     prometheusRuleSelector:
       matchLabels:
         operator.thanos.io/prometheus-rule: "true"
@@ -649,7 +642,6 @@ objects:
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/part-of: thanos
     name: thanos-compact-rhobs
@@ -670,7 +662,6 @@ objects:
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/part-of: thanos
     name: thanos-query-frontend-rhobs

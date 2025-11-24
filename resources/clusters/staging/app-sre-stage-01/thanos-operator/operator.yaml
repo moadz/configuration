@@ -1,7 +1,6 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: thanos-operator-manager
 objects:
 - apiVersion: v1
@@ -9,7 +8,6 @@ objects:
   metadata:
     annotations:
       service.beta.openshift.io/serving-cert-secret-name: kube-rbac-proxy-tls
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: kube-rbac-proxy
       app.kubernetes.io/created-by: thanos-operator
@@ -33,7 +31,6 @@ objects:
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: manager
       app.kubernetes.io/created-by: thanos-operator
@@ -59,7 +56,6 @@ objects:
       metadata:
         annotations:
           kubectl.kubernetes.io/default-container: manager
-        creationTimestamp: null
         labels:
           control-plane: controller-manager
       spec:
@@ -169,7 +165,6 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -182,7 +177,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: Role
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -227,7 +221,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: RoleBinding
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -248,7 +241,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -366,7 +358,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -387,7 +378,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: kube-rbac-proxy
       app.kubernetes.io/created-by: thanos-operator
@@ -405,7 +395,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: kube-rbac-proxy
       app.kubernetes.io/created-by: thanos-operator
@@ -430,7 +419,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: kube-rbac-proxy
       app.kubernetes.io/created-by: thanos-operator
@@ -460,7 +448,6 @@ objects:
           "verb": "get"
   kind: ConfigMap
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: manager
       app.kubernetes.io/created-by: thanos-operator
@@ -475,7 +462,6 @@ objects:
   metadata:
     annotations:
       service.beta.openshift.io/inject-cabundle: "true"
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: manager
       app.kubernetes.io/created-by: thanos-operator
@@ -488,7 +474,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -520,7 +505,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -548,7 +532,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -580,7 +563,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -608,7 +590,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -640,7 +621,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -668,7 +648,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -700,7 +679,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -728,7 +706,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
@@ -760,7 +737,6 @@ objects:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: rbac
       app.kubernetes.io/created-by: thanos-operator
