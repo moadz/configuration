@@ -99,7 +99,8 @@ objects:
     shardingStrategy:
       shards: 1
       type: block
-    storageSize: 10Gi
+    storage:
+      size: 10Gi
     storeLimitsOptions: {}
     timeRangeConfig:
       maxTime: -22h
@@ -237,7 +238,8 @@ objects:
       fiveMinutes: 365d
       oneHour: 365d
       raw: 365d
-    storageSize: 10Gi
+    storage:
+      size: 10Gi
     version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
@@ -458,7 +460,8 @@ objects:
           requests:
             cpu: "2"
             memory: 15Gi
-        storageSize: 10Gi
+        storage:
+          size: 10Gi
         storeLimitsOptions: {}
         tenancyConfig:
           defaultTenantID: FB870BF3-9F3A-44FF-9BF7-D7A047A52F43
@@ -637,7 +640,8 @@ objects:
     ruleTenancyConfig:
       tenantLabel: tenant_id
       tenantValueLabel: operator.thanos.io/tenant
-    storageSize: 10Gi
+    storage:
+      size: 10Gi
     version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: route.openshift.io/v1
