@@ -276,7 +276,9 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 			TimeRangeConfig: &v1alpha1.TimeRangeConfig{
 				MaxTime: ptr.To(v1alpha1.Duration("-2w")),
 			},
-			StorageSize: clusters.TemplateFn("STORE02W", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE02W", m.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(m),
@@ -340,7 +342,9 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				MinTime: ptr.To(v1alpha1.Duration("-90d")),
 				MaxTime: ptr.To(v1alpha1.Duration("-2w")),
 			},
-			StorageSize: clusters.TemplateFn("STORE2W90D", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE2W90D", m.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(m),
@@ -406,7 +410,9 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 			TimeRangeConfig: &v1alpha1.TimeRangeConfig{
 				MinTime: ptr.To(v1alpha1.Duration("-90d")),
 			},
-			StorageSize: clusters.TemplateFn("STORE90D+", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE90D+", m.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(m),
@@ -467,7 +473,9 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				BlockMetaFetchConcurrency: ptr.To(int32(32)),
 			},
 			IgnoreDeletionMarksDelay: v1alpha1.Duration("24h"),
-			StorageSize:              clusters.TemplateFn("STORE_ROS", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE_ROS", m.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(m),
@@ -530,7 +538,9 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 			TimeRangeConfig: &v1alpha1.TimeRangeConfig{
 				MaxTime: ptr.To(v1alpha1.Duration("-22h")),
 			},
-			StorageSize: clusters.TemplateFn("STORE_DEFAULT", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE_DEFAULT", m.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(m),
@@ -691,7 +701,9 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 			TimeRangeConfig: &v1alpha1.TimeRangeConfig{
 				MinTime: ptr.To(v1alpha1.Duration("-336h")),
 			},
-			StorageSize: clusters.TemplateFn("STORE02W", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE02W", m.StorageSize),
+			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -777,7 +789,9 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 				MinTime: ptr.To(v1alpha1.Duration("-2160h")),
 				MaxTime: ptr.To(v1alpha1.Duration("-336h")),
 			},
-			StorageSize: clusters.TemplateFn("STORE2W90D", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE2W90D", m.StorageSize),
+			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -866,7 +880,9 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 				MinTime: ptr.To(v1alpha1.Duration("-8760h")),
 				MaxTime: ptr.To(v1alpha1.Duration("-2160h")),
 			},
-			StorageSize: clusters.TemplateFn("STORE90D+", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE90D+", m.StorageSize),
+			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -951,7 +967,9 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 			TimeRangeConfig: &v1alpha1.TimeRangeConfig{
 				MaxTime: ptr.To(v1alpha1.Duration("-22h")),
 			},
-			StorageSize: clusters.TemplateFn("STORE_DEFAULT", m.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("STORE_DEFAULT", m.StorageSize),
+			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -981,8 +999,10 @@ func TmpRulerCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.Tha
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("RULER", templates.ResourceRequirements)),
 			},
-			Replicas:    clusters.TemplateFn("RULER", templates.Replicas),
-			StorageSize: string(clusters.TemplateFn("RULER", templates.StorageSize)),
+			Replicas: clusters.TemplateFn("RULER", templates.Replicas),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("RULER", templates.StorageSize),
+			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -1114,7 +1134,9 @@ func receiveCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.Than
 							TenantHeader:      "THANOS-TENANT",
 							TenantLabelName:   "tenant_id",
 						},
-						StorageSize: clusters.TemplateFn("RECEIVE_TELEMETER", templates.StorageSize),
+						StorageConfiguration: v1alpha1.StorageConfiguration{
+							Size: clusters.TemplateFn("RECEIVE_TELEMETER", templates.StorageSize),
+						},
 					},
 					{
 						Name: "default",
@@ -1146,7 +1168,9 @@ func receiveCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.Than
 							TenantLabelName:   "tenant_id",
 						},
 						ObjectStorageConfig: ptr.To(clusters.TemplateFn("DEFAULT", templates.ObjectStorageBucket)),
-						StorageSize:         clusters.TemplateFn("RECEIVE_DEFAULT", templates.StorageSize),
+						StorageConfiguration: v1alpha1.StorageConfiguration{
+							Size: clusters.TemplateFn("RECEIVE_DEFAULT", templates.StorageSize),
+						},
 					},
 				},
 			},
@@ -1353,7 +1377,9 @@ func defaultStoreCR(namespace string, templates clusters.TemplateMaps) runtime.O
 			TimeRangeConfig: &v1alpha1.TimeRangeConfig{
 				MaxTime: ptr.To(v1alpha1.Duration("-22h")),
 			},
-			StorageSize: clusters.TemplateFn(clusters.StoreDefault, templates.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn(clusters.StoreDefault, templates.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(templates),
@@ -1458,7 +1484,9 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 							TenantLabelName:   "tenant_id",
 						},
 						ObjectStorageConfig: ptr.To(clusters.TemplateFn(clusters.DefaultBucket, templates.ObjectStorageBucket)),
-						StorageSize:         clusters.TemplateFn(clusters.ReceiveIngestorDefault, templates.StorageSize),
+						StorageConfiguration: v1alpha1.StorageConfiguration{
+							Size: clusters.TemplateFn(clusters.ReceiveIngestorDefault, templates.StorageSize),
+						},
 					},
 				},
 			},
@@ -1509,7 +1537,9 @@ func defaultCompactCR(namespace string, templates clusters.TemplateMaps, oauth b
 				HaltOnError:          ptr.To(true),
 				MaxCompactionLevel:   ptr.To(int32(3)),
 			},
-			StorageSize: clusters.TemplateFn(clusters.CompactDefault, templates.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn(clusters.CompactDefault, templates.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(templates),
@@ -1628,7 +1658,9 @@ func defaultRulerCR(namespace string, templates clusters.TemplateMaps) runtime.O
 			AlertLabelDrop:      []string{"rule_replica"},
 			Retention:           v1alpha1.Duration("48h"),
 			EvaluationInterval:  v1alpha1.Duration("1m"),
-			StorageSize:         string(clusters.TemplateFn(clusters.Ruler, templates.StorageSize)),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn(clusters.Ruler, templates.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(templates),
@@ -1845,7 +1877,9 @@ func rulerCR(namespace string, templates clusters.TemplateMaps) []runtime.Object
 				AlertLabelDrop:     []string{"rule_replica"},
 				Retention:          v1alpha1.Duration("48h"),
 				EvaluationInterval: v1alpha1.Duration("1m"),
-				StorageSize:        string(clusters.TemplateFn("RULER", templates.StorageSize)),
+				StorageConfiguration: v1alpha1.StorageConfiguration{
+					Size: clusters.TemplateFn("RULER", templates.StorageSize),
+				},
 				FeatureGates: &v1alpha1.FeatureGates{
 					ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 						Enable: ptr.To(false),
@@ -1929,7 +1963,9 @@ func compactTempProduction(templates clusters.TemplateMaps) []runtime.Object {
 				HaltOnError:          ptr.To(false),
 				MaxCompactionLevel:   ptr.To(int32(4)),
 			},
-			StorageSize: v1alpha1.StorageSize("500Gi"),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: v1alpha1.StorageSize("500Gi"),
+			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -1994,7 +2030,9 @@ func compactTempProduction(templates clusters.TemplateMaps) []runtime.Object {
 				HaltOnError:          ptr.To(true),
 				MaxCompactionLevel:   ptr.To(int32(4)),
 			},
-			StorageSize: v1alpha1.StorageSize("3000Gi"),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: v1alpha1.StorageSize("3000Gi"),
+			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -2062,7 +2100,9 @@ func compactTempProduction(templates clusters.TemplateMaps) []runtime.Object {
 				HaltOnError:          ptr.To(true),
 				MaxCompactionLevel:   ptr.To(int32(4)),
 			},
-			StorageSize: v1alpha1.StorageSize("3000Gi"),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: v1alpha1.StorageSize("3000Gi"),
+			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -2114,7 +2154,9 @@ func stageCompactCR(namespace string, templates clusters.TemplateMaps) []runtime
 				HaltOnError:          ptr.To(true),
 				MaxCompactionLevel:   ptr.To(int32(3)),
 			},
-			StorageSize: clusters.TemplateFn("COMPACT_ROS", templates.StorageSize),
+			StorageConfiguration: v1alpha1.StorageConfiguration{
+				Size: clusters.TemplateFn("COMPACT_ROS", templates.StorageSize),
+			},
 			Additional: v1alpha1.Additional{
 				Containers: []corev1.Container{
 					tracingSidecar(templates),
