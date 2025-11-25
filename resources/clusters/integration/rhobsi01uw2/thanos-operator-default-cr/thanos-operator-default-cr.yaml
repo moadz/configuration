@@ -115,6 +115,7 @@ objects:
     namespace: rhobs-int
   spec:
     additionalArgs:
+    - --deduplication.replica-label=replica
     - |-
       --tracing.config="config":
         "sampler_param": 2

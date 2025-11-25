@@ -1515,6 +1515,7 @@ func defaultCompactCR(namespace string, templates clusters.TemplateMaps, oauth b
 					tracingSidecar(templates),
 				},
 				Args: []string{
+					`--deduplication.replica-label=replica`,
 					`--tracing.config="config":
   "sampler_param": 2
   "sampler_type": "ratelimiting"
