@@ -836,6 +836,7 @@ spec:
     - expr: sum by (code) (increase(alertmanager_notifications_failed_total{job="alertmanager"}[4w]))
       labels:
         job: alertmanager
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: alertmanager_notifications_failed:increase4w
     - alert: SLOMetricAbsent
@@ -851,6 +852,7 @@ spec:
       for: 2m
       labels:
         job: alertmanager
+        service: rhobs.regional
         severity: medium
         slo: api-alerting-notif-availability-slo
   - interval: 30s
@@ -860,42 +862,49 @@ spec:
         / sum(rate(alertmanager_notifications_failed_total{job="alertmanager"}[5m]))
       labels:
         job: alertmanager
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: alertmanager_notifications_failed:burnrate5m
     - expr: sum(rate(alertmanager_notifications_failed_total{code=~"^5..$",job="alertmanager"}[30m]))
         / sum(rate(alertmanager_notifications_failed_total{job="alertmanager"}[30m]))
       labels:
         job: alertmanager
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: alertmanager_notifications_failed:burnrate30m
     - expr: sum(rate(alertmanager_notifications_failed_total{code=~"^5..$",job="alertmanager"}[1h]))
         / sum(rate(alertmanager_notifications_failed_total{job="alertmanager"}[1h]))
       labels:
         job: alertmanager
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: alertmanager_notifications_failed:burnrate1h
     - expr: sum(rate(alertmanager_notifications_failed_total{code=~"^5..$",job="alertmanager"}[2h]))
         / sum(rate(alertmanager_notifications_failed_total{job="alertmanager"}[2h]))
       labels:
         job: alertmanager
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: alertmanager_notifications_failed:burnrate2h
     - expr: sum(rate(alertmanager_notifications_failed_total{code=~"^5..$",job="alertmanager"}[6h]))
         / sum(rate(alertmanager_notifications_failed_total{job="alertmanager"}[6h]))
       labels:
         job: alertmanager
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: alertmanager_notifications_failed:burnrate6h
     - expr: sum(rate(alertmanager_notifications_failed_total{code=~"^5..$",job="alertmanager"}[1d]))
         / sum(rate(alertmanager_notifications_failed_total{job="alertmanager"}[1d]))
       labels:
         job: alertmanager
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: alertmanager_notifications_failed:burnrate1d
     - expr: sum(rate(alertmanager_notifications_failed_total{code=~"^5..$",job="alertmanager"}[4d]))
         / sum(rate(alertmanager_notifications_failed_total{job="alertmanager"}[4d]))
       labels:
         job: alertmanager
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: alertmanager_notifications_failed:burnrate4d
     - alert: APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
@@ -914,6 +923,7 @@ spec:
         exhaustion: 2d
         job: alertmanager
         long_burnrate_window: 1h
+        service: rhobs.regional
         severity: high
         short_burnrate_window: 5m
         slo: api-alerting-notif-availability-slo
@@ -933,6 +943,7 @@ spec:
         exhaustion: 4d
         job: alertmanager
         long_burnrate_window: 6h
+        service: rhobs.regional
         severity: high
         short_burnrate_window: 30m
         slo: api-alerting-notif-availability-slo
@@ -952,6 +963,7 @@ spec:
         exhaustion: 2w
         job: alertmanager
         long_burnrate_window: 1d
+        service: rhobs.regional
         severity: medium
         short_burnrate_window: 2h
         slo: api-alerting-notif-availability-slo
@@ -971,6 +983,7 @@ spec:
         exhaustion: 4w
         job: alertmanager
         long_burnrate_window: 4d
+        service: rhobs.regional
         severity: medium
         short_burnrate_window: 6h
         slo: api-alerting-notif-availability-slo
@@ -979,24 +992,29 @@ spec:
     rules:
     - expr: "0.9990000000000001"
       labels:
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: pyrra_objective
     - expr: 2419200
       labels:
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: pyrra_window
     - expr: 1 - sum(alertmanager_notifications_failed:increase4w{code=~"^5..$",job="alertmanager",slo="api-alerting-notif-availability-slo"}
         or vector(0)) / sum(alertmanager_notifications_failed:increase4w{job="alertmanager",slo="api-alerting-notif-availability-slo"})
       labels:
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: pyrra_availability
     - expr: sum(alertmanager_notifications_failed_total{job="alertmanager"})
       labels:
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: pyrra_requests_total
     - expr: sum(alertmanager_notifications_failed_total{code=~"^5..$",job="alertmanager"}
         or vector(0))
       labels:
+        service: rhobs.regional
         slo: api-alerting-notif-availability-slo
       record: pyrra_errors_total
   - interval: 2m30s
@@ -1239,637 +1257,4 @@ spec:
       labels:
         service: rhobs.regional
         slo: api-metrics-write-latency-slo
-      record: pyrra_errors_total
-  - interval: 2m30s
-    name: api-metrics-read-1M-latency-slo-increase
-    rules:
-    - expr: sum by (http_code) (increase(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[4w]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:increase4w
-    - expr: sum by (http_code) (increase(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"}[4w]))
-      labels:
-        le: "10"
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:increase4w
-    - alert: SLOMetricAbsent
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 1M samples,
-          to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-      expr: absent(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"})
-        == 1
-      for: 2m
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: medium
-        slo: api-metrics-read-1M-latency-slo
-    - alert: SLOMetricAbsent
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 1M samples,
-          to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-      expr: absent(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"})
-        == 1
-      for: 2m
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: medium
-        slo: api-metrics-read-1M-latency-slo
-  - interval: 30s
-    name: api-metrics-read-1M-latency-slo
-    rules:
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[5m]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"}[5m])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[5m]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate5m
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[30m]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"}[30m])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[30m]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate30m
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[1h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"}[1h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[1h]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate1h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[2h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"}[2h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[2h]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate2h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[6h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"}[6h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[6h]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate6h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[1d]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"}[1d])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[1d]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate1d
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[4d]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"}[4d])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[4d]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate4d
-    - alert: APIMetricsReadLatency1MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 1M samples,
-          to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate5m{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        > (14 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1h{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        > (14 * (1-0.9))
-      for: 2m
-      labels:
-        exhaustion: 2d
-        long_burnrate_window: 1h
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: high
-        short_burnrate_window: 5m
-        slo: api-metrics-read-1M-latency-slo
-    - alert: APIMetricsReadLatency1MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 1M samples,
-          to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate30m{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        > (7 * (1-0.9)) and up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        > (7 * (1-0.9))
-      for: 15m
-      labels:
-        exhaustion: 4d
-        long_burnrate_window: 6h
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: high
-        short_burnrate_window: 30m
-        slo: api-metrics-read-1M-latency-slo
-    - alert: APIMetricsReadLatency1MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 1M samples,
-          to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate2h{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        > (2 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1d{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        > (2 * (1-0.9))
-      for: 1h
-      labels:
-        exhaustion: 2w
-        long_burnrate_window: 1d
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: medium
-        short_burnrate_window: 2h
-        slo: api-metrics-read-1M-latency-slo
-    - alert: APIMetricsReadLatency1MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 1M samples,
-          to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency1MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        > (1 * (1-0.9)) and up_custom_query_duration_seconds:burnrate4d{query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        > (1 * (1-0.9))
-      for: 3h
-      labels:
-        exhaustion: 4w
-        long_burnrate_window: 4d
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: medium
-        short_burnrate_window: 6h
-        slo: api-metrics-read-1M-latency-slo
-  - interval: 30s
-    name: api-metrics-read-1M-latency-slo-generic
-    rules:
-    - expr: "0.9"
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: pyrra_objective
-    - expr: 2419200
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: pyrra_window
-    - expr: sum(up_custom_query_duration_seconds:increase4w{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"}
-        or vector(0)) / sum(up_custom_query_duration_seconds:increase4w{http_code=~"^2..$",le="",query="query-path-sli-1M-samples",slo="api-metrics-read-1M-latency-slo"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: pyrra_availability
-    - expr: sum(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: pyrra_requests_total
-    - expr: sum(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"})
-        - sum(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="10",query="query-path-sli-1M-samples"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-1M-latency-slo
-      record: pyrra_errors_total
-  - interval: 2m30s
-    name: api-metrics-read-10M-latency-slo-increase
-    rules:
-    - expr: sum by (http_code) (increase(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[4w]))
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:increase4w
-    - expr: sum by (http_code) (increase(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"}[4w]))
-      labels:
-        le: "30"
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:increase4w
-    - alert: SLOMetricAbsent
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-      expr: absent(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"})
-        == 1
-      for: 2m
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        severity: medium
-        slo: api-metrics-read-10M-latency-slo
-    - alert: SLOMetricAbsent
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-      expr: absent(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"})
-        == 1
-      for: 2m
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        severity: medium
-        slo: api-metrics-read-10M-latency-slo
-  - interval: 30s
-    name: api-metrics-read-10M-latency-slo
-    rules:
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[5m]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"}[5m])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[5m]))
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate5m
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[30m]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"}[30m])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[30m]))
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate30m
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[1h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"}[1h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[1h]))
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate1h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[2h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"}[2h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[2h]))
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate2h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[6h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"}[6h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[6h]))
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate6h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[1d]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"}[1d])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[1d]))
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate1d
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[4d]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"}[4d])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"}[4d]))
-      labels:
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate4d
-    - alert: APIMetricsReadLatency10MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate5m{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        > (14 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1h{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        > (14 * (1-0.9))
-      for: 2m
-      labels:
-        exhaustion: 2d
-        long_burnrate_window: 1h
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        severity: high
-        short_burnrate_window: 5m
-        slo: api-metrics-read-10M-latency-slo
-    - alert: APIMetricsReadLatency10MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate30m{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        > (7 * (1-0.9)) and up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        > (7 * (1-0.9))
-      for: 15m
-      labels:
-        exhaustion: 4d
-        long_burnrate_window: 6h
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        severity: high
-        short_burnrate_window: 30m
-        slo: api-metrics-read-10M-latency-slo
-    - alert: APIMetricsReadLatency10MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate2h{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        > (2 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1d{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        > (2 * (1-0.9))
-      for: 1h
-      labels:
-        exhaustion: 2w
-        long_burnrate_window: 1d
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        severity: medium
-        short_burnrate_window: 2h
-        slo: api-metrics-read-10M-latency-slo
-    - alert: APIMetricsReadLatency10MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency10MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        > (1 * (1-0.9)) and up_custom_query_duration_seconds:burnrate4d{query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        > (1 * (1-0.9))
-      for: 3h
-      labels:
-        exhaustion: 4w
-        long_burnrate_window: 4d
-        query: query-path-sli-10M-samples
-        service: rhobs.regional
-        severity: medium
-        short_burnrate_window: 6h
-        slo: api-metrics-read-10M-latency-slo
-  - interval: 30s
-    name: api-metrics-read-10M-latency-slo-generic
-    rules:
-    - expr: "0.9"
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: pyrra_objective
-    - expr: 2419200
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: pyrra_window
-    - expr: sum(up_custom_query_duration_seconds:increase4w{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"}
-        or vector(0)) / sum(up_custom_query_duration_seconds:increase4w{http_code=~"^2..$",le="",query="query-path-sli-10M-samples",slo="api-metrics-read-10M-latency-slo"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: pyrra_availability
-    - expr: sum(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: pyrra_requests_total
-    - expr: sum(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-10M-samples"})
-        - sum(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="30",query="query-path-sli-10M-samples"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-10M-latency-slo
-      record: pyrra_errors_total
-  - interval: 2m30s
-    name: api-metrics-read-100M-latency-slo-increase
-    rules:
-    - expr: sum by (http_code) (increase(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[4w]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:increase4w
-    - expr: sum by (http_code) (increase(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"}[4w]))
-      labels:
-        le: "120"
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:increase4w
-    - alert: SLOMetricAbsent
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-      expr: absent(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"})
-        == 1
-      for: 2m
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: medium
-        slo: api-metrics-read-100M-latency-slo
-    - alert: SLOMetricAbsent
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-      expr: absent(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"})
-        == 1
-      for: 2m
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: medium
-        slo: api-metrics-read-100M-latency-slo
-  - interval: 30s
-    name: api-metrics-read-100M-latency-slo
-    rules:
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[5m]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"}[5m])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[5m]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate5m
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[30m]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"}[30m])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[30m]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate30m
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[1h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"}[1h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[1h]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate1h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[2h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"}[2h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[2h]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate2h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[6h]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"}[6h])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[6h]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate6h
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[1d]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"}[1d])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[1d]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate1d
-    - expr: (sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[4d]))
-        - sum(rate(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"}[4d])))
-        / sum(rate(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"}[4d]))
-      labels:
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: up_custom_query_duration_seconds:burnrate4d
-    - alert: APIMetricsReadLatency100MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate5m{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        > (14 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1h{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        > (14 * (1-0.9))
-      for: 2m
-      labels:
-        exhaustion: 2d
-        long_burnrate_window: 1h
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: high
-        short_burnrate_window: 5m
-        slo: api-metrics-read-100M-latency-slo
-    - alert: APIMetricsReadLatency100MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate30m{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        > (7 * (1-0.9)) and up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        > (7 * (1-0.9))
-      for: 15m
-      labels:
-        exhaustion: 4d
-        long_burnrate_window: 6h
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: high
-        short_burnrate_window: 30m
-        slo: api-metrics-read-100M-latency-slo
-    - alert: APIMetricsReadLatency100MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate2h{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        > (2 * (1-0.9)) and up_custom_query_duration_seconds:burnrate1d{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        > (2 * (1-0.9))
-      for: 1h
-      labels:
-        exhaustion: 2w
-        long_burnrate_window: 1d
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: medium
-        short_burnrate_window: 2h
-        slo: api-metrics-read-100M-latency-slo
-    - alert: APIMetricsReadLatency100MErrorBudgetBurning
-      annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
-        description: API /query endpoint is burning too much error budget for 100M
-          samples, to guarantee latency SLOs.
-        message: API /query endpoint is burning too much latency error budget.
-        runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#APIMetricsReadLatency100MErrorBudgetBurning
-      expr: up_custom_query_duration_seconds:burnrate6h{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        > (1 * (1-0.9)) and up_custom_query_duration_seconds:burnrate4d{query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        > (1 * (1-0.9))
-      for: 3h
-      labels:
-        exhaustion: 4w
-        long_burnrate_window: 4d
-        query: query-path-sli-1M-samples
-        service: rhobs.regional
-        severity: medium
-        short_burnrate_window: 6h
-        slo: api-metrics-read-100M-latency-slo
-  - interval: 30s
-    name: api-metrics-read-100M-latency-slo-generic
-    rules:
-    - expr: "0.9"
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: pyrra_objective
-    - expr: 2419200
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: pyrra_window
-    - expr: sum(up_custom_query_duration_seconds:increase4w{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"}
-        or vector(0)) / sum(up_custom_query_duration_seconds:increase4w{http_code=~"^2..$",le="",query="query-path-sli-1M-samples",slo="api-metrics-read-100M-latency-slo"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: pyrra_availability
-    - expr: sum(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
-      record: pyrra_requests_total
-    - expr: sum(up_custom_query_duration_seconds_count{http_code=~"^2..$",query="query-path-sli-1M-samples"})
-        - sum(up_custom_query_duration_seconds_bucket{http_code=~"^2..$",le="120",query="query-path-sli-1M-samples"})
-      labels:
-        service: rhobs.regional
-        slo: api-metrics-read-100M-latency-slo
       record: pyrra_errors_total

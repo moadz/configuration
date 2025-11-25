@@ -200,7 +200,7 @@ func ObservatoriumSLOs(signal Resource) []pyrrav1alpha1.ServiceLevelObjective {
 			{
 				name: "api-alerting-notif-availability-slo",
 				labels: map[string]string{
-					"service": rhobsNextServiceLabel,
+					slo.PropagationLabelsPrefix + "service": rhobsNextServiceLabel,
 				},
 				description:         "API Alertmanager failing to deliver alerts to upstream targets and is burning too much error budget to guarantee availability SLOs.",
 				summary:             "API Alertmanager is burning too much error budget to guarantee availability SLOs.",
@@ -223,44 +223,47 @@ func ObservatoriumSLOs(signal Resource) []pyrrav1alpha1.ServiceLevelObjective {
 				alertName:           "APIMetricsWriteLatencyErrorBudgetBurning",
 				sloType:             sloTypeLatency,
 			},
+			// These are commented out as we are not deploying synthetic avalanche/up jobs to rhobs.regional yet.
+			// We might choose to use other metrics/deploy those later on. For now dropping these SLOs.
+			//
 			// Queriers are deployed as separate instances for adhoc and rule queries.
 			// The read latencies SLO are split to reflect this deployment topology.
-			{
-				name: "api-metrics-read-1M-latency-slo",
-				labels: map[string]string{
-					slo.PropagationLabelsPrefix + "service": rhobsNextServiceLabel,
-				},
-				description:         "API /query endpoint is burning too much error budget for 1M samples, to guarantee latency SLOs.",
-				summary:             "API /query endpoint is burning too much latency error budget.",
-				successOrErrorsExpr: "up_custom_query_duration_seconds_bucket{query=\"query-path-sli-1M-samples\", http_code=~\"^2..$\", le=\"10\"}",
-				totalExpr:           "up_custom_query_duration_seconds_count{query=\"query-path-sli-1M-samples\", http_code=~\"^2..$\"}",
-				alertName:           "APIMetricsReadLatency1MErrorBudgetBurning",
-				sloType:             sloTypeLatency,
-			},
-			{
-				name: "api-metrics-read-10M-latency-slo",
-				labels: map[string]string{
-					slo.PropagationLabelsPrefix + "service": rhobsNextServiceLabel,
-				},
-				description:         "API /query endpoint is burning too much error budget for 100M samples, to guarantee latency SLOs.",
-				summary:             "API /query endpoint is burning too much latency error budget.",
-				successOrErrorsExpr: "up_custom_query_duration_seconds_bucket{query=\"query-path-sli-10M-samples\", http_code=~\"^2..$\", le=\"30\"}",
-				totalExpr:           "up_custom_query_duration_seconds_count{query=\"query-path-sli-10M-samples\", http_code=~\"^2..$\"}",
-				alertName:           "APIMetricsReadLatency10MErrorBudgetBurning",
-				sloType:             sloTypeLatency,
-			},
-			{
-				name: "api-metrics-read-100M-latency-slo",
-				labels: map[string]string{
-					slo.PropagationLabelsPrefix + "service": rhobsNextServiceLabel,
-				},
-				description:         "API /query endpoint is burning too much error budget for 100M samples, to guarantee latency SLOs.",
-				summary:             "API /query endpoint is burning too much latency error budget.",
-				successOrErrorsExpr: "up_custom_query_duration_seconds_bucket{query=\"query-path-sli-1M-samples\", http_code=~\"^2..$\", le=\"120\"}",
-				totalExpr:           "up_custom_query_duration_seconds_count{query=\"query-path-sli-1M-samples\", http_code=~\"^2..$\"}",
-				alertName:           "APIMetricsReadLatency100MErrorBudgetBurning",
-				sloType:             sloTypeLatency,
-			},
+			// {
+			// 	name: "api-metrics-read-1M-latency-slo",
+			// 	labels: map[string]string{
+			// 		slo.PropagationLabelsPrefix + "service": rhobsNextServiceLabel,
+			// 	},
+			// 	description:         "API /query endpoint is burning too much error budget for 1M samples, to guarantee latency SLOs.",
+			// 	summary:             "API /query endpoint is burning too much latency error budget.",
+			// 	successOrErrorsExpr: "up_custom_query_duration_seconds_bucket{query=\"query-path-sli-1M-samples\", http_code=~\"^2..$\", le=\"10\"}",
+			// 	totalExpr:           "up_custom_query_duration_seconds_count{query=\"query-path-sli-1M-samples\", http_code=~\"^2..$\"}",
+			// 	alertName:           "APIMetricsReadLatency1MErrorBudgetBurning",
+			// 	sloType:             sloTypeLatency,
+			// },
+			// {
+			// 	name: "api-metrics-read-10M-latency-slo",
+			// 	labels: map[string]string{
+			// 		slo.PropagationLabelsPrefix + "service": rhobsNextServiceLabel,
+			// 	},
+			// 	description:         "API /query endpoint is burning too much error budget for 100M samples, to guarantee latency SLOs.",
+			// 	summary:             "API /query endpoint is burning too much latency error budget.",
+			// 	successOrErrorsExpr: "up_custom_query_duration_seconds_bucket{query=\"query-path-sli-10M-samples\", http_code=~\"^2..$\", le=\"30\"}",
+			// 	totalExpr:           "up_custom_query_duration_seconds_count{query=\"query-path-sli-10M-samples\", http_code=~\"^2..$\"}",
+			// 	alertName:           "APIMetricsReadLatency10MErrorBudgetBurning",
+			// 	sloType:             sloTypeLatency,
+			// },
+			// {
+			// 	name: "api-metrics-read-100M-latency-slo",
+			// 	labels: map[string]string{
+			// 		slo.PropagationLabelsPrefix + "service": rhobsNextServiceLabel,
+			// 	},
+			// 	description:         "API /query endpoint is burning too much error budget for 100M samples, to guarantee latency SLOs.",
+			// 	summary:             "API /query endpoint is burning too much latency error budget.",
+			// 	successOrErrorsExpr: "up_custom_query_duration_seconds_bucket{query=\"query-path-sli-1M-samples\", http_code=~\"^2..$\", le=\"120\"}",
+			// 	totalExpr:           "up_custom_query_duration_seconds_count{query=\"query-path-sli-1M-samples\", http_code=~\"^2..$\"}",
+			// 	alertName:           "APIMetricsReadLatency100MErrorBudgetBurning",
+			// 	sloType:             sloTypeLatency,
+			// },
 		}
 	default:
 		panic(signal + " is not an Observatorium Resource")
