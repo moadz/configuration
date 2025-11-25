@@ -14,7 +14,7 @@ objects:
         ingestion:
           ingestionBurstSize: 256
           ingestionRate: 20
-          maxLineSize: 1048576
+          maxLineSize: 262144
         otlp:
           streamLabels:
             resourceAttributes:

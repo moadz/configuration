@@ -415,8 +415,8 @@ func DefaultBaseTemplate() TemplateMaps {
 			LokiConfig: LokiOverrides{
 				LokiLimitOverrides: LokiLimitOverrides{
 					IngestionRateLimitMB: 12,
-					IngestionBurstSizeMB: 256,         // workaround for LOG-6817, OTLP configuration appears to be sending unbounded-large requests
-					MaxLineSize:          1024 * 1024, // increased from default of 256K to accommodate audit logs
+					IngestionBurstSizeMB: 256, // workaround for LOG-6817, OTLP configuration appears to be sending unbounded-large requests
+					MaxLineSize:          256 * 1024,
 					QueryTimeout:         "3m",
 				},
 				Router: LokiComponentSpec{
