@@ -104,7 +104,7 @@ objects:
     storeLimitsOptions: {}
     timeRangeConfig:
       maxTime: -22h
-    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
+    version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosCompact
@@ -240,7 +240,7 @@ objects:
       raw: 365d
     storage:
       size: 10Gi
-    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
+    version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosQuery
@@ -333,7 +333,7 @@ objects:
         requests:
           cpu: 100m
           memory: 256Mi
-      version: 358a4a4341684ca1f199b6780891f4d09d5ca458
+      version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
     replicaLabels:
     - prometheus_replica
     - replica
@@ -361,7 +361,7 @@ objects:
       - "30"
       - "60"
       - "120"
-    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
+    version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
     webConfig:
       prefixHeader: X-Forwarded-Prefix
   status:
@@ -471,7 +471,7 @@ objects:
         tooFarInFutureTimeWindow: 5m
         tsdbConfig:
           retention: 1d
-        version: 358a4a4341684ca1f199b6780891f4d09d5ca458
+        version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
     routerSpec:
       additionalArgs:
       - |-
@@ -536,7 +536,7 @@ objects:
         requests:
           cpu: "1"
           memory: 5Gi
-      version: 358a4a4341684ca1f199b6780891f4d09d5ca458
+      version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
   status:
     routerStatus:
       availableReplicas: 0
@@ -642,7 +642,7 @@ objects:
       tenantValueLabel: operator.thanos.io/tenant
     storage:
       size: 10Gi
-    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
+    version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
   status: {}
 - apiVersion: route.openshift.io/v1
   kind: Route
