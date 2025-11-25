@@ -7,6 +7,7 @@ import (
 	thanosrules "github.com/perses/community-mixins/pkg/rules/thanos"
 	thanosoperatorrules "github.com/perses/community-mixins/pkg/rules/thanos-operator"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	"github.com/rhobs/configuration/internal/lokirules"
 )
 
 // Dashboard URLs
@@ -30,6 +31,7 @@ func (b Build) Rules() error {
 	b.ThanosRules()
 	b.ThanosOperatorRules()
 	b.AlertmanagerRules()
+	b.LokiRules()
 	b.SLORules()
 	return nil
 }
@@ -64,6 +66,18 @@ func (b Build) AlertmanagerRules() {
 func alertmanagerRules(gen *mimic.Generator) {
 	gen.Add("alertmanager-rules.yaml", encoding.GhodssYAML("", AlertmanagerPrometheusRule(false)))
 	gen.Add("alertmanager-rules-non-critical.yaml", encoding.GhodssYAML("", AlertmanagerPrometheusRule(true)))
+	gen.Generate()
+}
+
+// LokiRules generates recording rules and alerting rules for Loki
+func (b Build) LokiRules() {
+	gen := b.o11yGenerator("loki-rules")
+	lokiRules(gen)
+}
+
+func lokiRules(gen *mimic.Generator) {
+	gen.Add("loki-rules.yaml", encoding.GhodssYAML("", LokiPrometheusRule(false)))
+	gen.Add("loki-rules-non-critical.yaml", encoding.GhodssYAML("", LokiPrometheusRule(true)))
 	gen.Generate()
 }
 
@@ -155,6 +169,36 @@ func AlertmanagerPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePro
 		alertmanagerrules.WithDashboardURL(dashboardAlertmanager),
 	)
 
+	if err != nil {
+		return nil
+	}
+
+	if nonCriticalPostProcessing {
+		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
+	}
+	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
+
+	return &appInterfacePrometheusRule{
+		Schema:         schemaPath,
+		PrometheusRule: builder.PrometheusRule,
+	}
+}
+
+func LokiPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePrometheusRule {
+	builder, err := lokirules.NewLokiRulesBuilder(
+		"",
+		map[string]string{
+			"app.kubernetes.io/component": "loki",
+			"app.kubernetes.io/name":      "loki-rules",
+			"app.kubernetes.io/part-of":   rhobsNextServiceLabel,
+			"app.kubernetes.io/version":   "main",
+			"prometheus":                  "app-sre",
+			"role":                        "alert-rules",
+		},
+		map[string]string{},
+		lokirules.WithRunbookURL("https://loki-operator.dev/docs/sop.md/"),
+		lokirules.WithServiceLabelValue(rhobsNextServiceLabel),
+	)
 	if err != nil {
 		return nil
 	}

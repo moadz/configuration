@@ -1,0 +1,186 @@
+---
+$schema: /openshift/prometheus-rule-1.yml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: loki
+    app.kubernetes.io/name: loki-rules
+    app.kubernetes.io/part-of: rhobs.regional
+    app.kubernetes.io/version: main
+    prometheus: app-sre
+    role: alert-rules
+  name: loki-rules
+spec:
+  groups:
+  - name: loki-record
+    rules:
+    - expr: sum by (job, namespace, route, status_code) (irate(loki_request_duration_seconds_count[1m]))
+      record: job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m
+  - name: loki-alerts
+    rules:
+    - alert: LokiRequestErrors
+      annotations:
+        description: '{{ $labels.job }} {{ $labels.route }} is experiencing {{ printf
+          "%.2f" $value }}% errors.'
+        message: At least 10% of requests are responded by 5xx server errors.
+        runbook: https://loki-operator.dev/docs/sop.md/#loki-request-errors
+      expr: |2-
+              sum by (job, namespace, route) (
+                job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m{status_code=~"5xx"}
+              )
+            /
+              sum by (job, namespace, route) (
+                job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m
+              )
+          *
+            100
+        >
+          10
+      for: 15m
+      labels:
+        service: rhobs.regional
+        severity: critical
+    - alert: LokiRequestPanics
+      annotations:
+        description: '{{ $labels.job }} is experiencing an increase of {{ $value }}
+          panics.'
+        message: A panic was triggered.
+        runbook: https://loki-operator.dev/docs/sop.md/#loki-request-panics
+      expr: sum by (job, namespace) (increase(loki_panic_total[10m])) > 0
+      labels:
+        service: rhobs.regional
+        severity: critical
+    - alert: LokiRequestLatency
+      annotations:
+        description: '{{ $labels.job }} {{ $labels.route }} is experiencing {{ printf
+          "%.2f" $value }}s 99th percentile latency.'
+        message: The 99th percentile is experiencing high latency (higher than 1 second).
+        runbook: https://loki-operator.dev/docs/sop.md/#loki-request-latency
+      expr: |2-
+          histogram_quantile(
+            0.99,
+            sum by (job, namespace, route, le) (
+              irate(loki_request_duration_seconds_bucket{route!~"(?i).*tail.*"}[2m])
+            )
+          )
+        >
+          1
+      for: 15m
+      labels:
+        service: rhobs.regional
+        severity: critical
+    - alert: LokiTenantRateLimit
+      annotations:
+        description: '{{ $labels.job }} {{ $labels.route }} is experiencing 429 errors.'
+        message: At least 10% of requests are responded with the rate limit error
+          code.
+        runbook: https://loki-operator.dev/docs/sop.md/#loki-tenant-rate-limit
+      expr: |2-
+              sum by (job, namespace, route) (
+                job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m{status_code="429"}
+              )
+            /
+              sum by (job, namespace, route) (
+                job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m
+              )
+          *
+            100
+        >
+          10
+      for: 15m
+      labels:
+        service: rhobs.regional
+        severity: warning
+    - alert: LokiWritePathHighLoad
+      annotations:
+        description: The write path is experiencing high load.
+        message: The write path is experiencing high load, causing backpressure storage
+          flushing.
+        runbook: https://loki-operator.dev/docs/sop.md/#loki-write-path-high-load
+      expr: sum by (job, namespace) (loki_ingester_wal_replay_flushing) > 0
+      for: 15m
+      labels:
+        service: rhobs.regional
+        severity: warning
+    - alert: LokiReadPathHighLoad
+      annotations:
+        description: The read path is experiencing high load.
+        message: The read path has high volume of queries, causing longer response
+          times.
+        runbook: https://loki-operator.dev/docs/sop.md/#loki-read-path-high-load
+      expr: |2-
+          histogram_quantile(
+            0.99,
+            sum by (job, namespace, le) (rate(loki_logql_querystats_latency_seconds_bucket[5m]))
+          )
+        >
+          30
+      for: 15m
+      labels:
+        service: rhobs.regional
+        severity: warning
+    - alert: LokiDiscardedSamplesWarning
+      annotations:
+        description: Loki in namespace {{ $labels.namespace }} is discarding samples
+          in the "{{ $labels.tenant }}" tenant during ingestion. Samples are discarded
+          because of "{{ $labels.reason }}" at a rate of {{ .Value | humanize }} samples
+          per second.
+        message: Loki is discarding samples during ingestion because they fail validation.
+        runbook: https://loki-operator.dev/docs/sop.md/#loki-discarded-samples-warning
+      expr: |2-
+          sum by (namespace, tenant, reason) (
+            irate(
+              loki_discarded_samples_total{reason!="per_stream_rate_limit",reason!="rate_limited",reason!="stream_limit"}[2m]
+            )
+          )
+        >
+          0
+      for: 15m
+      labels:
+        service: rhobs.regional
+        severity: warning
+    - alert: LokiIngesterFlushFailureRateCritical
+      annotations:
+        description: 'Loki ingester {{ $labels.pod }} in the namespace {{ $labels.namespace
+          }} has a critical flush failure rate of {{ $value | humanizePercentage }}
+          over the last 5 minutes. This requires immediate attention as data is not
+          being flushed to the storage. Validate if the storage configuration is still
+          valid and if the storage is still reachable. Current failure rate: {{ $value
+          | humanizePercentage }} Threshold: 20%'
+        message: Loki ingester has critical flush failure rate.
+        runbook: https://loki-operator.dev/docs/sop.md/#loki-ingester-flush-failure-rate-critical
+      expr: |2-
+          sum by (namespace, pod) (
+              rate(loki_ingester_chunks_flush_failures_total[5m])
+            /
+              rate(loki_ingester_chunks_flush_requests_total[5m])
+          )
+        >
+          0.2
+      for: 15m
+      labels:
+        service: rhobs.regional
+        severity: critical
+    - alert: LokistackComponentsNotReadyWarning
+      annotations:
+        description: The LokiStack "{{ $labels.stack_name }}" in namespace "{{ $labels.namespace
+          }}" has components that are not ready.
+        message: One or more LokiStack components are not ready.
+        runbook: https://loki-operator.dev/docs/sop.md/#lokistack-components-not-ready-warning
+      expr: |2-
+          sum by (stack_name, namespace) (
+            label_replace(
+              lokistack_status_condition{reason="ReadyComponents",status="false"},
+              "namespace",
+              "$1",
+              "stack_namespace",
+              "(.+)"
+            )
+          )
+        >
+          0
+      for: 15m
+      labels:
+        service: rhobs.regional
+        severity: warning

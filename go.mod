@@ -12,6 +12,7 @@ require (
 	github.com/observatorium/observatorium v0.0.0-20250205114057-5a240b5d0bec
 	github.com/openshift/api v3.9.0+incompatible
 	github.com/perses/community-mixins v0.0.0-20251125095810-f2cc7bae7025
+	github.com/perses/promql-builder v0.2.1-0.20251110140620-19229f7152d4
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.87.0
 	github.com/prometheus/prometheus v1.8.2-0.20220211202545-56e14463bccf
 	github.com/pyrra-dev/pyrra v0.7.2
@@ -160,7 +161,6 @@ require (
 	github.com/opentracing-contrib/go-stdlib v1.1.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/oracle/oci-go-sdk/v65 v65.93.1 // indirect
-	github.com/perses/promql-builder v0.2.1-0.20251110140620-19229f7152d4 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
