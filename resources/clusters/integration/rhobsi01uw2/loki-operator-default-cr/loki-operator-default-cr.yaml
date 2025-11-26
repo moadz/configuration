@@ -38,7 +38,7 @@ objects:
       distributor:
         replicas: 3
       ingester:
-        replicas: 3
+        replicas: 6
       querier:
         replicas: 2
       queryFrontend:

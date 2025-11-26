@@ -70,6 +70,9 @@ func rhobsi01uw2TemplateMaps() TemplateMaps {
 				IngestionRateLimitMB: 20,
 				QueryTimeout:         "5m",
 			},
+			Ingest: LokiComponentSpec{
+				Replicas: 6,
+			},
 		},
 	}
 	return DefaultBaseTemplate().Override(lokiOverrides)
