@@ -66,34 +66,7 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 						StreamLabels: &lokiv1.OTLPStreamLabelSpec{
 							ResourceAttributes: []lokiv1.OTLPAttributeReference{
 								{
-									Name: "k8s.container.name",
-								},
-								{
-									Name: "k8s.cronjob.name",
-								},
-								{
-									Name: "k8s.daemonset.name",
-								},
-								{
-									Name: "k8s.deployment.name",
-								},
-								{
-									Name: "k8s.job.name",
-								},
-								{
 									Name: "k8s.namespace.name",
-								},
-								{
-									Name: "k8s.node.name",
-								},
-								{
-									Name: "k8s.pod.name",
-								},
-								{
-									Name: "k8s.statefulset.name",
-								},
-								{
-									Name: "openshift.cluster.uid",
 								},
 								{
 									Name: "openshift.label.cluster_name",
@@ -103,9 +76,6 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 								},
 								{
 									Name: "openshift.log.type",
-								},
-								{
-									Name: "service.name",
 								},
 							},
 						},
