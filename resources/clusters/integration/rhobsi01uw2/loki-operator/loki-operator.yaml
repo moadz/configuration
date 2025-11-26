@@ -378,14 +378,14 @@ objects:
           - /manager
           env:
           - name: RELATED_IMAGE_LOKI
-            value: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-loki:d252736dc89f8eaad6ebd4780b800b9ca90eed42
+            value: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-loki:177faa651b8678f7122500641e29aa009e096e80
           - name: RELATED_IMAGE_GATEWAY
             value: registry.redhat.io/openshift-logging/lokistack-gateway-rhel9@sha256:710a1a5e486de5724469e55f29e9ff3f6cbef8cd4b2d21dfe254ede2b953c150
           - name: RELATED_IMAGE_OPA
             value: registry.redhat.io/openshift-logging/opa-openshift-rhel9@sha256:06602373b99d694a83b845e9cc6746a4f37a7a6ca6943356fea6ee6dbbccda35
           - name: OPERATOR_CONDITION_NAME
             value: loki-operator.v6.3.0
-          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-loki-operator:9c2d30ee087b37a946318732bf56e36a2c11bc74
+          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-loki-operator:5ecfd6560e3d2585bc76910966dc667cf066a8d2
           imagePullPolicy: IfNotPresent
           name: manager
           ports:
