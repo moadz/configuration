@@ -2,7 +2,6 @@ package submodule
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,9 +11,6 @@ import (
 	"strings"
 
 	"github.com/go-kit/log"
-	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
 type repoType int
@@ -29,7 +25,6 @@ type Info struct {
 	Commit        string // Optional: if specified, use this commit instead of parsing from branch
 	SubmodulePath string
 	URL           string
-	PathToYAMLS   string
 }
 
 type Module struct {
@@ -58,83 +53,6 @@ func (i Info) Parse() (Module, error) {
 		}
 	}
 	return Module{}, fmt.Errorf("failed to find commit for submodule %q", i.SubmodulePath)
-}
-
-// FetchYAMLs fetches YAML files from the specified directory in the submodule commit and prints them
-func (i Info) FetchYAMLs() ([]runtime.Object, error) {
-	if i.PathToYAMLS == "" {
-		return nil, fmt.Errorf("PathToYAMLS is required")
-	}
-
-	// First get the submodule commit hash
-	module, err := i.Parse()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get submodule commit: %w", err)
-	}
-	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
-	_ = logger.Log("msg", "Got submodule commit", "commit", module.Commit, "url", module.URL)
-
-	// Get the submodule URL from .gitmodules
-	submoduleURL, err := i.getSubmoduleURL()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get submodule URL: %w", err)
-	}
-	_ = logger.Log("msg", "Got submodule URL", "url", submoduleURL)
-
-	// First check root directory to see what's in the repo
-	rootFiles, err := i.fetchDirectoryContents(submoduleURL, module.Commit, "")
-	if err != nil {
-		_ = logger.Log("msg", "Failed to fetch root directory", "error", err)
-	} else {
-		_ = logger.Log("msg", "Found items in root directory", "count", len(rootFiles))
-		limit := len(rootFiles)
-		if limit > 10 {
-			limit = 10
-		}
-		for _, f := range rootFiles[:limit] { // limit to first 10
-			_ = logger.Log("msg", "Root directory item", "name", f.Name, "type", f.Type)
-		}
-	}
-
-	// First check if operator directory exists
-	operatorFiles, err := i.fetchDirectoryContents(submoduleURL, module.Commit, "operator")
-	if err != nil {
-		_ = logger.Log("msg", "Failed to fetch operator directory", "error", err)
-	} else {
-		_ = logger.Log("msg", "Found items in operator directory", "count", len(operatorFiles))
-		for _, f := range operatorFiles {
-			_ = logger.Log("msg", "Operator directory item", "name", f.Name, "type", f.Type)
-		}
-	}
-
-	// Fetch directory contents from the submodule repository
-	files, err := i.fetchDirectoryContents(submoduleURL, module.Commit, i.PathToYAMLS)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch directory contents: %w", err)
-	}
-	_ = logger.Log("msg", "Found files in directory", "count", len(files), "directory", i.PathToYAMLS)
-
-	var objs []runtime.Object
-	for _, file := range files {
-		if strings.HasSuffix(strings.ToLower(file.Name), ".yaml") || strings.HasSuffix(strings.ToLower(file.Name), ".yml") {
-			content, err := i.fetchFileContent(submoduleURL, module.Commit, file.Path)
-			if err != nil {
-				_ = logger.Log("msg", "Error fetching file", "file", file.Name, "error", err)
-				continue
-			}
-			// todo we can pass specific types and filenames if needed
-			var obj v1.CustomResourceDefinition
-			decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewBuffer(content), 100000)
-			err = decoder.Decode(&obj)
-			if err != nil {
-				return nil, fmt.Errorf("failed to decode %s: %w", file.Name, err)
-			}
-
-			objs = append(objs, &obj)
-		}
-	}
-
-	return objs, nil
 }
 
 func buildRawURL(repoURL, branch, filePath string) (string, int) {
@@ -288,133 +206,6 @@ func getSubmoduleCommits(repoURL, branch string) ([]Module, error) {
 	}
 
 	return submodules, nil
-}
-
-type FileInfo struct {
-	Name string
-	Path string
-	Type string
-}
-
-// getSubmoduleURL gets the URL for the specified submodule from .gitmodules
-func (i Info) getSubmoduleURL() (string, error) {
-	// Use commit if specified, otherwise fall back to branch
-	ref := i.Commit
-	if ref == "" {
-		if i.Branch == "" {
-			return "", fmt.Errorf("either commit or branch is required to fetch .gitmodules file")
-		}
-		ref = i.Branch
-	}
-
-	infos, err := getSubmoduleCommits(i.URL, ref)
-	if err != nil {
-		return "", fmt.Errorf("failed to get submodule commits: %w", err)
-	}
-
-	for _, submodule := range infos {
-		if submodule.Path == i.SubmodulePath {
-			return submodule.URL, nil
-		}
-	}
-	return "", fmt.Errorf("submodule %s not found", i.SubmodulePath)
-}
-
-// fetchDirectoryContents fetches the contents of a directory from a repository
-func (i Info) fetchDirectoryContents(repoURL, commit, path string) ([]FileInfo, error) {
-	var files []FileInfo
-	var apiURL string
-
-	repoPath := extractRepoPath(repoURL)
-
-	if strings.Contains(repoURL, "github.com") {
-		apiURL = fmt.Sprintf("https://api.github.com/repos/%s/contents/%s?ref=%s", repoPath, path, commit)
-	} else if strings.Contains(repoURL, "gitlab") {
-		gitlabBaseURL := strings.Split(repoURL, "/")[0] + "//" + strings.Split(repoURL, "/")[2]
-		apiURL = fmt.Sprintf("%s/api/v4/projects/%s/repository/tree?ref=%s&path=%s",
-			gitlabBaseURL,
-			strings.ReplaceAll(repoPath, "/", "%2F"),
-			commit,
-			path)
-	} else {
-		return nil, fmt.Errorf("unsupported repository type")
-	}
-
-	resp, err := http.Get(apiURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch directory contents: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read directory contents: %w", err)
-	}
-
-	if strings.Contains(repoURL, "github.com") {
-		// GitHub API returns array of objects with "name", "path", "type"
-		nameRegex := regexp.MustCompile(`"name":\s*"([^"]+)"`)
-		pathRegex := regexp.MustCompile(`"path":\s*"([^"]+)"`)
-		typeRegex := regexp.MustCompile(`"type":\s*"([^"]+)"`)
-
-		names := nameRegex.FindAllStringSubmatch(string(body), -1)
-		paths := pathRegex.FindAllStringSubmatch(string(body), -1)
-		types := typeRegex.FindAllStringSubmatch(string(body), -1)
-
-		for i := 0; i < len(names) && i < len(paths) && i < len(types); i++ {
-			files = append(files, FileInfo{
-				Name: names[i][1],
-				Path: paths[i][1],
-				Type: types[i][1],
-			})
-		}
-	} else {
-		// GitLab API returns array of objects with "name", "path", "type"
-		nameRegex := regexp.MustCompile(`"name":\s*"([^"]+)"`)
-		pathRegex := regexp.MustCompile(`"path":\s*"([^"]+)"`)
-		typeRegex := regexp.MustCompile(`"type":\s*"([^"]+)"`)
-
-		names := nameRegex.FindAllStringSubmatch(string(body), -1)
-		paths := pathRegex.FindAllStringSubmatch(string(body), -1)
-		types := typeRegex.FindAllStringSubmatch(string(body), -1)
-
-		for i := 0; i < len(names) && i < len(paths) && i < len(types); i++ {
-			files = append(files, FileInfo{
-				Name: names[i][1],
-				Path: paths[i][1],
-				Type: types[i][1],
-			})
-		}
-	}
-
-	return files, nil
-}
-
-// fetchFileContent fetches the content of a specific file from a repository
-func (i Info) fetchFileContent(repoURL, commit, filePath string) ([]byte, error) {
-	var rawURL string
-
-	repoPath := extractRepoPath(repoURL)
-
-	if strings.Contains(repoURL, "github.com") {
-		rawURL = fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s", repoPath, commit, filePath)
-	} else if strings.Contains(repoURL, "gitlab") {
-		rawURL = fmt.Sprintf("%s/-/raw/%s/%s", repoURL, commit, filePath)
-	} else {
-		return nil, fmt.Errorf("unsupported repository type")
-	}
-
-	resp, err := http.Get(rawURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch file content: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file content: %w", err)
-	}
-	return body, nil
 }
 
 type gitHubCommit struct {
