@@ -30,6 +30,9 @@ parameters:
     value: openshift-observability-operator
   - name: SECRET_NAME
     value: hypershift-telemeter-client
+  - name: ADDITIONAL_MATCH_EXPRESSION
+    description: Hive SelectorSyncSet matchExpressions override. By default this template will target all MC's and SC's discovered.
+
 objects:
   - apiVersion: hive.openshift.io/v1
     kind: SelectorSyncSet
@@ -43,7 +46,7 @@ objects:
       clusterDeploymentSelector:
         matchLabels:
           api.openshift.com/managed: 'true'
-        matchExpressions:
+        matchExpressions: |-
           - key: api.openshift.com/fedramp
             operator: NotIn
             values:
@@ -53,14 +56,7 @@ objects:
             values:
               - management-cluster
               - service-cluster
-          - key: ext-hypershift.openshift.io/cluster-region
-            operator: In
-            values:
-              - ${REGION}
-          - key: ext-hypershift.openshift.io/cluster-sector
-            operator: In
-            values:
-              - ${SECTOR}
+          ${ADDITIONAL_MATCH_EXPRESSION}
 
       resources:
       - apiVersion: v1
