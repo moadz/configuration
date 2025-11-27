@@ -250,6 +250,11 @@ func NewClusterRoleLokiStackManager() *rbacv1.ClusterRole {
 				Resources: []string{"ingresses"},
 				Verbs:     []string{"get", "list", "watch", "create", "update", "patch", "delete"},
 			},
+			{
+				APIGroups: []string{"networking.k8s.io"},
+				Resources: []string{"networkpolicies"},
+				Verbs:     []string{"get", "list", "watch"},
+			},
 			// Networking resources finalizers
 			{
 				APIGroups: []string{"networking.k8s.io"},
