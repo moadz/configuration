@@ -16,23 +16,6 @@ See our [website](https://rhobs-handbook.netlify.app/) for more information abou
 
 Both can be installed using Homebrew: `brew install gnu-sed findutils`. Afterwards, update the `SED` and `XARGS` variables in the Makefile to use `gsed` and `gxargs` or replace them in your environment.
 
-## Hot fixing Thanos Operator
-When a critical issue is found in production, we sometimes need to hotfix the deployed configuration without 
-going through the full development and deployment cycle. The steps below outline the process to do so.
-We use production as an example, but the same steps apply to stage or any other environment in terms of process.
-The process can also be used for rolling out a new version of the operator if needed.
-
-Currently, we build directly from [upstream](https://github.com/thanos-community/thanos-operator).
-This works for now as we are maintainers of the project, but in future we might need to fork it.
-
-1. Create and merge a PR in the upstream repository with the fix.
-2. Go to our [Konflux fork](https://github.com/rhobs/rhobs-konflux-thanos-operator) where we build from a submodule.
-3. Run this [workflow](https://github.com/rhobs/rhobs-konflux-thanos-operator/actions/workflows/update-submodules.yml) targeting `main`.
-4. Merge the [generated PR](https://github.com/rhobs/rhobs-konflux-thanos-operator/pulls).
-5. Visit [quay.io](https://quay.io/repository/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator?tab=tags&tag=latest) to ensure the new image is built and available.
-6. Run `mage sync:operator thanos latest`
-7. Run `mage build:environment production` to generate the manifests for production environment.
-
 ## Building RHOBS Cells with Mage
 
 This repository leans heavily on [Mage](https://magefile.org/) to build various components of RHOBS. You can find the available Mage targets by running:

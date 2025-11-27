@@ -44,9 +44,7 @@ objects:
               description: ThanosCompactSpec defines the desired state of ThanosCompact
               properties:
                 additionalArgs:
-                  description: |-
-                    Additional arguments to pass to the Thanos components.
-                    An additional argument will override an existing argument provided by the operator if there is a conflict.
+                  description: Additional arguments to pass to the Thanos components.
                   items:
                     type: string
                   type: array
@@ -5350,9 +5348,7 @@ objects:
               description: ThanosQuerySpec defines the desired state of ThanosQuery
               properties:
                 additionalArgs:
-                  description: |-
-                    Additional arguments to pass to the Thanos components.
-                    An additional argument will override an existing argument provided by the operator if there is a conflict.
+                  description: Additional arguments to pass to the Thanos components.
                   items:
                     type: string
                   type: array
@@ -10214,9 +10210,7 @@ objects:
                     If you specify this, the operator will create a Query Frontend in front of your query deployment.
                   properties:
                     additionalArgs:
-                      description: |-
-                        Additional arguments to pass to the Thanos components.
-                        An additional argument will override an existing argument provided by the operator if there is a conflict.
+                      description: Additional arguments to pass to the Thanos components.
                       items:
                         type: string
                       type: array
@@ -15635,9 +15629,7 @@ objects:
                   description: Ingester is the configuration for the ingestor.
                   properties:
                     additionalArgs:
-                      description: |-
-                        Additional arguments to pass to the Thanos components.
-                        An additional argument will override an existing argument provided by the operator if there is a conflict.
+                      description: Additional arguments to pass to the Thanos components.
                       items:
                         type: string
                       type: array
@@ -20736,9 +20728,7 @@ objects:
                   description: Router is the configuration for the router.
                   properties:
                     additionalArgs:
-                      description: |-
-                        Additional arguments to pass to the Thanos components.
-                        An additional argument will override an existing argument provided by the operator if there is a conflict.
+                      description: Additional arguments to pass to the Thanos components.
                       items:
                         type: string
                       type: array
@@ -25841,9 +25831,7 @@ objects:
               description: ThanosRulerSpec defines the desired state of ThanosRuler
               properties:
                 additionalArgs:
-                  description: |-
-                    Additional arguments to pass to the Thanos components.
-                    An additional argument will override an existing argument provided by the operator if there is a conflict.
+                  description: Additional arguments to pass to the Thanos components.
                   items:
                     type: string
                   type: array
@@ -31151,9 +31139,7 @@ objects:
               description: ThanosStoreSpec defines the desired state of ThanosStore
               properties:
                 additionalArgs:
-                  description: |-
-                    Additional arguments to pass to the Thanos components.
-                    An additional argument will override an existing argument provided by the operator if there is a conflict.
+                  description: Additional arguments to pass to the Thanos components.
                   items:
                     type: string
                   type: array
