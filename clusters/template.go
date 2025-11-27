@@ -388,7 +388,7 @@ func DefaultBaseTemplate() TemplateMaps {
 		},
 		Replicas: ParamMap[int32]{
 			StoreDefault:           1,
-			ReceiveRouter:          1,
+			ReceiveRouter:          3,
 			ReceiveIngestorDefault: 3,
 			Ruler:                  1,
 			Query:                  1,
