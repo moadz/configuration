@@ -104,7 +104,7 @@ objects:
     storeLimitsOptions: {}
     timeRangeConfig:
       maxTime: -22h
-    version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosCompact
@@ -240,7 +240,7 @@ objects:
       raw: 365d
     storage:
       size: 10Gi
-    version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: monitoring.thanos.io/v1alpha1
   kind: ThanosQuery
@@ -333,7 +333,7 @@ objects:
         requests:
           cpu: 100m
           memory: 256Mi
-      version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
+      version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     replicaLabels:
     - prometheus_replica
     - replica
@@ -361,7 +361,7 @@ objects:
       - "30"
       - "60"
       - "120"
-    version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     webConfig:
       prefixHeader: X-Forwarded-Prefix
   status:
@@ -471,9 +471,10 @@ objects:
         tooFarInFutureTimeWindow: 5m
         tsdbConfig:
           retention: 1d
-        version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
+        version: 358a4a4341684ca1f199b6780891f4d09d5ca458
     routerSpec:
       additionalArgs:
+      - --receive.grpc-service-config='{"loadBalancingPolicy":"round_robin","retryPolicy":{"maxAttempts":0,"initialBackoff":"0.1s","backoffMultiplier":2,"retryableStatusCodes":["UNAVAILABLE"]}}'
       - |-
         --tracing.config="config":
           "sampler_param": 2
@@ -536,7 +537,7 @@ objects:
         requests:
           cpu: "1"
           memory: 5Gi
-      version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
+      version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status:
     routerStatus:
       availableReplicas: 0
@@ -642,7 +643,7 @@ objects:
       tenantValueLabel: operator.thanos.io/tenant
     storage:
       size: 10Gi
-    version: cf8043a897ba4be9ebc8ac11e8f6ac83609cd78c
+    version: 358a4a4341684ca1f199b6780891f4d09d5ca458
   status: {}
 - apiVersion: route.openshift.io/v1
   kind: Route
