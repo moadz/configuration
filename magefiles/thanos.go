@@ -1431,7 +1431,6 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 						tracingSidecar(templates),
 					},
 					Args: []string{
-						`--receive.grpc-service-config='{"loadBalancingPolicy":"round_robin","retryPolicy":{"maxAttempts":0,"initialBackoff":"0.1s","backoffMultiplier":2,"retryableStatusCodes":["UNAVAILABLE"]}}'`,
 						`--tracing.config="config":
   "sampler_param": 2
   "sampler_type": "ratelimiting"
