@@ -1,0 +1,772 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-rules
+  annotations:
+    description: "Template for deploying HCP rules to RHOBS"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: audit-webhook-error
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: AuditWebhookCloudWatchErrors
+          interval: 60s
+          rules:
+            - alert: AuditWebhookIncorrectCloudwatchConfiguration
+              annotations:
+                description: "The audit webhook cloudwatch configuration for {{ $labels.namespace }} has been invalid for 5 minutes."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/howto/customer-cw-audit-forwarding-for-hcp.md
+                summary: "Audit webhook cloudwatch configuration invalid"
+              expr: sum by (region, env, _mc_id, namespace, _id) (splunkforwarder_audit_filter_cloudwatch_configuration_invalid{}) > 0
+              for: 5m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: AuditWebhookCloudWatchErrors
+              annotations:
+                description: "The audit webhook cloudwatch integration for {{ $labels.namespace }} is experiencing problems."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/AuditWebhookCloudWatchErrors.md
+                summary: "Audit webhook cloudwatch error"
+              expr: |
+                (sum(splunkforwarder_audit_filter_cloudwatch_enabled) by (_id, _mc_id, namespace, region, env))
+                * on (_id, _mc_id, namespace, region, env)
+                (sum(rate(splunkforwarder_audit_filter_cloudwatch_errors_total[10m])) by (_id, _mc_id, namespace, region, env)) > 0
+              for: 10m
+              labels:
+                severity: warning
+                otel_collect: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: billing-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: BillingRules
+          interval: 30s
+          rules:
+            - alert: BillingMetricMissing
+              annotations:
+                description: "Recording rule hostedcluster:hypershift_cluster_vcpus:max is not defined for cluster {{ $labels._id }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/BillingMetricMissing.md
+                summary: Recording rule used for the billing is not defined
+              expr: |
+                hypershift_cluster_vcpus_computation_error or (hypershift_cluster_silence_alerts unless on(_id, _mc_id) hostedcluster:hypershift_cluster_vcpus:max)
+              for: 30m
+              labels:
+                severity: critical
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-node-not-joining-nodepool-sre-actionable-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-NodepoolFailureSRE
+          interval: 30s
+          rules:
+            ## Notify SRE when one or more nodepools are having issue while adding node and either nodepool component status is unavailable or nodepool has ignition payload hash mismatch
+            - alert: NodepoolFailureSRE
+              annotations:
+                description: "One or more nodepool from the cluster are having issue while adding node(s)"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodepoolFailureSRE.md"
+                summary: "HCP Cluster nodepool having issues while adding nodes"
+              expr: sre:nodepool:provisioning_failure_notify and on (exported_namespace, _mc_id) (sre:nodepool:all_components_available==0 or sre:nodepool:invalid_payload_nodepool_provision_failure)
+              for: 1h
+              labels:
+                otel_collect: "true"
+                severity: warning
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: oauth-service-health
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: OauthServiceRules
+          interval: 30s
+          rules:
+            - alert: OauthServiceDeploymentDegraded
+              annotations:
+                description: "An Oauth Service deployment does not have the expected number of replicas."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/OauthServiceDeploymentDegraded.md
+                summary: "An Oauth Service deployment does not have the expected number of available replicas."
+              expr: |
+                sre:oauth:deployment_pods_unavailable > 0
+              for: 10m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: OauthServiceDeploymentDown
+              annotations:
+                description: There are no ready Oauth Service pods in the HCP Namespace.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/OauthServiceDeploymentDown.md
+                summary: There are no ready Oauth Service pods in the HCP Namespace.
+              labels:
+                severity: warning
+                otel_collect: "true"
+              expr: sre:sre:oauth:pod_status_ready == 0
+              for: 15m
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-nodes-need-upscale-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-RequestServingNodesNeedUpscale
+          interval: 30s
+          rules:
+            ## If the CPU or Memory consumption is excessive, a critical alert to SRE to assign a new request serving node size.
+            - alert: RequestServingNodesNeedUpscale
+              annotations:
+                description: "The cluster's request serving nodes have been undersized for 1 hour and need to be assigned to a bigger request serving node pair."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/RequestServingNodesNeedUpscale.md
+                summary: "HCP Request Serving Nodes Need Upsizing"
+              expr: count(sre:node_request_serving:excessive_consumption_cpu or sre:node_request_serving:excessive_consumption_memory) by (request_node, _mc_id)
+              for: 1h
+              labels:
+                otel_collect: "true"
+                severity: critical
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sae-deployment-does-not-have-expected-replicas
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: SAEDeploymentDoesNotHaveExpectedReplicas
+          interval: 1m
+          rules:
+            - alert: SAEDeploymentDoesNotHaveExpectedReplicas
+              annotations:
+                description: "Splunk Audit Exporter does not have expected number of replicas"
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/SAEDeploymentDoesNotHaveExpectedReplicas.md
+                summary: Splunk Audit Exporter Deployment does not have expected replicas
+              expr: |
+                count by (namespace, deployment, _mc_id) (
+                  sum by(namespace, deployment, _mc_id) (
+                    kube_deployment_status_replicas_available{namespace=~"ocm-.*", deployment="audit-webhook"}
+                  )
+                  <
+                  sum by(namespace, deployment, _mc_id) (
+                    kube_deployment_spec_replicas{namespace=~"ocm-.*", deployment="audit-webhook"}
+                  )
+                ) >= 1
+              for: 10m
+              labels:
+                severity: warning
+                otel_collect: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: watchdog
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: Watchdog
+          interval: 60s
+          rules:
+            - alert: Watchdog
+              # This expression is needed to get the _id label
+              expr: group by (_id, _mc_id)(kube_node_labels)
+              annotations:
+                description: |
+                  This is an alert meant to ensure that the entire alerting pipeline is functional.
+                  This alert is always firing, therefore it should always be firing in Alertmanager
+                  and always fire against a receiver. There are integrations with various notification
+                  mechanisms that send a notification when this alert is not firing. For example the
+                  "DeadMansSnitch" integration in PagerDuty.
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-cluster-operators-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-cluster-operators-rules
+          interval: 30s
+          rules:
+            # This alert is cribbed from https://github.com/openshift/cluster-version-operator/blob/9de00ba8fb8330b3a1b440396dc2c5dbe974119b/install/0000_90_cluster-version-operator_02_servicemonitor.yaml#L96-L105
+            # The expression and runbook_url have been modified to meet the needs of ROSA HCP.
+            # Specifically, this alert only fires if the HCP cluster is not silenced/deleting and has >= 2 healthy nodes. 2 nodes are required to run the 2 replicas of the default ingresscontroller.
+            # Uses hypershift_cluster_alerts_disabled which covers cluster deletion, limited support, and manual silencing scenarios.
+            - alert: ClusterOperatorDown
+              annotations:
+                summary: Cluster operator has not been available for 10 minutes.
+                description: The {{ "{{ $labels.name }}" }} operator may be down or disabled because {{ "{{ $labels.reason }}" }}, and the components it manages may be unavailable or degraded.  Cluster upgrades may not complete. For more information refer to '{{ "{{ if eq $labels.name \"version\" }}oc adm upgrade{{ else }}oc get -o yaml clusteroperator {{ $labels.name }}{{ end }}" }}'{{ "{{ with $console_url := \"console_url\" | query }}{{ if ne (len (label \"url\" (first $console_url ) ) ) 0}} or {{ label \"url\" (first $console_url ) }}/settings/cluster/{{ end }}{{ end }}" }}.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/ClusterOperatorDown.md
+              # This expression can be extended in the future as https://issues.redhat.com/browse/SREP-1293 and other initiatives
+              # continue to add more ClusterOperators to monitor.
+              expr: max by (_id, _mc_id, namespace, name, reason) (cluster_operator_up{name=~"ingress"} == 0) and on (namespace) (hcp_worker_nodes:available_count >= 2) unless on (_id) hypershift_cluster_alerts_disabled
+              for: 10m
+              labels:
+                severity: critical
+            # This alert is cribbed from https://github.com/openshift/cluster-ingress-operator/blob/afb2160975399f4249d9d100641ce32a33c262f1/manifests/0000_90_ingress-operator_03_prometheusrules.yaml#L35
+            # The expression and severity have been modified to meet the needs of ROSA HCP.
+            # This alert will help catch scenarios like Canary health checks failing.
+            - alert: DefaultIngressControllerDegraded
+              annotations:
+                summary: The "default" IngressController has been degraded for 30m.
+                description: "This alert fires when the default IngressController status is degraded."
+                message: "The {{ $labels.namespace }}/{{ $labels.name }} ingresscontroller is degraded."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/DefaultIngressControllerDegraded.md
+              expr: max by (_id, _mc_id, condition, name, namespace) (ingress_controller_conditions{name="default", condition="Degraded"} == 1)
+              for: 30m
+              labels:
+                severity: warning
+            # This alert monitors core cluster operators (dns, monitoring, console, network) for being down.
+            # It triggers when any of these operators is down (cluster_operator_up == 0) for 15 minutes.
+            # This follows the same pattern as the existing ClusterOperatorDown alert but for additional operators.
+            - alert: CoreClusterOperatorDown
+              annotations:
+                summary: Core cluster operator {{ "{{ $labels.name }}" }} has been down for 15 minutes.
+                description: The {{ "{{ $labels.name }}" }} operator has been down for 15 minutes, and the components it manages may be unavailable or degraded. Check the operator status with 'oc get clusteroperator {{ "{{ $labels.name }}" }}'.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/CoreClusterOperatorDown.md
+              expr: core_cluster_operator:down:filtered{name=~"console|network|monitoring|dns"}
+              for: 15m
+              labels:
+                severity: warning
+  - # Implements SLO based alerting for Kube API server.
+    # Targe: 99.99% availability.
+    # See https://docs.google.com/spreadsheets/d/1K-IjRBj4OlyngQ4VnJklr5p_zm_1se48Y0netnfBSmE/edit#gid=0
+    #
+    # The Hypershift alerts defined here are similar to the ones defined for a standard Openshift cluster:
+    # https://github.com/openshift/cluster-kube-apiserver-operator/blob/master/bindata/assets/alerts/kube-apiserver-slos-basic.yaml
+    # https://github.com/openshift/cluster-kube-apiserver-operator/blob/master/bindata/assets/alerts/kube-apiserver-slos-extended.yaml
+    # We may want to update this file with the improvements added to the 2 above files on a regular basis.
+    # Remark however that there are some differences with the rules defined here:
+    # - The avaibility target is only 99% for a standard Openshift cluster.
+    # - We are defining here one alert per type (error/slow-resource/slow-namespace/slow-cluster) and verb (read/write)
+    # - Finally remark that metrics are not filtered using the "job" label. Indeed this label is sometimes / currently set differently in
+    #   the data plane so we prefer to be more explicit by specifying the service providing the metrics.
+    apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: kube-api-error-budget-burn
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: KubeAPIErrorBudgetBurn_1m_eval
+          interval: 1m
+          rules:
+            - alert: KubeAPIErrorBudgetBurn
+              annotations:
+                description: The API server is burning too much error budget. This alert fires when too many requests are failing with high latency. Use the 'API Performance' monitoring dashboards to narrow down the request states and latency. The 'etcd' monitoring dashboards also provides metrics to help determine etcd stability and performance.
+                runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-kube-apiserver-operator/KubeAPIErrorBudgetBurn.md
+                summary: High error budget burn for Kube API server
+              labels:
+                long: 1h
+                short: 5m
+                severity: warning
+                otel_collect: "true"
+              expr: |
+                max_over_time(count by (_id, _mc_id, job, namespace,type,verb)(apiserver_request:error_rate_1h > (14.40 * 0.0001) and apiserver_request:error_rate_5m > (14.40 * 0.0001))[5m:])
+              for: 2m
+            - alert: KubeAPIErrorBudgetBurn
+              annotations:
+                description: The API server is burning too much error budget. This alert fires when too many requests are failing with high latency. Use the 'API Performance' monitoring dashboards to narrow down the request states and latency. The 'etcd' monitoring dashboards also provides metrics to help determine etcd stability and performance.
+                runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-kube-apiserver-operator/KubeAPIErrorBudgetBurn.md
+                summary: High error budget burn for Kube API server
+              labels:
+                long: 6h
+                short: 30m
+                severity: warning
+                otel_collect: "true"
+              expr: |
+                max_over_time(count by (_id, _mc_id, job, namespace,type,verb)(apiserver_request:error_rate_6h > (6.00 * 0.0001) and apiserver_request:error_rate_30m > (6.00 * 0.0001))[10m:])
+              for: 15m
+        - name: KubeAPIErrorBudgetBurn_15m_eval
+          interval: 15m
+          rules:
+            - alert: KubeAPIErrorBudgetBurn
+              annotations:
+                description: The API server is burning too much error budget. This alert fires when too many requests are failing with high latency. Use the 'API Performance' monitoring dashboards to narrow down the request states and latency. The 'etcd' monitoring dashboards also provides metrics to help determine etcd stability and performance.
+                runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-kube-apiserver-operator/KubeAPIErrorBudgetBurn.md
+                summary: High error budget burn for Kube API server
+              labels:
+                long: 1d
+                short: 2h
+                severity: warning
+                otel_collect: "true"
+              expr: |
+                apiserver_request:error_rate_1d > (3.00 * 0.0001)
+                and
+                apiserver_request:error_rate_2h > (3.00 * 0.0001)
+              for: 15m
+            - alert: KubeAPIErrorBudgetBurn
+              annotations:
+                description: The API server is burning too much error budget. This alert fires when too many requests are failing with high latency. Use the 'API Performance' monitoring dashboards to narrow down the request states and latency. The 'etcd' monitoring dashboards also provides metrics to help determine etcd stability and performance.
+                runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-kube-apiserver-operator/KubeAPIErrorBudgetBurn.md
+                summary: High error budget burn for Kube API server
+              labels:
+                long: 3d
+                short: 6h
+                severity: warning
+                otel_collect: "true"
+              expr: |
+                apiserver_request:error_rate_3d  > (1.00 * 0.0001)
+                and
+                apiserver_request:error_rate_6h > (1.00 * 0.0001)
+              for: 15m
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-kube-controller-manager-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-kube-controller-manager-rules
+          interval: 1m
+          rules:
+            # This alert uses the sre:kube_controller_manager:pod_status_ready rule to count the number of `Ready` pods for kube-controller-manager.
+            # In HCP, we expect 2, so this alert will fire when the number of ready pods is 0.
+            - alert: KubeControllerManagerDown
+              annotations:
+                description: "There are 0 Ready 'kube-controller-manager' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeControllerManagerDown.md
+                summary: No Ready kube-controller-manager pods.
+              labels:
+                severity: critical
+              expr: sre:kube_controller_manager:pod_status_ready == 0
+              for: 15m
+            # This alert uses the sre:kube_controller_manager:pod_status_ready rule to count the number of `Ready` pods for kube-controller-manager.
+            # In HCP, we expect 2, so this alert will fire when the number of Ready pods is 1. The 0 pods case is covered by KubeControllerManagerDown.
+            - alert: KubeControllerManagerDegraded
+              annotations:
+                description: "There is not at least 2 Ready 'kube-controller-manager' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeControllerManagerDown.md
+                summary: Minimum Ready kube-controller-manager Pods not met.
+              labels:
+                severity: warning
+              expr: sre:kube_controller_manager:pod_status_ready == 1
+              for: 15m
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-kube-scheduler-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-kube-scheduler-rules
+          interval: 1m
+          rules:
+            # This alert uses the sre:kube-scheduler:pod_status_ready rule to count the number of `Ready` pods for kube-scheduler.
+            # In HCP, we expect 2, so this alert will fire when the number of ready pods is 0.
+            - alert: KubeSchedulerDown
+              annotations:
+                description: "There are 0 Ready 'kube-scheduler' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeSchedulerDown.md
+                summary: No Ready kube-scheduler pods.
+              labels:
+                severity: critical
+              expr: sre:kube_scheduler:pod_status_ready == 0
+              for: 15m
+            # This alert uses the sre:kube-scheduler:pod_status_ready rule to count the number of `Ready` pods for kube-scheduler.
+            # In HCP, we expect 2, so this alert will fire when the number of Ready pods is 1. The 0 pods case is covered by KubeSchedulerDown.
+            - alert: KubeSchedulerDegraded
+              annotations:
+                description: "There is not at least 2 Ready 'kube-scheduler' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeSchedulerDown.md
+                summary: Minimum Ready kube-scheduler Pods not met.
+              labels:
+                severity: warning
+              expr: sre:kube_scheduler:pod_status_ready == 1
+              for: 15m
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: api
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: api-SLOs-probe
+          interval: 30s
+          rules:
+            - alert: api-ErrorBudgetBurn
+              annotations:
+                message: "High error budget burn for openshift api"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                        label_replace(
+                            label_replace((
+
+                    1-(sum by (probe_url, mc_name, _mc_id, sector, region, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[5m]))/ sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[5m])))> (14.40*(1-0.990)) and sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[5m])) > 5
+                    and
+                    1-(sum by (probe_url, mc_name, _mc_id, sector, region, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[1h]))/ sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[1h])))> (14.40*(1-0.990)) and sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[1h])) > 60
+                            ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                        "_id_or_ns", "$0", "_id", ".+")
+                    unless on (_id_or_ns) (
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                        or
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*")),
+                    "_id_or_ns", "", "_id_or_ns", ".*")
+              labels:
+                long_window: 1h
+                namespace: openshift-route-monitor-operator
+                severity: critical
+                short_window: 5m
+                otel_collect: "true"
+            - alert: api-ErrorBudgetBurn
+              annotations:
+                message: "High error budget burn for openshift api"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                        label_replace(
+                            label_replace((
+
+                    1-(sum by (probe_url, mc_name, _mc_id, sector, region, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[30m]))/ sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[30m])))> (6*(1-0.990)) and sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[30m])) > 30
+                    and
+                    1-(sum by (probe_url, mc_name, _mc_id, sector, region, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[6h]))/ sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[6h])))> (6*(1-0.990)) and sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[6h])) > 360
+                            ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                        "_id_or_ns", "$0", "_id", ".+")
+                    unless on (_id_or_ns) (
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                        or
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*")),
+                    "_id_or_ns", "", "_id_or_ns", ".*")
+              labels:
+                long_window: 6h
+                namespace: openshift-route-monitor-operator
+                severity: critical
+                short_window: 30m
+                otel_collect: "true"
+            - alert: api-ErrorBudgetBurn
+              annotations:
+                message: "High error budget burn for openshift api"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                    label_replace((
+
+                1-(sum by (probe_url, region, sector, _mc_id, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[2h]))/ sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[2h])))> (3*(1-0.990)) and sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[2h])) > 120
+                and
+                1-(sum by (probe_url, region, sector, _mc_id, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[1d]))/ sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[1d])))> (3*(1-0.990)) and sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[1d])) > 1440
+                        ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                    "_id_or_ns", "$0", "_id", ".+")
+                unless on (_id_or_ns) (
+                    label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                    or
+                    label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*"))
+              for: 1h
+              labels:
+                long_window: 1d
+                namespace: openshift-route-monitor-operator
+                severity: warning
+                short_window: 2h
+                otel_collect: "true"
+            - alert: api-ErrorBudgetBurn
+              annotations:
+                message: "High error budget burn for openshift api"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                    label_replace((
+
+                1-(sum by (probe_url, region, sector, _mc_id, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[6h]))/ sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[6h])))> (1*(1-0.990)) and sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[6h])) > 360
+                and
+                1-(sum by (probe_url, region, sector, _mc_id, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[3d]))/ sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[3d])))> (1*(1-0.990)) and sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[3d])) > 4320
+                        ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                    "_id_or_ns", "$0", "_id", ".+")
+                unless on (_id_or_ns) (
+                    label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                    or
+                    label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*"))
+              for: 3h
+              labels:
+                long_window: 3d
+                namespace: openshift-route-monitor-operator
+                severity: warning
+                short_window: 6h
+                otel_collect: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-kube-apiserver-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: osd-kube-apiserver-rules
+          interval: 1m
+          rules:
+            # Specifically, this alert only fires when the sre:kube_apiserver:pod_status_ready metric, derived from kube_pod_status_ready for kube-apiserver.* pods in namespaces matching ocm-.*-.*, equals 0 for 15 minutes, indicating no ready KubeAPIServer pods.
+            # This alert will help catch scenarios like Complete KubeAPIServer outage, blocking all cluster operations like kubectl commands
+            - alert: KubeAPIServerDown
+              annotations:
+                description: The KubeAPIServer pods in the HCP Namespace are not ready, blocking all cluster operations.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeAPIServerDown.md
+                summary: No ready KubeAPIServer pods in the HCP namespace.
+              labels:
+                severity: critical
+                otel_collect: "true"
+              expr: sre:kube_apiserver:pod_status_ready == 0
+              for: 15m
+            # Specifically, this alert only fires when the sre:kube_apiserver:deployment_pods_unavailable metric, derived from kube_deployment_status_replicas_unavailable for kube-apiserver deployment in ocm-.*-.* namespaces, is greater than 0 for 15 minutes, indicating at least one unavailable replica.
+            # This alert will help catch scenarios like Partial degradation, causing reduced API server capacity, potential latency spikes, or risk of further failure in the cluster.
+            - alert: KubeAPIServerDegraded
+              annotations:
+                description: "A KubeAPIServer deployment in the HCP namespace has unavailable replicas, risking reduced capacity or latency."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeAPIServerDegraded.md
+                summary: "Unavailable replicas in KubeAPIServer deployment in the HCP namespace."
+              expr: |
+                sre:kube_apiserver:deployment_pods_unavailable > 0
+              for: 15m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            # Specifically, this alert only fires when the sre:openshift_apiserver:pod_status_ready metric, derived from kube_pod_status_ready for openshift-apiserver.* pods in namespaces matching ocm-.*-.*, equals 0 for 15 minutes, indicating no ready openshiftAPIServer pods.
+            # This alert will help catch scenarios like OpenShiftAPIServer outage, blocking  openshift-specific things to be blocked.
+            - alert: OpenshiftAPIServerDown
+              annotations:
+                description: The OpenShiftAPIServer pods in the HCP Namespace are not ready, blocking openshift-specific operations to be blocked.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/OpenshiftAPIServerDown.md
+                summary: No ready OpenShiftAPIServer pods in the HCP namespace.
+              labels:
+                severity: critical
+                otel_collect: "true"
+              expr: sre:openshift_apiserver:pod_status_ready == 0
+              for: 15m
+            # Specifically, this alert only fires when the sre:openshift_apiserver:deployment_pods_unavailable metric, derived from kube_deployment_status_replicas_unavailable for openshift-apiserver deployment in ocm-.*-.* namespaces, is greater than 0 for 15 minutes, indicating at least one unavailable replica.
+            # This alert will help catch scenarios like Partial degradation, causing reduced OpenShiftAPIServer capacity, potential latency spikes, or risk of further failure in the cluster.
+            - alert: OpenshiftAPIServerDegraded
+              annotations:
+                description: "An OpenShiftAPIServer deployment in the HCP namespace has unavailable replicas, risking reduced capacity or latency."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/OpenshiftAPIServerDegraded.md
+                summary: "Unavailable replicas in OpenShiftAPIServer deployment in the HCP namespace."
+              expr: |
+                sre:openshift_apiserver:deployment_pods_unavailable > 0
+              for: 15m
+              labels:
+                severity: warning
+                otel_collect: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-etcd-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-etcd-rules
+          interval: 30s
+          rules:
+            # This alert is cribbed from https://github.com/openshift/cluster-etcd-operator/blob/3fc88b0392f731df592a484d2a3b452712cf7ece/manifests/0000_90_etcd-operator_03_prometheusrule.yaml#L13-L22
+            # The expression has been modified to meet the needs of ROSA HCP.
+            - alert: etcdNoLeader
+              annotations:
+                summary: etcd cluster has no leader
+                description: 'etcd cluster "{{ $labels.job }}": member {{ $labels.instance }} has no leader.'
+                runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-etcd-operator/etcdNoLeader.md
+              expr: etcd_server_has_leader{job=~".*etcd.*", _id!=""} == 0
+              for: 1m
+              labels:
+                severity: critical
+            # This alert is cribbed from https://github.com/openshift/cluster-etcd-operator/blob/3fc88b0392f731df592a484d2a3b452712cf7ece/manifests/0000_90_etcd-operator_03_prometheusrule.yaml#L157-L165
+            # The expression has been modified to meet the needs of ROSA HCP.
+            - alert: etcdHighNumberOfLeaderChanges
+              annotations:
+                summary: etcd cluster has high number of leader changes.
+                description: 'etcd cluster "{{ $labels.job }}": {{ $value }} average leader changes within the last 10 minutes. Frequent elections may be a sign of insufficient resources, high network latency, or disruptions by other components and should be investigated.'
+              expr: avg by (_id, _mc_id) (changes(etcd_server_is_leader{_id!=""}[10m])) > 5
+              for: 5m
+              labels:
+                severity: warning
+            # The below three etcdDatabaseQuotaLowSpace alerts have been cribbed from https://github.com/openshift/cluster-etcd-operator/blob/61b7fb5116f8672bab6fcccbb9336e197ac07602/manifests/0000_90_etcd-operator_03_prometheusrule.yaml#L84-L108
+            # They have been modified to aggregate by the `_id` label, to give us a per-HCP result.
+            - alert: etcdDatabaseQuotaLowSpace
+              annotations:
+                description: 'etcd cluster for "{{ $labels._id }}": database size is 65% of the defined quota on etcd instance {{ $labels.instance }}, please defrag or increase the quota as the writes to etcd will be disabled when it is full.'
+                summary: etcd cluster database is using >= 65% of the defined quota.
+              expr: |
+                (
+                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                  /
+                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                )
+                * 100 > 65
+              for: 10m
+              labels:
+                severity: info
+            - alert: etcdDatabaseQuotaLowSpace
+              annotations:
+                description: 'etcd cluster for "{{ $labels._id }}": database size is 75% of the defined quota on etcd instance {{ $labels.instance }}, please defrag or increase the quota as the writes to etcd will be disabled when it is full.'
+                summary: etcd cluster database is using >= 75% of the defined quota.
+              expr: |
+                (
+                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                  /
+                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                )
+                * 100 > 75
+              for: 10m
+              labels:
+                severity: warning
+            - alert: etcdDatabaseQuotaLowSpace
+              annotations:
+                description: 'etcd cluster for "{{ $labels._id }}": database size is 85% of the defined quota on etcd instance {{ $labels.instance }}, please defrag or increase the quota as the writes to etcd will be disabled when it is full.'
+                runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-etcd-operator/etcdDatabaseQuotaLowSpace.md
+                summary: etcd cluster database is running full.
+              expr: |
+                (
+                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                  /
+                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                )
+                * 100 > 85
+              for: 10m
+              labels:
+                severity: critical
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: cluster-autoscaler-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: cluster-autoscaler.rules
+          interval: 1m
+          rules:
+            # This alert uses the sre:kube-scheduler:pod_status_ready rule to count the number of `Ready` pods for kube-scheduler.
+            # In HCP, we expect 1 for each cluster where autoscaler is enabled, so this alert will fire when the number of ready pods is 0.
+            - alert: ClusterAutoscalerDown
+              annotations:
+                description: "There are 0 Ready 'cluster-autoscaler' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/ClusterAutoscalerAlert.md
+                summary: No Ready cluster-autoscaler pods.
+              labels:
+                severity: critical
+              expr: cluster_autoscaler:pod_status_ready == 0
+              for: 15m
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: nodes-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: NodesRules
+          interval: 30s
+          rules:
+            - alert: NodeHighResourceUsage
+              expr: hypershift_node:high_usage
+              for: 30m
+              labels:
+                severity: warning
+              annotations:
+                summary: "High {{ $labels.resource }} usage on node {{ $labels.node }}"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeHighResourceUsage.md"
+                description: "Node {{ $labels.node }} has {{ $labels.resource }} usage above {{ $labels.threshold }} (current value: {{ $value | humanizePercentage }}) for more than 30 minutes."
+            - alert: NodeNotReady
+              expr: hypershift_node:ready == 0
+              for: 30m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Node {{ $labels.node }} is not ready"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeNotReady.md"
+                description: "Node {{ $labels.node }} has not been ready for more than 30 minutes."
+            - alert: NodeInBadCondition
+              expr: hypershift_node:in_bad_condition == 1
+              for: 30m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Node {{ $labels.node }} is in bad condition"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeInBadCondition.md"
+                description: "Condition {{ $labels.condition }} has been triggering on node {{ $labels.node }} for more than 30 minutes."
+  - # These alerts are defined to help us ensure ServiceMonitors and PodMonitors in HCP namespaces
+    # are up and reporting metrics.
+    apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-prometheus-target-alerting
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-prometheus-target-alerting
+          interval: 1m
+          rules:
+            - alert: HCPPrometheusPodMonitorDown
+              expr: sre:hcp_podmonitor_up:sum{name!~"karpenter"} == 0
+              for: 30m
+              labels:
+                severity: critical
+              annotations:
+                summary: "PodMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} is down."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/HCPPrometheusPodMonitorDown.md"
+                description: "PodMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} has been down for 30m."
+            # Until https://issues.redhat.com/browse/OCPBUGS-55399 is resolved, node-tuning-operator metrics do not work in HyperShift
+            # Until https://issues.redhat.com//browse/OCPBUGS-62851 is resolved, cluster-version-operator metrics do not work in HyperShift
+            # Until <BUG_NEEDED> is resolved, ovnkube-control-plane metrics do not work in HyperShift
+            # hypershift_cluster_waiting_initial_avaibility_duration_seconds is used to not alert in case the cluster is in installing state. This would create noise (e.g.audit webhook servicemonitor is deployed before the cluster is available - but can't start if KAS is not up).
+            - alert: HCPPrometheusServiceMonitorDown
+              expr: (sre:hcp_servicemonitor_up:sum{name!~"node-tuning-operator|ovnkube-control-plane|cluster-version-operator"} == 0) unless on (_id) hypershift_cluster_waiting_initial_avaibility_duration_seconds
+              for: 30m
+              labels:
+                severity: critical
+              annotations:
+                summary: "ServiceMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} is down."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/HCPPrometheusServiceMonitorDown.md"
+                description: "ServiceMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} has been down for 30m."
