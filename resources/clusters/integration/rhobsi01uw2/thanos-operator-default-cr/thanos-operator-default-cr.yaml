@@ -455,7 +455,7 @@ objects:
           key: thanos.yaml
           name: default-thanos-bucket
           optional: false
-        replicas: 3
+        replicas: 5
         resourceRequirements:
           requests:
             cpu: "2"
