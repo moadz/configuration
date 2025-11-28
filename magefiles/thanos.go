@@ -1481,8 +1481,7 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 						ExternalLabels: map[string]string{
 							"replica": "$(POD_NAME)",
 						},
-						//Replicas: clusters.TemplateFn(clusters.ReceiveIngestorDefault, templates.Replicas),
-						Replicas: 5,
+						Replicas: clusters.TemplateFn(clusters.ReceiveIngestorDefault, templates.Replicas),
 						TSDBConfig: v1alpha1.TSDBConfig{
 							Retention: v1alpha1.Duration("1d"),
 						},
