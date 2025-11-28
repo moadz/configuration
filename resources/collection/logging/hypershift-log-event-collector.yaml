@@ -42,14 +42,12 @@ objects:
             operator: NotIn
             values:
               - 'true'
-
           - key: ext-hypershift.openshift.io/cluster-type
             operator: In
             values:
               - management-cluster
               - service-cluster
-
-          ${ADDITIONAL_MATCH_EXPRESSION}
+          - ${ADDITIONAL_MATCH_EXPRESSION}
 
       resources:
         - kind: ServiceAccount
