@@ -34,16 +34,18 @@ objects:
     clusterDeploymentSelector:
       matchLabels:
         api.openshift.com/managed: 'true'
-      matchExpressions: |-
+      matchExpressions:
         - key: api.openshift.com/fedramp
           operator: NotIn
           values:
             - 'true'
+
         - key: ext-hypershift.openshift.io/cluster-type
           operator: In
           values:
             - management-cluster
             - service-cluster
+
         ${ADDITIONAL_MATCH_EXPRESSION}
 
     resources:
