@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"sort"
 
@@ -1402,6 +1403,18 @@ func defaultStoreCR(namespace string, templates clusters.TemplateMaps) runtime.O
 }
 
 func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime.Object {
+	grpcDisableEndlessRetry := `{
+  "loadBalancingPolicy":"round_robin",
+  "retryPolicy": {
+    "maxAttempts": 0,
+    "initialBackoff": "0.1s",
+    "backoffMultiplier": 1,
+    "retryableStatusCodes": [
+  	  "UNAVAILABLE"
+    ]
+  }
+}`
+
 	return &v1alpha1.ThanosReceive{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "monitoring.thanos.io/v1alpha1",
@@ -1431,6 +1444,7 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 						tracingSidecar(templates),
 					},
 					Args: []string{
+						fmt.Sprintf("--receive.grpc-service-config=%s", grpcDisableEndlessRetry),
 						`--tracing.config="config":
   "sampler_param": 2
   "sampler_type": "ratelimiting"
