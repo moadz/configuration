@@ -56,8 +56,7 @@ objects:
       clusterDeploymentSelector:
         matchLabels:
           api.openshift.com/managed: 'true'
-        matchExpressions:
-         ${ADDITIONAL_MATCH_EXPRESSION}
+        matchExpressions: ${ADDITIONAL_MATCH_EXPRESSION}
 
       resources:
       - apiVersion: v1
