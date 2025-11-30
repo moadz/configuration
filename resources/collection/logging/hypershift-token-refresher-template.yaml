@@ -20,6 +20,16 @@ parameters:
     description: "URL for logs write endpoint"
     required: true
   - name: ADDITIONAL_MATCH_EXPRESSION
+    value: |-
+      - key: api.openshift.com/fedramp
+        operator: NotIn
+        values:
+          - "true"
+      - key: ext-hypershift.openshift.io/cluster-type
+        operator: In
+        values:
+          - management-cluster
+          - service-cluster
     description: Hive SelectorSyncSet matchExpressions override. By default this template will target all MC's and SC's discovered.
 
 objects:
@@ -35,16 +45,7 @@ objects:
       matchLabels:
         api.openshift.com/managed: 'true'
       matchExpressions:
-        - key: api.openshift.com/fedramp
-          operator: NotIn
-          values:
-            - 'true'
-        - key: ext-hypershift.openshift.io/cluster-type
-          operator: In
-          values:
-            - management-cluster
-            - service-cluster
-        - ${ADDITIONAL_MATCH_EXPRESSION}
+       ${ADDITIONAL_MATCH_EXPRESSION}
 
     resources:
       - apiVersion: v1
