@@ -12,7 +12,7 @@ parameters:
     description: sector of SC/MC clusters
     required: true
   - name: ADDITIONAL_MATCH_EXPRESSION
-    value: |-
+    value: |
       - key: api.openshift.com/fedramp
         operator: NotIn
         values:
