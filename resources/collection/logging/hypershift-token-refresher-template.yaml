@@ -7,9 +7,9 @@ metadata:
 parameters:
   - name: REGION
     description: region of SC/MC clusters
-  - name: SECTOR
-    description: sector of SC/MC clusters
-    required: true
+  - name: SECTORS
+    description: String array of Sectors targeted for SC/MC clusters e.g. '["sector-1", "sector-2"]'
+    value: '["main"]'
   - name: CLIENT_ID
     description: "OIDC client ID"
     required: true
@@ -19,18 +19,6 @@ parameters:
   - name: LOGS_WRITE_URL
     description: "URL for logs write endpoint"
     required: true
-  - name: ADDITIONAL_MATCH_EXPRESSION
-    value: |
-      - key: api.openshift.com/fedramp
-        operator: NotIn
-        values:
-          - "true"
-      - key: ext-hypershift.openshift.io/cluster-type
-        operator: In
-        values:
-          - management-cluster
-          - service-cluster
-    description: Hive SelectorSyncSet matchExpressions override. By default this template will target all MC's and SC's discovered.
 
 objects:
 - apiVersion: hive.openshift.io/v1
@@ -44,7 +32,20 @@ objects:
     clusterDeploymentSelector:
       matchLabels:
         api.openshift.com/managed: 'true'
-      matchExpressions: ${ADDITIONAL_MATCH_EXPRESSION}
+      matchExpressions:
+        - key: api.openshift.com/fedramp
+          operator: NotIn
+          values:
+            - 'true'
+        - key: ext-hypershift.openshift.io/cluster-type
+          operator: In
+          values:
+            - management-cluster
+            - service-cluster
+        - key: ext-hypershift.openshift.io/cluster-sector
+          operator: In
+          values:
+            ${{SECTORS}}
 
     resources:
       - apiVersion: v1
