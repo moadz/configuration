@@ -20,7 +20,7 @@ parameters:
     description: "URL for logs write endpoint"
     required: true
   - name: ADDITIONAL_MATCH_EXPRESSION
-    value: |-
+    value: |
       - key: api.openshift.com/fedramp
         operator: NotIn
         values:
