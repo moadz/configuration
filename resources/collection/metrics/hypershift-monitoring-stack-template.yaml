@@ -32,6 +32,16 @@ parameters:
     value: hypershift-telemeter-client
   - name: ADDITIONAL_MATCH_EXPRESSION
     description: Hive SelectorSyncSet matchExpressions override. By default this template will target all MC's and SC's discovered.
+    value: |-
+      - key: api.openshift.com/fedramp
+        operator: NotIn
+        values:
+          - "true"
+      - key: ext-hypershift.openshift.io/cluster-type
+        operator: In
+        values:
+          - management-cluster
+          - service-cluster
 
 objects:
   - apiVersion: hive.openshift.io/v1
@@ -47,16 +57,7 @@ objects:
         matchLabels:
           api.openshift.com/managed: 'true'
         matchExpressions:
-          - key: api.openshift.com/fedramp
-            operator: NotIn
-            values:
-              - 'true'
-          - key: ext-hypershift.openshift.io/cluster-type
-            operator: In
-            values:
-              - management-cluster
-              - service-cluster
-          - ${ADDITIONAL_MATCH_EXPRESSION}
+         ${ADDITIONAL_MATCH_EXPRESSION}
 
       resources:
       - apiVersion: v1
