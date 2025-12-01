@@ -23,7 +23,7 @@ objects:
       port: metrics
     namespaceSelector:
       matchNames:
-      - ${NAMESPACE}
+      - rhobs-int
     selector:
       matchLabels:
         app.kubernetes.io/component: synthetics-api

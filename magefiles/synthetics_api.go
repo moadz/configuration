@@ -243,7 +243,7 @@ func createSyntheticsApiServiceMonitor(config *syntheticsApiConfig) *monitoringv
 				MatchLabels: config.Labels,
 			},
 			NamespaceSelector: monitoringv1.NamespaceSelector{
-				MatchNames: []string{"${NAMESPACE}"},
+				MatchNames: []string{config.Namespace},
 			},
 		},
 	}
