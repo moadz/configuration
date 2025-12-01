@@ -17,7 +17,7 @@ objects:
     - honorLabels: true
       interval: 30s
       path: /metrics
-      port: metrics
+      port: synthetics-api
     namespaceSelector:
       matchNames:
       - rhobs-int
@@ -37,7 +37,7 @@ objects:
       - honorLabels: true
         interval: 30s
         path: /metrics
-        port: metrics
+        port: http-metrics
     namespaceSelector:
       matchNames:
         - rhobs-int
@@ -57,7 +57,7 @@ objects:
       - honorLabels: true
         interval: 30s
         path: /metrics
-        port: metrics
+        port: http
     namespaceSelector:
       matchNames:
         - rhobs-int
