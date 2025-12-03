@@ -71,7 +71,7 @@ func rhobsi01uw2TemplateMaps() TemplateMaps {
 				QueryTimeout:         "5m",
 			},
 			Ingest: LokiComponentSpec{
-				Replicas: 9,
+				Replicas: 12,
 			},
 		},
 	}
