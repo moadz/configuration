@@ -11,8 +11,8 @@ require (
 	github.com/observatorium/api v0.1.3-0.20230711132510-96e8799ade44
 	github.com/observatorium/observatorium v0.0.0-20250205114057-5a240b5d0bec
 	github.com/openshift/api v3.9.0+incompatible
-	github.com/perses/community-mixins v0.0.0-20251125095810-f2cc7bae7025
-	github.com/perses/promql-builder v0.2.1-0.20251110140620-19229f7152d4
+	github.com/perses/community-mixins v0.0.0-20251203111459-09381e1a7005
+	github.com/perses/promql-builder v0.2.1-0.20251203103153-a3bca1892a7b
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.87.0
 	github.com/prometheus/prometheus v1.8.2-0.20220211202545-56e14463bccf
 	github.com/pyrra-dev/pyrra v0.7.2

@@ -1208,10 +1208,10 @@ github.com/oracle/oci-go-sdk/v65 v65.93.1/go.mod h1:u6XRPsw9tPziBh76K7GrrRXPa8P8
 github.com/ovh/go-ovh v1.7.0 h1:V14nF7FwDjQrZt9g7jzcvAAQ3HN6DNShRFRMC3jLoPw=
 github.com/ovh/go-ovh v1.7.0/go.mod h1:cTVDnl94z4tl8pP1uZ/8jlVxntjSIf09bNcQ5TJSC7c=
 github.com/pborman/getopt v0.0.0-20170112200414-7148bc3a4c30/go.mod h1:85jBQOZwpVEaDAr341tbn15RS4fCAsIst0qp7i8ex1o=
-github.com/perses/community-mixins v0.0.0-20251125095810-f2cc7bae7025 h1:gKJWt/yXbCDMI/z+r1DmZrv9bs8Yd77E8sCeNeF19kU=
-github.com/perses/community-mixins v0.0.0-20251125095810-f2cc7bae7025/go.mod h1:Jvs4M3TIkYLs1YuGChWzXUsHXjxjgtLy4ouWszsgDnU=
-github.com/perses/promql-builder v0.2.1-0.20251110140620-19229f7152d4 h1:LO3yL/h03HCG4abpEeGInCjm21+7WXbFmWqcOZx1YNE=
-github.com/perses/promql-builder v0.2.1-0.20251110140620-19229f7152d4/go.mod h1:5O4fblt5Ui928jxpw7KtbRiSKt0x37QDycDPTGA0JRM=
+github.com/perses/community-mixins v0.0.0-20251203111459-09381e1a7005 h1:mE8JyajlcH/mkYivo8Ri771uVn59ZRRFn9q2y6OP0RY=
+github.com/perses/community-mixins v0.0.0-20251203111459-09381e1a7005/go.mod h1:tsS5QVsZXj8ZgLwOqOcebYCrSJvVd/NnNy2h2hy7Maw=
+github.com/perses/promql-builder v0.2.1-0.20251203103153-a3bca1892a7b h1:W+0LE4409siSZixU7MMHcFsBtSHzgVeaIlTVBPfG/8E=
+github.com/perses/promql-builder v0.2.1-0.20251203103153-a3bca1892a7b/go.mod h1:Vh6Ffwh4IYrNE7bJbMlF1JQsReex42hiMT0Yw8BYrIQ=
 github.com/phpdave11/gofpdf v1.4.2/go.mod h1:zpO6xFn9yxo3YLyMvW8HcKWVdbNqgIfOOp2dXMnm1mY=
 github.com/phpdave11/gofpdi v1.0.12/go.mod h1:vBmVV0Do6hSBHC8uKUQ71JGW+ZGQq74llk/7bXwjDoI=
 github.com/phpdave11/gofpdi v1.0.13/go.mod h1:vBmVV0Do6hSBHC8uKUQ71JGW+ZGQq74llk/7bXwjDoI=
