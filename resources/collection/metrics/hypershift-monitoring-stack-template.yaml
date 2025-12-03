@@ -122,10 +122,17 @@ objects:
                 metadataConfig:
                   send: false
                 writeRelabelConfigs:
-                  # Drop container_cpu_usage_seconds_total and container_memory_rss metrics from non-ocm namespaces
+                  # 1. Mark allowed namespaces
+                  - action: replace
+                    sourceLabels: [namespace]
+                    regex: (ocm-.*|openshift-logging|openshift-observability-operator)
+                    replacement: allowed
+                    targetLabel: __tmp_allowed
+                  # 2. Drop CPU/mem metrics from NOT-allowed namespaces
+                  # We match only the metric names but ALSO require __tmp_allowed to be empty.
                   - action: drop
-                    regex: (container_cpu_usage_seconds_total|container_memory_rss);(|[^o].*|o[^c].*|oc[^m].*|ocm[^-].*)
-                    sourceLabels: [__name__, namespace]
+                    sourceLabels: [__name__, __tmp_allowed]
+                    regex: "(container_cpu_usage_seconds_total|container_memory_rss);$"
                     # We filter MC metrics based on their names
                     # and
                     # We forward all metrics with the source label DP as the filtering happens in preceding DP-> MC forwarding side step
