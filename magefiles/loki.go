@@ -55,9 +55,11 @@ func NewLokiStack(namespace string, overrides clusters.TemplateMaps) *lokiv1.Lok
 			Limits: &lokiv1.LimitsSpec{
 				Global: &lokiv1.LimitsTemplateSpec{
 					IngestionLimits: &lokiv1.IngestionLimitSpec{
-						IngestionRate:      overrides.LokiOverrides[clusters.LokiConfig].IngestionRateLimitMB,
-						IngestionBurstSize: overrides.LokiOverrides[clusters.LokiConfig].IngestionBurstSizeMB,
-						MaxLineSize:        overrides.LokiOverrides[clusters.LokiConfig].MaxLineSize,
+						IngestionRate:           overrides.LokiOverrides[clusters.LokiConfig].IngestionRateLimitMB,
+						IngestionBurstSize:      overrides.LokiOverrides[clusters.LokiConfig].IngestionBurstSizeMB,
+						MaxLineSize:             overrides.LokiOverrides[clusters.LokiConfig].MaxLineSize,
+						PerStreamRateLimit:      overrides.LokiOverrides[clusters.LokiConfig].PerStreamRateLimitMB,
+						PerStreamRateLimitBurst: overrides.LokiOverrides[clusters.LokiConfig].PerStreamBurstSizeMB,
 					},
 					QueryLimits: &lokiv1.QueryLimitSpec{
 						QueryTimeout: overrides.LokiOverrides[clusters.LokiConfig].QueryTimeout,

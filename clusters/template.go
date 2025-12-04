@@ -37,6 +37,9 @@ type LokiLimitOverrides struct {
 	IngestionBurstSizeMB int32
 	MaxLineSize          int32
 
+	PerStreamRateLimitMB int32
+	PerStreamBurstSizeMB int32
+
 	QueryTimeout string
 }
 
@@ -178,6 +181,12 @@ func mergeLokiLimitOverrides(existing, override LokiLimitOverrides) LokiLimitOve
 	}
 	if override.IngestionBurstSizeMB != 0 {
 		result.IngestionBurstSizeMB = override.IngestionBurstSizeMB
+	}
+	if override.PerStreamRateLimitMB != 0 {
+		result.PerStreamRateLimitMB = override.PerStreamRateLimitMB
+	}
+	if override.PerStreamBurstSizeMB != 0 {
+		result.PerStreamBurstSizeMB = override.PerStreamBurstSizeMB
 	}
 	if override.QueryTimeout != "" {
 		result.QueryTimeout = override.QueryTimeout
@@ -417,6 +426,8 @@ func DefaultBaseTemplate() TemplateMaps {
 					IngestionRateLimitMB: 12,
 					IngestionBurstSizeMB: 256, // workaround for LOG-6817, OTLP configuration appears to be sending unbounded-large requests
 					MaxLineSize:          256 * 1024,
+					PerStreamRateLimitMB: 5,
+					PerStreamBurstSizeMB: 15,
 					QueryTimeout:         "3m",
 				},
 				Router: LokiComponentSpec{
