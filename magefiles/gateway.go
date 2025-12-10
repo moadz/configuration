@@ -253,6 +253,7 @@ func createObservatoriumAPIContainer(m clusters.TemplateMaps, namespace string, 
 		args = append(args,
 			fmt.Sprintf("--metrics.read.endpoint=http://%s.%s.svc.cluster.local:9090", qfeService, namespace),
 			fmt.Sprintf("--metrics.write.endpoint=http://%s.%s.svc.cluster.local:19291", routerService, namespace),
+			"--metrics.read.enable-status-endpoints=true",
 		)
 	}
 
