@@ -34,6 +34,7 @@ const (
 	componentJaegerAgent = "jaeger-agent"
 
 	qfeService    = "thanos-query-frontend-rhobs"
+	queryService  = "thanos-query-rhobs"
 	routerService = "thanos-receive-router-rhobs"
 
 	logsQfeService    = "observatorium-lokistack-query-frontend-http"
@@ -253,7 +254,7 @@ func createObservatoriumAPIContainer(m clusters.TemplateMaps, namespace string, 
 		args = append(args,
 			fmt.Sprintf("--metrics.read.endpoint=http://%s.%s.svc.cluster.local:9090", qfeService, namespace),
 			fmt.Sprintf("--metrics.write.endpoint=http://%s.%s.svc.cluster.local:19291", routerService, namespace),
-			"--metrics.read.enable-status-endpoints=true",
+			fmt.Sprintf("--metrics.status.endpoint=http://%s.%s.svc.cluster.local:9090", queryService, namespace),
 		)
 	}
 

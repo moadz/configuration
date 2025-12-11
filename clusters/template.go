@@ -236,7 +236,7 @@ const (
 
 const (
 	ObservatoriumImage   = "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api"
-	ObservatoriumVersion = "8aed366b3c7ca852b616137561a4780495e0ba62"
+	ObservatoriumVersion = "eace2da37e3111cf894c462d39e50bf85f51f7f8"
 )
 
 // Template key constants - exportable template parameter names
