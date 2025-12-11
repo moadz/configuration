@@ -70,7 +70,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 98f89ac6b75d7e887090efdeb2778b132bd405b9
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
 - apiVersion: apps/v1
@@ -81,7 +81,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 98f89ac6b75d7e887090efdeb2778b132bd405b9
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
   spec:
@@ -104,7 +104,7 @@ objects:
           app.kubernetes.io/instance: rhobs
           app.kubernetes.io/name: observatorium-api
           app.kubernetes.io/part-of: rhobs
-          app.kubernetes.io/version: 98f89ac6b75d7e887090efdeb2778b132bd405b9
+          app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
       spec:
         affinity:
           podAntiAffinity:
@@ -135,7 +135,7 @@ objects:
           - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
           - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-int.svc.cluster.local:3100
           - --probes.endpoint=http://synthetics-api.rhobs-int.svc.cluster.local:8080
-          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:98f89ac6b75d7e887090efdeb2778b132bd405b9
+          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:8aed366b3c7ca852b616137561a4780495e0ba62
           livenessProbe:
             failureThreshold: 10
             httpGet:
@@ -187,7 +187,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 98f89ac6b75d7e887090efdeb2778b132bd405b9
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
   stringData:
@@ -212,7 +212,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 98f89ac6b75d7e887090efdeb2778b132bd405b9
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
   spec:
@@ -253,7 +253,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: 98f89ac6b75d7e887090efdeb2778b132bd405b9
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
 parameters:
