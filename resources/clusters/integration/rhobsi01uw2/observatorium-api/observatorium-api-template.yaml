@@ -70,7 +70,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: eace2da37e3111cf894c462d39e50bf85f51f7f8
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
 - apiVersion: apps/v1
@@ -81,7 +81,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: eace2da37e3111cf894c462d39e50bf85f51f7f8
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
   spec:
@@ -104,7 +104,7 @@ objects:
           app.kubernetes.io/instance: rhobs
           app.kubernetes.io/name: observatorium-api
           app.kubernetes.io/part-of: rhobs
-          app.kubernetes.io/version: eace2da37e3111cf894c462d39e50bf85f51f7f8
+          app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
       spec:
         affinity:
           podAntiAffinity:
@@ -129,13 +129,13 @@ objects:
           - --server.read-timeout=5m
           - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-int.svc.cluster.local:9090
           - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-int.svc.cluster.local:19291
-          - --metrics.status.endpoint=http://thanos-query-rhobs.rhobs-int.svc.cluster.local:9090
+          - --metrics.read.enable-status-endpoints=true
           - --logs.write-timeout=4m0s
           - --logs.read.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
           - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-int.svc.cluster.local:3100
           - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-int.svc.cluster.local:3100
           - --probes.endpoint=http://synthetics-api.rhobs-int.svc.cluster.local:8080
-          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:eace2da37e3111cf894c462d39e50bf85f51f7f8
+          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:8aed366b3c7ca852b616137561a4780495e0ba62
           livenessProbe:
             failureThreshold: 10
             httpGet:
@@ -187,7 +187,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: eace2da37e3111cf894c462d39e50bf85f51f7f8
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
   stringData:
@@ -212,7 +212,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: eace2da37e3111cf894c462d39e50bf85f51f7f8
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
   spec:
@@ -253,7 +253,7 @@ objects:
       app.kubernetes.io/instance: rhobs
       app.kubernetes.io/name: observatorium-api
       app.kubernetes.io/part-of: rhobs
-      app.kubernetes.io/version: eace2da37e3111cf894c462d39e50bf85f51f7f8
+      app.kubernetes.io/version: 8aed366b3c7ca852b616137561a4780495e0ba62
     name: observatorium-api
     namespace: rhobs-int
 parameters:
