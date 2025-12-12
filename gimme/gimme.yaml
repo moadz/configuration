@@ -1,0 +1,20 @@
+browser: Safari
+vpn: "London (LCY)"
+
+clusters:
+  stage:
+    - name: "rhobss01ue1"
+      region: "ue1"
+      console: "https://console-openshift-console.apps.rhobss01ue1.pwhm.p1.openshiftapps.com/"
+      prometheus: "https://prometheus.rhobss01ue1.devshift.net/"
+      alertmanager: "https://alertmanager.rhobss01ue1.devshift.net/"
+      cidr: "10.170.83.0/24"
+      bastion: "bastion.ci.int.devshift.net"
+  int:
+    - name: "rhobsi01uw2"
+      region: "uw2"
+      console: "https://console-openshift-console.apps.rhobsi01uw2.mxci.p1.openshiftapps.com/"
+      prometheus: "https://prometheus.rhobsi01uw2.devshift.net/"
+      alertmanager: "https://alertmanager.rhobsi01uw2.devshift.net/"
+      cidr: "10.170.65.0/24"
+      bastion: "bastion.ci.int.devshift.net"
