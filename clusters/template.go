@@ -208,8 +208,8 @@ func TemplateFn[T any](param string, m ParamMap[T]) T {
 
 const (
 	thanosImage        = "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos"
-	thanosVersionStage = "358a4a4341684ca1f199b6780891f4d09d5ca458"
-	thanosVersionProd  = "358a4a4341684ca1f199b6780891f4d09d5ca458"
+	thanosVersionStage = "0dcacf2a5108328d537dbcf59fcabc9b69f08a2b"
+	thanosVersionProd  = "0dcacf2a5108328d537dbcf59fcabc9b69f08a2b"
 
 	ThanosOperatorImage = "quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator"
 	// ThanosOperatorVersion is the image version (git sha) of the Thanos Operator and is matched to a commit in
