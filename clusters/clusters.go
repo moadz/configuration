@@ -103,6 +103,8 @@ const (
 	StepMemcached    = "memcached"
 
 	StepSyntheticsApi = "synthetics-api"
+
+	StepNoOp = "noop"
 )
 
 // DefaultBuildSteps returns the default build pipeline for clusters

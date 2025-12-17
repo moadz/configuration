@@ -22,7 +22,7 @@ func init() {
 			WithTracingEnabled(),
 		),
 		Templates:  appSreStage01TemplateMaps(),
-		BuildSteps: Prune(DefaultBuildSteps(), DefaultLoggingBuildSteps(), DefaultSyntheticsBuildSteps()),
+		BuildSteps: []string{StepNoOp},
 	})
 }
 
