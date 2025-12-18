@@ -12,6 +12,7 @@ import (
 	"github.com/go-kit/log"
 	observatoriumapi "github.com/observatorium/observatorium/configuration_go/abstr/kubernetes/observatorium/api"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
+	routev1 "github.com/openshift/api/route/v1"
 	templatev1 "github.com/openshift/api/template/v1"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
@@ -142,6 +143,13 @@ func generateGatewayBundle(config clusters.ClusterConfig) error {
 		filename := fmt.Sprintf("proxy-%s-%s.yaml", gatewayName, getResourceKind(obj))
 		processedObj := gatewayPostProcessForBundle(obj, ns)
 		bundleGen.Add(filename, encoding.GhodssYAML(processedObj))
+	}
+
+	// Generate custom route if configured
+	if config.GatewayConfig.CustomRoute() != "" {
+		route := createGatewayRoute(ns, config.GatewayConfig.CustomRoute())
+		filename := fmt.Sprintf("proxy-%s-Route.yaml", gatewayName)
+		bundleGen.Add(filename, encoding.GhodssYAML(route))
 	}
 
 	// Generate individual cache resource files with cache- prefix
@@ -644,9 +652,53 @@ func createGatewayServiceAccount(m clusters.TemplateMaps, namespace string) *cor
 	}
 }
 
+func createGatewayRoute(namespace, host string) *routev1.Route {
+	return &routev1.Route{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Route",
+			APIVersion: "route.openshift.io/v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      gatewayName,
+			Namespace: namespace,
+			Annotations: map[string]string{
+				"cert-manager.io/issuer-kind":         "ClusterIssuer",
+				"cert-manager.io/issuer-name":         "rhobs-public-route",
+				"haproxy.router.openshift.io/balance": "source",
+				"haproxy.router.openshift.io/timeout": "5m",
+			},
+			Labels: map[string]string{
+				"app":                "observatorium-api",
+				"rhobs-public-route": "true",
+			},
+		},
+		Spec: routev1.RouteSpec{
+			Host: host,
+			Port: &routev1.RoutePort{
+				TargetPort: intstr.FromString("public"),
+			},
+			TLS: &routev1.TLSConfig{
+				Termination:                   routev1.TLSTerminationEdge,
+				InsecureEdgeTerminationPolicy: routev1.InsecureEdgeTerminationPolicyRedirect,
+			},
+			To: routev1.RouteTargetReference{
+				Kind:   "Service",
+				Name:   gatewayName,
+				Weight: int32Ptr(100),
+			},
+			WildcardPolicy: routev1.WildcardPolicyNone,
+		},
+	}
+}
+
 // Helper function to return a pointer to a string
 func stringPtr(s string) *string {
 	return &s
+}
+
+// Helper function to return a pointer to an int32
+func int32Ptr(i int32) *int32 {
+	return &i
 }
 
 func gatewayRBAC(m clusters.TemplateMaps, namespace, contents string) *corev1.ConfigMap {

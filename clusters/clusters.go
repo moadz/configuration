@@ -40,6 +40,7 @@ type GatewayConfig struct {
 	amsURL         string
 	tenants        observatoriumapi.Tenants
 	rbac           cfgobservatorium.ObservatoriumRBAC
+	customRoute    string
 }
 
 // String returns the string representation of ClusterName
@@ -271,6 +272,12 @@ func WithRBAC(rbac cfgobservatorium.ObservatoriumRBAC) func(*GatewayConfig) {
 	}
 }
 
+func WithCustomRoute(route string) func(*GatewayConfig) {
+	return func(g *GatewayConfig) {
+		g.customRoute = route
+	}
+}
+
 // Getter methods for GatewayConfig fields
 
 // MetricsEnabled returns whether metrics are enabled for the gateway
@@ -306,4 +313,9 @@ func (g *GatewayConfig) Tenants() observatoriumapi.Tenants {
 // RBAC returns the RBAC configuration for the gateway
 func (g *GatewayConfig) RBAC() cfgobservatorium.ObservatoriumRBAC {
 	return g.rbac
+}
+
+// CustomRoute returns the custom route for the gateway
+func (g *GatewayConfig) CustomRoute() string {
+	return g.customRoute
 }
