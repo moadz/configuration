@@ -58,7 +58,13 @@ func rhobsi01uw2RBAC() cfgobservatorium.ObservatoriumRBAC {
 }
 
 func rhobsi01uw2BuildSteps() []string {
-	return DefaultBuildSteps()
+	return []string{
+		StepGateway,
+		StepDefaultThanosStack,
+		StepDefaultLokiStack,
+		StepSyntheticsApi,
+		StepAlertmanager,
+	}
 }
 
 // rhobsi01uw2TemplateMaps returns template mappings specific to the rhobsi01uw2 integration cluster

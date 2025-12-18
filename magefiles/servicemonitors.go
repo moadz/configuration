@@ -99,6 +99,277 @@ func thanosOperatorServiceMonitor(namespace string) []runtime.Object {
 	}
 }
 
+func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object {
+	interval30s := monitoringv1.Duration("30s")
+	metricsPath := "/metrics"
+	objs := []runtime.Object{
+		// Single ServiceMonitor for all Thanos Compact instances
+		&monitoringv1.ServiceMonitor{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.coreos.com/v1",
+				Kind:       "ServiceMonitor",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "thanos-compact",
+				Namespace: openshiftCustomerMonitoringNamespace,
+				Labels: map[string]string{
+					"app.kubernetes.io/component":  "thanos-compactor",
+					"app.kubernetes.io/managed-by": "thanos-operator",
+					"app.kubernetes.io/name":       "thanos-compact",
+					"app.kubernetes.io/part-of":    "thanos",
+					"prometheus":                   "app-sre",
+				},
+			},
+			Spec: monitoringv1.ServiceMonitorSpec{
+				Endpoints: []monitoringv1.Endpoint{
+					{
+						Interval: interval30s,
+						Path:     metricsPath,
+						Port:     "http",
+					},
+				},
+				NamespaceSelector: monitoringv1.NamespaceSelector{
+					MatchNames: []string{namespace},
+				},
+				Selector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app.kubernetes.io/component":  "thanos-compactor",
+						"app.kubernetes.io/managed-by": "thanos-operator",
+						"app.kubernetes.io/name":       "thanos-compact",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+			},
+		},
+		// Single ServiceMonitor for all Thanos Store instances
+		&monitoringv1.ServiceMonitor{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.coreos.com/v1",
+				Kind:       "ServiceMonitor",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "thanos-store",
+				Namespace: openshiftCustomerMonitoringNamespace,
+				Labels: map[string]string{
+					"app.kubernetes.io/component":  "object-storage-gateway",
+					"app.kubernetes.io/managed-by": "thanos-operator",
+					"app.kubernetes.io/name":       "thanos-store",
+					"app.kubernetes.io/part-of":    "thanos",
+					"prometheus":                   "app-sre",
+				},
+			},
+			Spec: monitoringv1.ServiceMonitorSpec{
+				Endpoints: []monitoringv1.Endpoint{
+					{
+						Interval: interval30s,
+						Path:     metricsPath,
+						Port:     "http",
+					},
+				},
+				NamespaceSelector: monitoringv1.NamespaceSelector{
+					MatchNames: []string{namespace},
+				},
+				Selector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app.kubernetes.io/component":  "object-storage-gateway",
+						"app.kubernetes.io/managed-by": "thanos-operator",
+						"app.kubernetes.io/name":       "thanos-store",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+			},
+		},
+		// Single ServiceMonitor for all Thanos Receive Ingester instances
+		&monitoringv1.ServiceMonitor{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.coreos.com/v1",
+				Kind:       "ServiceMonitor",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "thanos-receive-ingester",
+				Namespace: openshiftCustomerMonitoringNamespace,
+				Labels: map[string]string{
+					"app.kubernetes.io/component":  "thanos-receive-ingester",
+					"app.kubernetes.io/managed-by": "thanos-operator",
+					"app.kubernetes.io/name":       "thanos-receive",
+					"app.kubernetes.io/part-of":    "thanos",
+					"prometheus":                   "app-sre",
+				},
+			},
+			Spec: monitoringv1.ServiceMonitorSpec{
+				Endpoints: []monitoringv1.Endpoint{
+					{
+						Interval: interval30s,
+						Path:     metricsPath,
+						Port:     "http",
+					},
+				},
+				NamespaceSelector: monitoringv1.NamespaceSelector{
+					MatchNames: []string{namespace},
+				},
+				Selector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app.kubernetes.io/component":  "thanos-receive-ingester",
+						"app.kubernetes.io/managed-by": "thanos-operator",
+						"app.kubernetes.io/name":       "thanos-receive",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+			},
+		},
+		// Single ServiceMonitors for other components (non-consolidated)
+		&monitoringv1.ServiceMonitor{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.coreos.com/v1",
+				Kind:       "ServiceMonitor",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "thanos-query",
+				Namespace: openshiftCustomerMonitoringNamespace,
+				Labels: map[string]string{
+					"app.kubernetes.io/component":  "thanos-query",
+					"app.kubernetes.io/managed-by": "thanos-operator",
+					"app.kubernetes.io/name":       "thanos-query",
+					"app.kubernetes.io/part-of":    "thanos",
+					"prometheus":                   "app-sre",
+				},
+			},
+			Spec: monitoringv1.ServiceMonitorSpec{
+				Endpoints: []monitoringv1.Endpoint{
+					{
+						Interval: interval30s,
+						Path:     metricsPath,
+						Port:     "http",
+					},
+				},
+				NamespaceSelector: monitoringv1.NamespaceSelector{
+					MatchNames: []string{namespace},
+				},
+				Selector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app.kubernetes.io/component":  "thanos-query",
+						"app.kubernetes.io/managed-by": "thanos-operator",
+						"app.kubernetes.io/name":       "thanos-query",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+			},
+		},
+		&monitoringv1.ServiceMonitor{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.coreos.com/v1",
+				Kind:       "ServiceMonitor",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "thanos-query-frontend",
+				Namespace: openshiftCustomerMonitoringNamespace,
+				Labels: map[string]string{
+					"app.kubernetes.io/component":  "thanos-query-frontend",
+					"app.kubernetes.io/managed-by": "thanos-operator",
+					"app.kubernetes.io/name":       "thanos-query-frontend",
+					"app.kubernetes.io/part-of":    "thanos",
+					"prometheus":                   "app-sre",
+				},
+			},
+			Spec: monitoringv1.ServiceMonitorSpec{
+				Endpoints: []monitoringv1.Endpoint{
+					{
+						Interval: interval30s,
+						Path:     metricsPath,
+						Port:     "public",
+					},
+				},
+				NamespaceSelector: monitoringv1.NamespaceSelector{
+					MatchNames: []string{namespace},
+				},
+				Selector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app.kubernetes.io/component":  "thanos-query-frontend",
+						"app.kubernetes.io/managed-by": "thanos-operator",
+						"app.kubernetes.io/name":       "thanos-query-frontend",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+			},
+		},
+		&monitoringv1.ServiceMonitor{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.coreos.com/v1",
+				Kind:       "ServiceMonitor",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "thanos-receive-router",
+				Namespace: openshiftCustomerMonitoringNamespace,
+				Labels: map[string]string{
+					"app.kubernetes.io/component":  "thanos-receive-router",
+					"app.kubernetes.io/managed-by": "thanos-operator",
+					"app.kubernetes.io/name":       "thanos-receive",
+					"app.kubernetes.io/part-of":    "thanos",
+					"prometheus":                   "app-sre",
+				},
+			},
+			Spec: monitoringv1.ServiceMonitorSpec{
+				Endpoints: []monitoringv1.Endpoint{
+					{
+						Interval: interval30s,
+						Path:     metricsPath,
+						Port:     "http",
+					},
+				},
+				NamespaceSelector: monitoringv1.NamespaceSelector{
+					MatchNames: []string{namespace},
+				},
+				Selector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app.kubernetes.io/component":  "thanos-receive-router",
+						"app.kubernetes.io/managed-by": "thanos-operator",
+						"app.kubernetes.io/name":       "thanos-receive",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+			},
+		},
+		&monitoringv1.ServiceMonitor{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "monitoring.coreos.com/v1",
+				Kind:       "ServiceMonitor",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "thanos-ruler",
+				Namespace: openshiftCustomerMonitoringNamespace,
+				Labels: map[string]string{
+					"app.kubernetes.io/component":  "rule-evaluation-engine",
+					"app.kubernetes.io/managed-by": "thanos-operator",
+					"app.kubernetes.io/name":       "thanos-ruler",
+					"app.kubernetes.io/part-of":    "thanos",
+					"prometheus":                   "app-sre",
+				},
+			},
+			Spec: monitoringv1.ServiceMonitorSpec{
+				Endpoints: []monitoringv1.Endpoint{
+					{
+						Interval: interval30s,
+						Path:     metricsPath,
+						Port:     "http",
+					},
+				},
+				NamespaceSelector: monitoringv1.NamespaceSelector{
+					MatchNames: []string{namespace},
+				},
+				Selector: metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app.kubernetes.io/component":  "rule-evaluation-engine",
+						"app.kubernetes.io/managed-by": "thanos-operator",
+						"app.kubernetes.io/name":       "thanos-ruler",
+						"app.kubernetes.io/part-of":    "thanos",
+					},
+				},
+			},
+		},
+	}
+	return objs
+}
+
 func createThanosServiceMonitors(namespace string) []runtime.Object {
 	interval30s := monitoringv1.Duration("30s")
 	metricsPath := "/metrics"
@@ -634,7 +905,7 @@ func lokiOperatorServiceMonitor(namespace string) []runtime.Object {
 				},
 				Selector: metav1.LabelSelector{
 					MatchLabels: map[string]string{
-						"app.kubernetes.io/component": "metrics",
+						"name": "loki-operator-controller-manager",
 					},
 				},
 				NamespaceSelector: monitoringv1.NamespaceSelector{

@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: memcached
+    prometheus: app-sre
+  name: thanos-bucket-cache
+  namespace: openshift-customer-monitoring
+spec:
+  endpoints:
+  - honorLabels: true
+    interval: 30s
+    path: /metrics
+    port: metrics
+  namespaceSelector:
+    matchNames:
+    - rhobs-stage
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: memcached
+      app.kubernetes.io/name: thanos-bucket-cache

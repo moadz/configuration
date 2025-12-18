@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strings"
 
 	"github.com/bwplotka/mimic/encoding"
 	kghelpers "github.com/observatorium/observatorium/configuration_go/kubegen/helpers"
@@ -11,12 +12,15 @@ import (
 	"github.com/observatorium/observatorium/configuration_go/kubegen/workload"
 	templatev1 "github.com/openshift/api/template/v1"
 	monv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/yaml"
+	"k8s.io/utils/ptr"
 )
 
 const (
@@ -78,7 +82,7 @@ func makeOauthProxy(upstreamPort int32, namespace, serviceAccount, tlsSecret str
 			"-tls-cert=/etc/tls/private/tls.crt",
 			"-tls-key=/etc/tls/private/tls.key",
 			"-client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token",
-			"-cookie-secret=${OAUTH_PROXY_COOKIE_SECRET}", // replaced by openshift template parameter
+			"-cookie-secret-file=/etc/oauth-cookie/cookie.txt",
 			"-openshift-ca=/etc/pki/tls/cert.pem",
 			"-openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
 		},
@@ -99,9 +103,83 @@ func makeOauthProxy(upstreamPort int32, namespace, serviceAccount, tlsSecret str
 				MountPath: "/etc/tls/private",
 				ReadOnly:  true,
 			},
+			{
+				Name:      "oauth-cookie",
+				MountPath: "/etc/oauth-cookie",
+				ReadOnly:  true,
+			},
 		},
 		Volumes: []corev1.Volume{
 			kghelpers.NewPodVolumeFromSecret("tls", tlsSecret),
+			kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"),
+		},
+	}
+}
+
+// makeOauthProxyContainer creates a corev1.Container for the oauth-proxy sidecar with proper security context.
+func makeOauthProxyContainer(upstreamPort int32, namespace, serviceAccount, tlsSecret string) corev1.Container {
+	const (
+		name     = "oauth-proxy"
+		image    = "registry.redhat.io/openshift4/ose-oauth-proxy"
+		imageTag = "v4.14"
+	)
+
+	const (
+		cpuRequest    = "100m"
+		memoryRequest = "100Mi"
+	)
+
+	proxyPort := int32(8443)
+
+	return corev1.Container{
+		Name:  name,
+		Image: fmt.Sprintf("%s:%s", image, imageTag),
+		Args: []string{
+			"-provider=openshift",
+			fmt.Sprintf("-https-address=:%d", proxyPort),
+			"-http-address=",
+			"-email-domain=*",
+			fmt.Sprintf("-upstream=http://localhost:%d", upstreamPort),
+			fmt.Sprintf("-openshift-service-account=%s", serviceAccount),
+			fmt.Sprintf(`-openshift-sar={"resource": "namespaces", "verb": "get", "name": "%s", "namespace": "%s"}`, namespace, namespace),
+			fmt.Sprintf(`-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get", "name": "%s", "namespace": "%s"}}`, namespace, namespace),
+			"-tls-cert=/etc/tls/private/tls.crt",
+			"-tls-key=/etc/tls/private/tls.key",
+			"-client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token",
+			"-cookie-secret-file=/etc/oauth-cookie/cookie.txt",
+			"-openshift-ca=/etc/pki/tls/cert.pem",
+			"-openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+		},
+		Resources: kghelpers.NewResourcesRequirements(cpuRequest, "", memoryRequest, ""),
+		Ports: []corev1.ContainerPort{
+			{
+				Name:          "https",
+				ContainerPort: proxyPort,
+				Protocol:      corev1.ProtocolTCP,
+			},
+		},
+		SecurityContext: &corev1.SecurityContext{
+			AllowPrivilegeEscalation: ptr.To(false),
+			Capabilities: &corev1.Capabilities{
+				Drop: []corev1.Capability{"ALL"},
+			},
+			RunAsNonRoot: ptr.To(true),
+			SeccompProfile: &corev1.SeccompProfile{
+				Type: corev1.SeccompProfileTypeRuntimeDefault,
+			},
+		},
+		TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      "tls",
+				MountPath: "/etc/tls/private",
+				ReadOnly:  true,
+			},
+			{
+				Name:      "oauth-cookie",
+				MountPath: "/etc/oauth-cookie",
+				ReadOnly:  true,
+			},
 		},
 	}
 }
@@ -208,4 +286,54 @@ func getCustomResourceDefinition(url string) (*v1.CustomResourceDefinition, erro
 	}
 
 	return &obj, nil
+}
+
+// getResourceKind returns the Kind field from a Kubernetes object
+func getResourceKind(obj runtime.Object) string {
+	switch obj.(type) {
+	case *appsv1.Deployment:
+		return "Deployment"
+	case *corev1.Service:
+		return "Service"
+	case *corev1.ServiceAccount:
+		return "ServiceAccount"
+	case *corev1.ConfigMap:
+		return "ConfigMap"
+	case *corev1.Secret:
+		return "Secret"
+	case *appsv1.StatefulSet:
+		return "StatefulSet"
+	case *rbacv1.ClusterRole:
+		return "ClusterRole"
+	case *rbacv1.ClusterRoleBinding:
+		return "ClusterRoleBinding"
+	case *rbacv1.Role:
+		return "Role"
+	case *rbacv1.RoleBinding:
+		return "RoleBinding"
+	default:
+		// Try to get the kind from TypeMeta as a fallback
+		if gvk := obj.GetObjectKind().GroupVersionKind(); gvk.Kind != "" {
+			return gvk.Kind
+		}
+		// If TypeMeta doesn't have Kind, try to infer from type name
+		objType := fmt.Sprintf("%T", obj)
+		if objType != "" && len(objType) > 1 {
+			// Extract the last part after the dot and asterisk (e.g., "*v1.LokiStack" -> "LokiStack")
+			parts := strings.Split(objType, ".")
+			if len(parts) > 0 {
+				typeName := parts[len(parts)-1]
+				return typeName
+			}
+		}
+		return "Unknown"
+	}
+}
+
+// createServiceSelectorLabels creates labels for service selectors, removing version labels that go stale
+func createServiceSelectorLabels(labels map[string]string) map[string]string {
+	selectorLabels := deepCopyMap(labels)
+	// Remove version label as it goes stale
+	delete(selectorLabels, "app.kubernetes.io/version")
+	return selectorLabels
 }

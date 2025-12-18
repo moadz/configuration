@@ -102,7 +102,8 @@ const (
 	StepGateway      = "gateway"
 	StepMemcached    = "memcached"
 
-	StepSyntheticsApi = "synthetics-api"
+	StepSyntheticsApi  = "synthetics-api"
+	StepAlertmanagerCR = "alertmanager-cr"
 
 	StepNoOp = "noop"
 )
@@ -113,22 +114,22 @@ func DefaultBuildSteps() []string {
 	steps = append(steps, DefaultMetricsBuildSteps()...)
 	steps = append(steps, DefaultLoggingBuildSteps()...)
 	steps = append(steps, DefaultSyntheticsBuildSteps()...)
+	steps = append(steps, DefaultAlertingBuildSteps()...)
+	steps = append(steps, DefaultGatewayBuildSteps()...)
 
 	steps = append(steps,
 		StepServiceMonitors, // Monitoring setup
-		StepAlertmanager,    // Alerting configuration
 		StepSecrets,         // Secrets last
 		StepMemcached,       // Memcached configuration
-		StepGateway,         // Gateway configuration
 	)
 	return steps
 }
 
 func DefaultMetricsBuildSteps() []string {
 	return []string{
-		StepThanosOperatorCRDS, // Core components first
-		StepThanosOperator,     // Custom Resource Definitions
-		StepDefaultThanosStack, // ThanosOperator deployment
+		StepThanosOperatorCRDS,
+		StepThanosOperator,
+		StepDefaultThanosStack,
 	}
 }
 
@@ -143,6 +144,19 @@ func DefaultLoggingBuildSteps() []string {
 func DefaultSyntheticsBuildSteps() []string {
 	return []string{
 		StepSyntheticsApi,
+	}
+}
+
+func DefaultAlertingBuildSteps() []string {
+	return []string{
+		StepAlertmanager,
+		StepAlertmanagerCR,
+	}
+}
+
+func DefaultGatewayBuildSteps() []string {
+	return []string{
+		StepGateway,
 	}
 }
 

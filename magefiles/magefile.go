@@ -70,6 +70,10 @@ var BuildStepFunctions = map[string]func(Build, clusters.ClusterConfig) error{
 		b.SyntheticsApi(cfg)
 		return nil
 	},
+	clusters.StepAlertmanagerCR: func(b Build, cfg clusters.ClusterConfig) error {
+		b.AlertmanagerCR(cfg)
+		return nil
+	},
 	clusters.StepGateway: func(b Build, cfg clusters.ClusterConfig) error {
 		err := b.Gateway(cfg)
 		if err != nil {
@@ -108,7 +112,9 @@ func (b Build) Clusters() error {
 			return err
 		}
 	}
-	return nil
+
+	// Generate all monitoring bundles after all build steps complete
+	return GenerateAllMonitoringBundles()
 }
 
 // Cluster Builds manifests for a specific cluster
@@ -118,7 +124,12 @@ func (b Build) Cluster(clusterName string) error {
 		return err
 	}
 
-	return b.executeSteps(cluster.BuildSteps, *cluster)
+	if err := b.executeSteps(cluster.BuildSteps, *cluster); err != nil {
+		return err
+	}
+
+	// Generate monitoring bundle after build steps complete
+	return GenerateAllMonitoringBundles()
 }
 
 // Environment Builds manifests for all clusters in a specific environment
@@ -138,7 +149,9 @@ func (b Build) Environment(environment string) error {
 			return err
 		}
 	}
-	return nil
+
+	// Generate all monitoring bundles after all build steps complete
+	return GenerateAllMonitoringBundles()
 }
 
 // Steps Shows all available build steps

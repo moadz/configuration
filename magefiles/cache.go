@@ -334,6 +334,8 @@ func createCacheHeadlessService(config *memcachedConfig) *corev1.Service {
 
 func createCacheServiceMonitor(config *memcachedConfig) *monitoringv1.ServiceMonitor {
 	labels := deepCopyMap(config.Labels)
+	// Remove version label as it goes stale
+	delete(labels, "app.kubernetes.io/version")
 	labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
 
 	return &monitoringv1.ServiceMonitor{
@@ -356,7 +358,7 @@ func createCacheServiceMonitor(config *memcachedConfig) *monitoringv1.ServiceMon
 				},
 			},
 			Selector: metav1.LabelSelector{
-				MatchLabels: config.Labels,
+				MatchLabels: createServiceSelectorLabels(config.Labels),
 			},
 			NamespaceSelector: monitoringv1.NamespaceSelector{
 				MatchNames: []string{config.Namespace},

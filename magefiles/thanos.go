@@ -3,18 +3,22 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"sort"
+	"strings"
 
+	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
+	kitlog "github.com/go-kit/log"
 	kghelpers "github.com/observatorium/observatorium/configuration_go/kubegen/helpers"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	routev1 "github.com/openshift/api/route/v1"
 	templatev1 "github.com/openshift/api/template/v1"
+	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
 	"github.com/thanos-community/thanos-operator/api/v1alpha1"
 
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -22,6 +26,14 @@ import (
 )
 
 func (b Build) DefaultThanosStack(config clusters.ClusterConfig) {
+	// For rhobss01ue1 and rhobsi01uw2 clusters, generate metrics bundle with individual resources
+	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+		if err := generateMetricsBundle(config); err != nil {
+			log.Printf("Error generating metrics bundle: %v", err)
+		}
+		return
+	}
+
 	gen := b.generator(config, "thanos-operator-default-cr")
 	var objs []runtime.Object
 
@@ -157,83 +169,6 @@ func (s Stage) Thanos() {
 	gen.Generate()
 }
 
-// tracingSidecar is the jaeger-agent sidecar container for tracing.
-func tracingSidecar(m clusters.TemplateMaps) corev1.Container {
-	return corev1.Container{
-		Name:            "jaeger-agent",
-		Image:           clusters.TemplateFn(clusters.Jaeger, m.Images),
-		ImagePullPolicy: corev1.PullIfNotPresent,
-		Args: []string{
-			"--reporter.grpc.host-port=dns:///otel-trace-writer-collector-headless.observatorium-tools.svc:14250",
-			"--reporter.type=grpc",
-			"--agent.tags=pod.namespace=$(NAMESPACE),pod.name=$(POD)",
-		},
-		Env: []corev1.EnvVar{
-			{
-				Name: "NAMESPACE",
-				ValueFrom: &corev1.EnvVarSource{
-					FieldRef: &corev1.ObjectFieldSelector{
-						FieldPath: "metadata.namespace",
-					},
-				},
-			},
-			{
-				Name: "POD",
-				ValueFrom: &corev1.EnvVarSource{
-					FieldRef: &corev1.ObjectFieldSelector{
-						FieldPath: "metadata.name",
-					},
-				},
-			},
-		},
-		Ports: []corev1.ContainerPort{
-			{
-				ContainerPort: 5778,
-				Name:          "configs",
-			},
-			{
-				ContainerPort: 6831,
-				Name:          "jaeger-thrift",
-			},
-			{
-				ContainerPort: 14271,
-				Name:          "metrics",
-			},
-		},
-		ReadinessProbe: &corev1.Probe{
-			ProbeHandler: corev1.ProbeHandler{
-				HTTPGet: &corev1.HTTPGetAction{
-					Path:   "/",
-					Port:   intstr.FromInt(14271),
-					Scheme: corev1.URISchemeHTTP,
-				},
-			},
-			InitialDelaySeconds: 1,
-		},
-		LivenessProbe: &corev1.Probe{
-			ProbeHandler: corev1.ProbeHandler{
-				HTTPGet: &corev1.HTTPGetAction{
-					Path:   "/",
-					Port:   intstr.FromInt(14271),
-					Scheme: corev1.URISchemeHTTP,
-				},
-			},
-			FailureThreshold:    5,
-			InitialDelaySeconds: 1,
-		},
-		Resources: corev1.ResourceRequirements{
-			Requests: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("32m"),
-				corev1.ResourceMemory: resource.MustParse("64Mi"),
-			},
-			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("128m"),
-				corev1.ResourceMemory: resource.MustParse("128Mi"),
-			},
-		},
-	}
-}
-
 func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 	store0to2w := &v1alpha1.ThanosStore{
 		TypeMeta: metav1.TypeMeta{
@@ -252,6 +187,11 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE02W", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE02W", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE02W", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", m.ObjectStorageBucket),
@@ -281,16 +221,7 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				Size: clusters.TemplateFn("STORE02W", m.StorageSize),
 			},
 			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(m),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-store"
-"type": "JAEGER"`,
-				},
+				Args: []string{},
 			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
@@ -317,6 +248,11 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE2W90D", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE2W90D", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE2W90D", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", m.ObjectStorageBucket),
@@ -347,16 +283,7 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				Size: clusters.TemplateFn("STORE2W90D", m.StorageSize),
 			},
 			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(m),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-store"
-"type": "JAEGER"`,
-				},
+				Args: []string{},
 			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
@@ -386,6 +313,11 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE90D+", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE90D+", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE90D+", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", m.ObjectStorageBucket),
@@ -415,16 +347,7 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				Size: clusters.TemplateFn("STORE90D+", m.StorageSize),
 			},
 			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(m),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-store"
-"type": "JAEGER"`,
-				},
+				Args: []string{},
 			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
@@ -452,6 +375,11 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE_ROS", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE_ROS", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE_ROS", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("ROS", m.ObjectStorageBucket),
@@ -478,16 +406,7 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				Size: clusters.TemplateFn("STORE_ROS", m.StorageSize),
 			},
 			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(m),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-store"
-"type": "JAEGER"`,
-				},
+				Args: []string{},
 			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
@@ -514,6 +433,11 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE_DEFAULT", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE_DEFAULT", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE_DEFAULT", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("DEFAULT", m.ObjectStorageBucket),
@@ -543,16 +467,7 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 				Size: clusters.TemplateFn("STORE_DEFAULT", m.StorageSize),
 			},
 			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(m),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-store"
-"type": "JAEGER"`,
-				},
+				Args: []string{},
 			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
@@ -678,6 +593,11 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE02W", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE02W", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE02W", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", m.ObjectStorageBucket),
@@ -764,6 +684,11 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE2W90D", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE2W90D", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE2W90D", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", m.ObjectStorageBucket),
@@ -855,6 +780,11 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE90D+", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE90D+", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE90D+", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", m.ObjectStorageBucket),
@@ -943,6 +873,11 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 				LogLevel:             ptr.To(clusters.TemplateFn("STORE_DEFAULT", m.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("STORE_DEFAULT", m.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE_DEFAULT", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("DEFAULT", m.ObjectStorageBucket),
@@ -1038,16 +973,7 @@ func TmpRulerCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.Tha
 			Retention:          v1alpha1.Duration("2h"),
 			EvaluationInterval: v1alpha1.Duration("1m"),
 			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(templates),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-ruler"
-"type": "JAEGER"`,
-				},
+				Args: []string{},
 			},
 		},
 	}
@@ -1079,31 +1005,13 @@ func receiveCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.Than
 					"receive": "true",
 				},
 				Additional: v1alpha1.Additional{
-					Containers: []corev1.Container{
-						tracingSidecar(templates),
-					},
-					Args: []string{
-						`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-receive-router"
-"type": "JAEGER"`,
-					},
+					Args: []string{},
 				},
 			},
 			Ingester: v1alpha1.IngesterSpec{
 				DefaultObjectStorageConfig: clusters.TemplateFn("TELEMETER", templates.ObjectStorageBucket),
 				Additional: v1alpha1.Additional{
-					Containers: []corev1.Container{
-						tracingSidecar(templates),
-					},
-					Args: []string{
-						`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-receive-ingester"
-"type": "JAEGER"`,
-					},
+					Args: []string{},
 				},
 				Hashrings: []v1alpha1.IngesterHashringSpec{
 					{
@@ -1207,6 +1115,11 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 				LogLevel:             ptr.To(clusters.TemplateFn(clusters.Query, templates.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn(clusters.Query, templates.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			StoreLabelSelector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
@@ -1237,6 +1150,11 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 					LogLevel:             ptr.To(clusters.TemplateFn("QUERY_FRONTEND", templates.LogLevels)),
 					LogFormat:            ptr.To("logfmt"),
 					ResourceRequirements: ptr.To(clusters.TemplateFn("QUERY_FRONTEND", templates.ResourceRequirements)),
+					SecurityContext: &corev1.PodSecurityContext{
+						SeccompProfile: &corev1.SeccompProfile{
+							Type: corev1.SeccompProfileTypeRuntimeDefault,
+						},
+					},
 				},
 				Replicas:             clusters.TemplateFn("QUERY_FRONTEND", templates.Replicas),
 				CompressResponses:    true,
@@ -1311,8 +1229,9 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 				IntVal: 8443,
 			},
 		})
-		query.Spec.QueryFrontend.Additional.Containers = append(query.Spec.QueryFrontend.Additional.Containers, makeOauthProxy(9090, namespace, "thanos-query-frontend-rhobs", "query-frontend-tls").GetContainer())
+		query.Spec.QueryFrontend.Additional.Containers = append(query.Spec.QueryFrontend.Additional.Containers, makeOauthProxyContainer(9090, namespace, "thanos-query-frontend-rhobs", "query-frontend-tls"))
 		query.Spec.QueryFrontend.Additional.Volumes = append(query.Spec.QueryFrontend.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "query-frontend-tls"))
+		query.Spec.QueryFrontend.Additional.Volumes = append(query.Spec.QueryFrontend.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
 	}
 
 	objs = append(objs, query)
@@ -1337,6 +1256,11 @@ func defaultStoreCR(namespace string, templates clusters.TemplateMaps) runtime.O
 				LogLevel:             ptr.To(clusters.TemplateFn(clusters.StoreDefault, templates.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn(clusters.StoreDefault, templates.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas:            clusters.TemplateFn(clusters.StoreDefault, templates.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn(clusters.DefaultBucket, templates.ObjectStorageBucket),
@@ -1381,18 +1305,7 @@ func defaultStoreCR(namespace string, templates clusters.TemplateMaps) runtime.O
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: clusters.TemplateFn(clusters.StoreDefault, templates.StorageSize),
 			},
-			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(templates),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-store"
-"type": "JAEGER"`,
-				},
-			},
+			Additional: v1alpha1.Additional{},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -1433,6 +1346,11 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 					LogLevel:             ptr.To(clusters.TemplateFn(clusters.ReceiveRouter, templates.LogLevels)),
 					LogFormat:            ptr.To("logfmt"),
 					ResourceRequirements: ptr.To(clusters.TemplateFn(clusters.ReceiveRouter, templates.ResourceRequirements)),
+					SecurityContext: &corev1.PodSecurityContext{
+						SeccompProfile: &corev1.SeccompProfile{
+							Type: corev1.SeccompProfileTypeRuntimeDefault,
+						},
+					},
 				},
 				Replicas:          clusters.TemplateFn(clusters.ReceiveRouter, templates.Replicas),
 				ReplicationFactor: 3,
@@ -1440,33 +1358,14 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 					"receive": "true",
 				},
 				Additional: v1alpha1.Additional{
-					Containers: []corev1.Container{
-						tracingSidecar(templates),
-					},
 					Args: []string{
 						fmt.Sprintf("--receive.grpc-service-config=%s", grpcDisableEndlessRetry),
-						`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-receive-router"
-"type": "JAEGER"`,
 					},
 				},
 			},
 			Ingester: v1alpha1.IngesterSpec{
 				DefaultObjectStorageConfig: clusters.TemplateFn(clusters.DefaultBucket, templates.ObjectStorageBucket),
-				Additional: v1alpha1.Additional{
-					Containers: []corev1.Container{
-						tracingSidecar(templates),
-					},
-					Args: []string{
-						`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-receive-ingester"
-"type": "JAEGER"`,
-					},
-				},
+				Additional:                 v1alpha1.Additional{},
 				Hashrings: []v1alpha1.IngesterHashringSpec{
 					{
 						Name: "default",
@@ -1477,6 +1376,11 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 							LogLevel:             ptr.To(clusters.TemplateFn(clusters.ReceiveIngestorDefault, templates.LogLevels)),
 							LogFormat:            ptr.To("logfmt"),
 							ResourceRequirements: ptr.To(clusters.TemplateFn(clusters.ReceiveIngestorDefault, templates.ResourceRequirements)),
+							SecurityContext: &corev1.PodSecurityContext{
+								SeccompProfile: &corev1.SeccompProfile{
+									Type: corev1.SeccompProfileTypeRuntimeDefault,
+								},
+							},
 						},
 						ExternalLabels: map[string]string{
 							"replica": "$(POD_NAME)",
@@ -1532,6 +1436,11 @@ func defaultCompactCR(namespace string, templates clusters.TemplateMaps, oauth b
 				LogLevel:             ptr.To(clusters.TemplateFn(clusters.CompactDefault, templates.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn(clusters.CompactDefault, templates.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			ObjectStorageConfig: clusters.TemplateFn(clusters.DefaultBucket, templates.ObjectStorageBucket),
 			RetentionConfig: v1alpha1.RetentionResolutionConfig{
@@ -1555,16 +1464,8 @@ func defaultCompactCR(namespace string, templates clusters.TemplateMaps, oauth b
 				Size: clusters.TemplateFn(clusters.CompactDefault, templates.StorageSize),
 			},
 			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(templates),
-				},
 				Args: []string{
 					`--deduplication.replica-label=replica`,
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-compact"
-"type": "JAEGER"`,
 				},
 			},
 			FeatureGates: &v1alpha1.FeatureGates{
@@ -1616,8 +1517,9 @@ func defaultCompactCR(namespace string, templates clusters.TemplateMaps, oauth b
 				IntVal: 8443,
 			},
 		})
-		defaultCompact.Spec.Additional.Containers = append(defaultCompact.Spec.Additional.Containers, makeOauthProxy(10902, namespace, "thanos-compact-rhobs", "compact-tls").GetContainer())
+		defaultCompact.Spec.Additional.Containers = append(defaultCompact.Spec.Additional.Containers, makeOauthProxyContainer(10902, namespace, "thanos-compact-rhobs", "compact-tls"))
 		defaultCompact.Spec.Additional.Volumes = append(defaultCompact.Spec.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "compact-tls"))
+		defaultCompact.Spec.Additional.Volumes = append(defaultCompact.Spec.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
 	}
 
 	objs = append(objs, defaultCompact)
@@ -1642,6 +1544,11 @@ func defaultRulerCR(namespace string, templates clusters.TemplateMaps) runtime.O
 				LogLevel:             ptr.To(clusters.TemplateFn(clusters.Ruler, templates.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn(clusters.Ruler, templates.ResourceRequirements)),
+				SecurityContext: &corev1.PodSecurityContext{
+					SeccompProfile: &corev1.SeccompProfile{
+						Type: corev1.SeccompProfileTypeRuntimeDefault,
+					},
+				},
 			},
 			Replicas: clusters.TemplateFn(clusters.Ruler, templates.Replicas),
 			RuleConfigSelector: &metav1.LabelSelector{
@@ -1675,18 +1582,7 @@ func defaultRulerCR(namespace string, templates clusters.TemplateMaps) runtime.O
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: clusters.TemplateFn(clusters.Ruler, templates.StorageSize),
 			},
-			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(templates),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-ruler"
-"type": "JAEGER"`,
-				},
-			},
+			Additional: v1alpha1.Additional{},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
 					Enable: ptr.To(false),
@@ -1768,6 +1664,11 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 					LogLevel:             ptr.To(clusters.TemplateFn("QUERY_FRONTEND", templates.LogLevels)),
 					LogFormat:            ptr.To("logfmt"),
 					ResourceRequirements: ptr.To(clusters.TemplateFn("QUERY_FRONTEND", templates.ResourceRequirements)),
+					SecurityContext: &corev1.PodSecurityContext{
+						SeccompProfile: &corev1.SeccompProfile{
+							Type: corev1.SeccompProfileTypeRuntimeDefault,
+						},
+					},
 				},
 				Replicas:             clusters.TemplateFn("QUERY_FRONTEND", templates.Replicas),
 				CompressResponses:    true,
@@ -1834,8 +1735,9 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 				IntVal: 8443,
 			},
 		})
-		query.Spec.QueryFrontend.Additional.Containers = append(query.Spec.QueryFrontend.Additional.Containers, makeOauthProxy(9090, namespace, "thanos-query-frontend-rhobs", "query-frontend-tls").GetContainer())
+		query.Spec.QueryFrontend.Additional.Containers = append(query.Spec.QueryFrontend.Additional.Containers, makeOauthProxyContainer(9090, namespace, "thanos-query-frontend-rhobs", "query-frontend-tls"))
 		query.Spec.QueryFrontend.Additional.Volumes = append(query.Spec.QueryFrontend.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "query-frontend-tls"))
+		query.Spec.QueryFrontend.Additional.Volumes = append(query.Spec.QueryFrontend.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
 	}
 
 	objs = append(objs, query)
@@ -2172,16 +2074,7 @@ func stageCompactCR(namespace string, templates clusters.TemplateMaps) []runtime
 				Size: clusters.TemplateFn("COMPACT_ROS", templates.StorageSize),
 			},
 			Additional: v1alpha1.Additional{
-				Containers: []corev1.Container{
-					tracingSidecar(templates),
-				},
-				Args: []string{
-					`--tracing.config="config":
-  "sampler_param": 2
-  "sampler_type": "ratelimiting"
-  "service_name": "thanos-compact"
-"type": "JAEGER"`,
-				},
+				Args: []string{},
 			},
 			FeatureGates: &v1alpha1.FeatureGates{
 				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
@@ -2192,4 +2085,186 @@ func stageCompactCR(namespace string, templates clusters.TemplateMaps) []runtime
 	}
 
 	return []runtime.Object{rosCompact}
+}
+
+// generateMetricsBundle generates individual metrics bundle resources for Thanos components
+// Ordering: CRDs, operator, cache, then Thanos components
+func generateMetricsBundle(config clusters.ClusterConfig) error {
+	ns := config.Namespace
+
+	// Create bundle generator for individual resource files
+	bundleGen := &mimic.Generator{}
+	bundleGen = bundleGen.With(templatePath, templateClustersPath, string(config.Environment), string(config.Name), "metrics", "bundle")
+	bundleGen.Logger = kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stdout))
+
+	// 1. CRDs (prefix: 01-*)
+	crdObjs := getCRDObjects()
+	crdNames := []string{"compacts", "queries", "receives", "rulers", "stores"}
+	for i, crd := range crdObjs {
+		crdName := "unknown"
+		if i < len(crdNames) {
+			crdName = crdNames[i]
+		}
+		filename := fmt.Sprintf("01-crd-%s.yaml", crdName)
+		bundleGen.Add(filename, encoding.GhodssYAML(crd))
+	}
+
+	// 2. OPERATOR (prefix: 02-*)
+	operatorObjs := operatorResources(ns, config.Templates)
+	for _, obj := range operatorObjs {
+		resourceKind := getResourceKind(obj)
+		resourceName := getSmartResourceName(obj)
+		filename := fmt.Sprintf("02-operator-%s-%s.yaml", resourceName, resourceKind)
+		bundleGen.Add(filename, encoding.GhodssYAML(obj))
+	}
+
+	// 3. CACHE (prefix: 03-*)
+	cacheObjs := getThanosCacheObjects(ns, config.Templates)
+	for _, obj := range cacheObjs {
+		cacheKind := getResourceKind(obj)
+		cacheName := getResourceName(obj)
+		// Remove thanos- prefix and simplify cache names
+		cleanCacheName := strings.TrimPrefix(cacheName, "thanos-")
+		filename := fmt.Sprintf("03-cache-%s-%s.yaml", cleanCacheName, cacheKind)
+		bundleGen.Add(filename, encoding.GhodssYAML(obj))
+	}
+
+	// 4. CUSTOM RESOURCES (prefix: 04-*)
+	thanosObjs := make([]runtime.Object, 0, 7) // Pre-allocate for expected ~7 resources (query+route, receive, compact+route, ruler, store)
+	thanosObjs = append(thanosObjs, defaultQueryCR(ns, config.Templates, true)...)
+	thanosObjs = append(thanosObjs, defaultReceiveCR(ns, config.Templates))
+	thanosObjs = append(thanosObjs, defaultCompactCR(ns, config.Templates, true)...)
+	thanosObjs = append(thanosObjs, defaultRulerCR(ns, config.Templates))
+	thanosObjs = append(thanosObjs, defaultStoreCR(ns, config.Templates))
+
+	for i, obj := range thanosObjs {
+		resourceKind := getResourceKind(obj)
+		resourceName := getResourceName(obj)
+		// Clean up names and remove redundant prefixes
+		cleanName := strings.TrimPrefix(resourceName, "thanos-")
+		cleanName = strings.TrimPrefix(cleanName, "rhobs-")
+		if cleanName == "Unknown" || cleanName == resourceKind || cleanName == "" {
+			filename := fmt.Sprintf("04-%s-%d.yaml", strings.ToLower(resourceKind), i+1)
+			bundleGen.Add(filename, encoding.GhodssYAML(obj))
+		} else {
+			filename := fmt.Sprintf("04-%s-%s.yaml", cleanName, resourceKind)
+			bundleGen.Add(filename, encoding.GhodssYAML(obj))
+		}
+	}
+
+	// Generate the bundle files
+	bundleGen.Generate()
+
+	// Add consolidated ServiceMonitors to monitoring bundle
+	monBundle := GetMonitoringBundle(config)
+	thanosServiceMonitors := createConsolidatedThanosServiceMonitors(ns)
+	operatorServiceMonitors := thanosOperatorServiceMonitor(ns)
+
+	for _, sm := range thanosServiceMonitors {
+		if smObj, ok := sm.(*monitoringv1.ServiceMonitor); ok && smObj != nil {
+			monBundle.AddServiceMonitor(smObj)
+		}
+	}
+	for _, sm := range operatorServiceMonitors {
+		if smObj, ok := sm.(*monitoringv1.ServiceMonitor); ok && smObj != nil {
+			monBundle.AddServiceMonitor(smObj)
+		}
+	}
+
+	// Generate the individual ServiceMonitor files
+	if err := monBundle.Generate(); err != nil {
+		return fmt.Errorf("failed to generate monitoring bundle: %w", err)
+	}
+
+	return nil
+}
+
+// getCRDObjects retrieves Thanos operator CRDs
+func getCRDObjects() []runtime.Object {
+	const (
+		compact   = "thanoscompacts.yaml"
+		queries   = "thanosqueries.yaml"
+		receivers = "thanosreceives.yaml"
+		rulers    = "thanosrulers.yaml"
+		stores    = "thanosstores.yaml"
+		base      = "https://raw.githubusercontent.com/thanos-community/thanos-operator/" + thanosOperatorCRDRef + "/config/crd/bases/monitoring.thanos.io_"
+	)
+
+	var objs []runtime.Object
+	for _, component := range []string{compact, queries, receivers, rulers, stores} {
+		crd, err := getCustomResourceDefinition(base + component)
+		if err != nil {
+			log.Printf("Error fetching CRD %s: %v", component, err)
+			continue
+		}
+		objs = append(objs, crd)
+	}
+	return objs
+}
+
+// getThanosCacheObjects returns cache objects for Thanos components
+func getThanosCacheObjects(namespace string, templates clusters.TemplateMaps) []runtime.Object {
+	var objs []runtime.Object
+
+	// Index cache
+	indexCacheConfig := indexCache(templates, namespace)
+	objs = append(objs, memcachedStatefulSet(indexCacheConfig, templates))
+	objs = append(objs, createServiceAccount(indexCacheConfig.Name, indexCacheConfig.Namespace, indexCacheConfig.Labels))
+	objs = append(objs, createCacheHeadlessService(indexCacheConfig))
+
+	// Bucket cache
+	bucketCacheConfig := bucketCache(templates, namespace)
+	objs = append(objs, memcachedStatefulSet(bucketCacheConfig, templates))
+	objs = append(objs, createServiceAccount(bucketCacheConfig.Name, bucketCacheConfig.Namespace, bucketCacheConfig.Labels))
+	objs = append(objs, createCacheHeadlessService(bucketCacheConfig))
+
+	// Query range cache
+	queryRangeCacheConfig := queryRangeCache(templates, namespace)
+	objs = append(objs, memcachedStatefulSet(queryRangeCacheConfig, templates))
+	objs = append(objs, createServiceAccount(queryRangeCacheConfig.Name, queryRangeCacheConfig.Namespace, queryRangeCacheConfig.Labels))
+	objs = append(objs, createCacheHeadlessService(queryRangeCacheConfig))
+
+	// Cache secrets
+	cacheSecrets := memcachedCacheSecrets(namespace)
+	for _, secret := range cacheSecrets {
+		objs = append(objs, secret)
+	}
+
+	return objs
+}
+
+// getResourceName extracts a meaningful name from a Kubernetes object
+func getResourceName(obj runtime.Object) string {
+	if obj == nil {
+		return "unknown"
+	}
+
+	switch o := obj.(type) {
+	case metav1.Object:
+		name := o.GetName()
+		if name != "" {
+			return name
+		}
+	}
+
+	// Fallback to the object type
+	return "unnamed"
+}
+
+// getSmartResourceName generates meaningful names for operator resources
+func getSmartResourceName(obj runtime.Object) string {
+	if obj == nil {
+		return "unknown"
+	}
+
+	// Get the basic name first
+	basicName := getResourceName(obj)
+	if basicName == "unnamed" || basicName == "unknown" {
+		return basicName
+	}
+
+	// For operator resources that have thanos-operator prefix, remove it since it's implied
+	basicName = strings.TrimPrefix(basicName, "thanos-operator-")
+
+	return basicName
 }
