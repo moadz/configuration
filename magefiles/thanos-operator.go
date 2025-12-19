@@ -183,7 +183,6 @@ func operatorResources(namespace string, m clusters.TemplateMaps) ([]runtime.Obj
 
 	for i, container := range deployment.Spec.Template.Spec.Containers {
 		if container.Name == "manager" {
-			deployment.Spec.Template.Spec.Containers[i].Args = append(deployment.Spec.Template.Spec.Containers[i].Args, "--feature-gate.enable-prometheus-operator-crds=false")
 			deployment.Spec.Template.Spec.Containers[i].Resources = clusters.TemplateFn(clusters.Manager, m.ResourceRequirements)
 		}
 		if container.Name == "kube-rbac-proxy" {

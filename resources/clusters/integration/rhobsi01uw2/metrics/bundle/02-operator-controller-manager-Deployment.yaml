@@ -37,7 +37,6 @@ spec:
         - --health-probe-bind-address=:8081
         - --log.format=logfmt
         - --log.level=debug
-        - --feature-gate.enable-prometheus-operator-crds=false
         command:
         - /manager
         image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator:d540840adb98f6275447f479bbfcbf5c469a0587
