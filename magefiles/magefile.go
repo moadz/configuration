@@ -32,8 +32,7 @@ var BuildStepFunctions = map[string]func(Build, clusters.ClusterConfig) error{
 		return b.ThanosOperatorCRDS(cfg)
 	},
 	clusters.StepThanosOperator: func(b Build, cfg clusters.ClusterConfig) error {
-		b.ThanosOperator(cfg)
-		return nil
+		return b.ThanosOperator(cfg)
 	},
 	clusters.StepDefaultThanosStack: func(b Build, cfg clusters.ClusterConfig) error {
 		b.DefaultThanosStack(cfg)

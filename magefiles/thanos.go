@@ -2110,7 +2110,10 @@ func generateMetricsBundle(config clusters.ClusterConfig) error {
 	}
 
 	// 2. OPERATOR (prefix: 02-*)
-	operatorObjs := operatorResources(ns, config.Templates)
+	operatorObjs, err := operatorResources(ns, config.Templates)
+	if err != nil {
+		return fmt.Errorf("failed to generate operator resources: %w", err)
+	}
 	for _, obj := range operatorObjs {
 		resourceKind := getResourceKind(obj)
 		resourceName := getSmartResourceName(obj)

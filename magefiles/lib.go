@@ -288,6 +288,27 @@ func getCustomResourceDefinition(url string) (*v1.CustomResourceDefinition, erro
 	return &obj, nil
 }
 
+func getClusterRole(url string) (*rbacv1.ClusterRole, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch %s: %w", url, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to fetch %s: %s", url, resp.Status)
+	}
+
+	var obj rbacv1.ClusterRole
+	decoder := yaml.NewYAMLOrJSONDecoder(resp.Body, 100000)
+	err = decoder.Decode(&obj)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode %s: %w", url, err)
+	}
+
+	return &obj, nil
+}
+
 // getResourceKind returns the Kind field from a Kubernetes object
 func getResourceKind(obj runtime.Object) string {
 	switch obj.(type) {

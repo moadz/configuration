@@ -9,7 +9,6 @@ metadata:
     app.kubernetes.io/name: clusterrolebinding
     app.kubernetes.io/part-of: thanos-operator
   name: thanos-operator-manager-rolebinding
-  namespace: rhobs-int
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
