@@ -12,15 +12,12 @@ spec:
     matchLabels:
       app.kubernetes.io/part-of: thanos
       operator.thanos.io/store-api: "true"
-  featureGates:
-    podDisruptionBudget:
-      enable: false
-    serviceMonitor:
-      enable: false
   grpcProxyStrategy: lazy
   imagePullPolicy: IfNotPresent
   logFormat: logfmt
   logLevel: info
+  podDisruptionBudgetConfig:
+    enable: false
   queryFrontend:
     additionalContainers:
     - args:

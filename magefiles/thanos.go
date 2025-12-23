@@ -223,11 +223,6 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 			Additional: v1alpha1.Additional{
 				Args: []string{},
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 
@@ -252,6 +247,9 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 					SeccompProfile: &corev1.SeccompProfile{
 						Type: corev1.SeccompProfileTypeRuntimeDefault,
 					},
+				},
+				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
+					Enable: ptr.To(false),
 				},
 			},
 			Replicas:            clusters.TemplateFn("STORE2W90D", m.Replicas),
@@ -284,14 +282,6 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 			},
 			Additional: v1alpha1.Additional{
 				Args: []string{},
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
-					Enable: ptr.To(false),
-				},
 			},
 		},
 	}
@@ -349,11 +339,6 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 			Additional: v1alpha1.Additional{
 				Args: []string{},
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 
@@ -407,11 +392,6 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 			},
 			Additional: v1alpha1.Additional{
 				Args: []string{},
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
 			},
 		},
 	}
@@ -468,11 +448,6 @@ func storeCR(namespace string, m clusters.TemplateMaps) []runtime.Object {
 			},
 			Additional: v1alpha1.Additional{
 				Args: []string{},
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
 			},
 		},
 	}
@@ -625,11 +600,6 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: clusters.TemplateFn("STORE02W", m.StorageSize),
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 
@@ -689,6 +659,9 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 						Type: corev1.SeccompProfileTypeRuntimeDefault,
 					},
 				},
+				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
+					Enable: ptr.To(false),
+				},
 			},
 			Replicas:            clusters.TemplateFn("STORE2W90D", m.Replicas),
 			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", m.ObjectStorageBucket),
@@ -717,14 +690,6 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 			},
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: clusters.TemplateFn("STORE2W90D", m.StorageSize),
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
-					Enable: ptr.To(false),
-				},
 			},
 		},
 	}
@@ -814,11 +779,6 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: clusters.TemplateFn("STORE90D+", m.StorageSize),
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 
@@ -906,11 +866,6 @@ func tmpStoreProduction(namespace string, m clusters.TemplateMaps) []runtime.Obj
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: clusters.TemplateFn("STORE_DEFAULT", m.StorageSize),
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 	return []runtime.Object{store0to2w, store2wto90d, store90dplus, storeDefault}
@@ -939,17 +894,7 @@ func TmpRulerCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.Tha
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: clusters.TemplateFn("RULER", templates.StorageSize),
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
-			RuleConfigSelector: &metav1.LabelSelector{
-				MatchLabels: map[string]string{
-					"operator.thanos.io/rule-file": "true",
-				},
-			},
-			PrometheusRuleSelector: metav1.LabelSelector{
+			RuleConfigSelector: metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"operator.thanos.io/prometheus-rule": "true",
 				},
@@ -1083,11 +1028,6 @@ func receiveCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.Than
 					},
 				},
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 }
@@ -1119,6 +1059,9 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 					SeccompProfile: &corev1.SeccompProfile{
 						Type: corev1.SeccompProfileTypeRuntimeDefault,
 					},
+				},
+				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
+					Enable: ptr.To(false),
 				},
 			},
 			StoreLabelSelector: &metav1.LabelSelector{
@@ -1176,14 +1119,6 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 						},
 						Key: "thanos.yaml",
 					},
-				},
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
-					Enable: ptr.To(false),
 				},
 			},
 		},
@@ -1306,11 +1241,6 @@ func defaultStoreCR(namespace string, templates clusters.TemplateMaps) runtime.O
 				Size: clusters.TemplateFn(clusters.StoreDefault, templates.StorageSize),
 			},
 			Additional: v1alpha1.Additional{},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 }
@@ -1408,11 +1338,6 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 					},
 				},
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 }
@@ -1466,11 +1391,6 @@ func defaultCompactCR(namespace string, templates clusters.TemplateMaps, oauth b
 			Additional: v1alpha1.Additional{
 				Args: []string{
 					`--deduplication.replica-label=replica`,
-				},
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
 				},
 			},
 		},
@@ -1551,12 +1471,7 @@ func defaultRulerCR(namespace string, templates clusters.TemplateMaps) runtime.O
 				},
 			},
 			Replicas: clusters.TemplateFn(clusters.Ruler, templates.Replicas),
-			RuleConfigSelector: &metav1.LabelSelector{
-				MatchLabels: map[string]string{
-					"operator.thanos.io/rule-file": "true",
-				},
-			},
-			PrometheusRuleSelector: metav1.LabelSelector{
+			RuleConfigSelector: metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"operator.thanos.io/prometheus-rule": "true",
 				},
@@ -1583,11 +1498,6 @@ func defaultRulerCR(namespace string, templates clusters.TemplateMaps) runtime.O
 				Size: clusters.TemplateFn(clusters.Ruler, templates.StorageSize),
 			},
 			Additional: v1alpha1.Additional{},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 }
@@ -1634,6 +1544,9 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 				LogLevel:             ptr.To(clusters.TemplateFn("QUERY", templates.LogLevels)),
 				LogFormat:            ptr.To("logfmt"),
 				ResourceRequirements: ptr.To(clusters.TemplateFn("QUERY", templates.ResourceRequirements)),
+				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
+					Enable: ptr.To(false),
+				},
 			},
 			StoreLabelSelector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
@@ -1683,14 +1596,6 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 				QueryRangeSplitInterval: ptr.To(v1alpha1.Duration("48h")),
 				LabelsSplitInterval:     ptr.To(v1alpha1.Duration("48h")),
 				LabelsDefaultTimeRange:  ptr.To(v1alpha1.Duration("336h")),
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
-					Enable: ptr.To(false),
-				},
 			},
 		},
 	}
@@ -1765,12 +1670,7 @@ func rulerCR(namespace string, templates clusters.TemplateMaps) []runtime.Object
 					ResourceRequirements: ptr.To(clusters.TemplateFn("RULER", templates.ResourceRequirements)),
 				},
 				Replicas: clusters.TemplateFn("RULER", templates.Replicas),
-				RuleConfigSelector: &metav1.LabelSelector{
-					MatchLabels: map[string]string{
-						"operator.thanos.io/rule-file": "true",
-					},
-				},
-				PrometheusRuleSelector: metav1.LabelSelector{
+				RuleConfigSelector: metav1.LabelSelector{
 					MatchLabels: map[string]string{
 						"operator.thanos.io/prometheus-rule": "true",
 					},
@@ -1795,11 +1695,6 @@ func rulerCR(namespace string, templates clusters.TemplateMaps) []runtime.Object
 				EvaluationInterval: v1alpha1.Duration("1m"),
 				StorageConfiguration: v1alpha1.StorageConfiguration{
 					Size: clusters.TemplateFn("RULER", templates.StorageSize),
-				},
-				FeatureGates: &v1alpha1.FeatureGates{
-					ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-						Enable: ptr.To(false),
-					},
 				},
 			},
 		},
@@ -1882,11 +1777,6 @@ func compactTempProduction(templates clusters.TemplateMaps) []runtime.Object {
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: v1alpha1.StorageSize("500Gi"),
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 		},
 	}
 
@@ -1948,11 +1838,6 @@ func compactTempProduction(templates clusters.TemplateMaps) []runtime.Object {
 			},
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: v1alpha1.StorageSize("3000Gi"),
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
 			},
 			TimeRangeConfig: &v1alpha1.TimeRangeConfig{
 				MaxTime: ptr.To(v1alpha1.Duration("-120d")),
@@ -2019,11 +1904,6 @@ func compactTempProduction(templates clusters.TemplateMaps) []runtime.Object {
 			StorageConfiguration: v1alpha1.StorageConfiguration{
 				Size: v1alpha1.StorageSize("3000Gi"),
 			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
-			},
 			TimeRangeConfig: &v1alpha1.TimeRangeConfig{
 				MinTime: ptr.To(v1alpha1.Duration("-61d")),
 			},
@@ -2075,11 +1955,6 @@ func stageCompactCR(namespace string, templates clusters.TemplateMaps) []runtime
 			},
 			Additional: v1alpha1.Additional{
 				Args: []string{},
-			},
-			FeatureGates: &v1alpha1.FeatureGates{
-				ServiceMonitorConfig: &v1alpha1.ServiceMonitorConfig{
-					Enable: ptr.To(false),
-				},
 			},
 		},
 	}

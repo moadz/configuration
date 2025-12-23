@@ -13,9 +13,6 @@ spec:
     externalCacheConfig:
       key: thanos.yaml
       name: thanos-bucket-cache-memcached
-  featureGates:
-    serviceMonitor:
-      enable: false
   ignoreDeletionMarksDelay: 24h
   imagePullPolicy: IfNotPresent
   indexCacheConfig:

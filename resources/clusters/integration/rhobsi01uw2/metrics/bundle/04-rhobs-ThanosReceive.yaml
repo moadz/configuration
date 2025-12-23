@@ -4,9 +4,6 @@ metadata:
   name: rhobs
   namespace: rhobs-int
 spec:
-  featureGates:
-    serviceMonitor:
-      enable: false
   ingesterSpec:
     defaultObjectStorageConfig:
       key: thanos.yaml

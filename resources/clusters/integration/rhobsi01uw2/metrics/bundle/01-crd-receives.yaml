@@ -38,60 +38,6 @@ spec:
           spec:
             description: Spec defines the desired state of ThanosReceive
             properties:
-              featureGates:
-                default:
-                  serviceMonitor:
-                    enable: true
-                description: FeatureGates are feature gates for the compact component.
-                properties:
-                  podDisruptionBudget:
-                    default:
-                      enable: true
-                    description: |-
-                      PodDisruptionBudgetConfig is the configuration for the PodDisruptionBudget.
-                      This setting requires the feature gate for PodDisruptionBudget management to be enabled.
-                    properties:
-                      enable:
-                        description: Enabled enables the creation of a PodDisruptionBudget
-                          for the Thanos component.
-                        type: boolean
-                      maxUnavailable:
-                        description: |-
-                          MaxUnavailable is the maximum number of pods that can be unavailable during the disruption.
-                          If neither MaxUnavailable nor MinAvailable is specified, the default is 1.
-                        format: int32
-                        type: integer
-                      minAvailable:
-                        description: MinAvailable is the minimum number of pods that
-                          must still be available during the disruption.
-                        format: int32
-                        type: integer
-                    type: object
-                  prometheusRuleEnabled:
-                    default: true
-                    description: |-
-                      PrometheusRuleEnabled enables the loading of PrometheusRules into the Thanos Ruler.
-                      This setting is only applicable to ThanosRuler CRD, will be ignored for other components.
-                    type: boolean
-                  serviceMonitor:
-                    default:
-                      enable: true
-                    description: |-
-                      ServiceMonitorConfig is the configuration for the ServiceMonitor.
-                      This setting requires the feature gate for ServiceMonitor management to be enabled.
-                    properties:
-                      enable:
-                        description: |-
-                          Enable the management of ServiceMonitors for the Thanos component.
-                          If not specified, the operator will default to true.
-                        type: boolean
-                      labels:
-                        additionalProperties:
-                          type: string
-                        description: Labels to add to the ServiceMonitor.
-                        type: object
-                    type: object
-                type: object
               ingesterSpec:
                 description: Ingester is the configuration for the ingestor.
                 properties:
@@ -977,7 +923,9 @@ spec:
                               type: integer
                           type: object
                         resizePolicy:
-                          description: Resources resize policy for the container.
+                          description: |-
+                            Resources resize policy for the container.
+                            This field cannot be set on ephemeral containers.
                           items:
                             description: ContainerResizePolicy represents resource
                               resize policy for the container.
@@ -2561,7 +2509,7 @@ spec:
                                     resources:
                                       description: |-
                                         resources represents the minimum resources the volume should have.
-                                        If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                                        Users are allowed to specify resource requirements
                                         that are lower than previous value but must still be higher than capacity recorded in the
                                         status field of the claim.
                                         More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -3442,6 +3390,24 @@ spec:
                                         description: Kubelet's generated CSRs will
                                           be addressed to this signer.
                                         type: string
+                                      userAnnotations:
+                                        additionalProperties:
+                                          type: string
+                                        description: |-
+                                          userAnnotations allow pod authors to pass additional information to
+                                          the signer implementation.  Kubernetes does not restrict or validate this
+                                          metadata in any way.
+
+                                          These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+                                          the PodCertificateRequest objects that Kubelet creates.
+
+                                          Entries are subject to the same validation as object metadata annotations,
+                                          with the addition that all keys must be domain-prefixed. No restrictions
+                                          are placed on values, except an overall size limitation on the entire field.
+
+                                          Signers should document the keys and values they support. Signers should
+                                          deny requests that contain keys they do not recognize.
+                                        type: object
                                     required:
                                     - keyType
                                     - signerName
@@ -4940,6 +4906,20 @@ spec:
                           - key
                           type: object
                           x-kubernetes-map-type: atomic
+                        podDisruptionBudgetConfig:
+                          default:
+                            enable: true
+                          description: |-
+                            PodDisruptionBudgetConfig holds the configuration for the PodDisruptionBudget.
+                            This allows enabling or disabling the creation of a PodDisruptionBudget for the Thanos component.
+                            When enabled, a resource that has more than one replica will have a PodDisruptionBudget created
+                            that sets maxUnavailable to 1.
+                          properties:
+                            enable:
+                              description: Enabled enables the creation of a PodDisruptionBudget
+                                for the Thanos component.
+                              type: boolean
+                          type: object
                         replicas:
                           default: 1
                           description: Replicas is the number of replicas/members
@@ -5349,9 +5329,10 @@ spec:
                               operator:
                                 description: |-
                                   Operator represents a key's relationship to the value.
-                                  Valid operators are Exists and Equal. Defaults to Equal.
+                                  Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                                   Exists is equivalent to wildcard for value, so that a pod can
                                   tolerate all taints of a particular category.
+                                  Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                                 type: string
                               tolerationSeconds:
                                 description: |-
@@ -6307,7 +6288,9 @@ spec:
                               type: integer
                           type: object
                         resizePolicy:
-                          description: Resources resize policy for the container.
+                          description: |-
+                            Resources resize policy for the container.
+                            This field cannot be set on ephemeral containers.
                           items:
                             description: ContainerResizePolicy represents resource
                               resize policy for the container.
@@ -7891,7 +7874,7 @@ spec:
                                     resources:
                                       description: |-
                                         resources represents the minimum resources the volume should have.
-                                        If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                                        Users are allowed to specify resource requirements
                                         that are lower than previous value but must still be higher than capacity recorded in the
                                         status field of the claim.
                                         More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -8772,6 +8755,24 @@ spec:
                                         description: Kubelet's generated CSRs will
                                           be addressed to this signer.
                                         type: string
+                                      userAnnotations:
+                                        additionalProperties:
+                                          type: string
+                                        description: |-
+                                          userAnnotations allow pod authors to pass additional information to
+                                          the signer implementation.  Kubernetes does not restrict or validate this
+                                          metadata in any way.
+
+                                          These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+                                          the PodCertificateRequest objects that Kubelet creates.
+
+                                          Entries are subject to the same validation as object metadata annotations,
+                                          with the addition that all keys must be domain-prefixed. No restrictions
+                                          are placed on values, except an overall size limitation on the entire field.
+
+                                          Signers should document the keys and values they support. Signers should
+                                          deny requests that contain keys they do not recognize.
+                                        type: object
                                     required:
                                     - keyType
                                     - signerName
@@ -10194,6 +10195,20 @@ spec:
                     description: NodeSelector defines on which Nodes the workloads
                       are scheduled.
                     type: object
+                  podDisruptionBudgetConfig:
+                    default:
+                      enable: true
+                    description: |-
+                      PodDisruptionBudgetConfig holds the configuration for the PodDisruptionBudget.
+                      This allows enabling or disabling the creation of a PodDisruptionBudget for the Thanos component.
+                      When enabled, a resource that has more than one replica will have a PodDisruptionBudget created
+                      that sets maxUnavailable to 1.
+                    properties:
+                      enable:
+                        description: Enabled enables the creation of a PodDisruptionBudget
+                          for the Thanos component.
+                        type: boolean
+                    type: object
                   replicas:
                     default: 1
                     description: Replicas is the number of router replicas.
@@ -10533,9 +10548,10 @@ spec:
                         operator:
                           description: |-
                             Operator represents a key's relationship to the value.
-                            Valid operators are Exists and Equal. Defaults to Equal.
+                            Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                             Exists is equivalent to wildcard for value, so that a pod can
                             tolerate all taints of a particular category.
+                            Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                           type: string
                         tolerationSeconds:
                           description: |-

@@ -74,9 +74,6 @@ spec:
   downsamplingConfig:
     disable: false
     downsamplingConcurrency: 1
-  featureGates:
-    serviceMonitor:
-      enable: false
   imagePullPolicy: IfNotPresent
   logFormat: logfmt
   logLevel: info
