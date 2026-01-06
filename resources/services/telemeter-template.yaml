@@ -137,6 +137,7 @@ objects:
           - --whitelist={__name__="cluster:mcd_nodes_with_unsupported_packages:count"}
           - --whitelist={__name__="cluster:mcd_total_unsupported_packages:sum"}
           - --whitelist={__name__="cluster:memory_usage_bytes:sum"}
+          - --whitelist={__name__="cluster:mtv_migrations_status_total:sum", provider=~"ova|vsphere|openstack|openshift|ovirt|awsec2", target=~"Local|Remote", mode=~"Cold|Warm|RCM", status=~"Succeeded|Failed|Canceled"}
           - --whitelist={__name__="cluster:network_attachment_definition_enabled_instance_up:max"}
           - --whitelist={__name__="cluster:network_attachment_definition_instances:max"}
           - --whitelist={__name__="cluster:node_instance_type_count:sum"}
@@ -248,6 +249,7 @@ objects:
           - --whitelist={__name__="ols:rest_api_query_calls_total:5xx"}
           - --whitelist={__name__="openshift:build_by_strategy:sum"}
           - --whitelist={__name__="openshift:cpu_usage_cores:sum"}
+          - --whitelist={__name__="openshift:gateway_api_usage:count",gateway_class_type=~"openshift|not-openshift"}
           - --whitelist={__name__="openshift:memory_usage_bytes:sum"}
           - --whitelist={__name__="openshift:openshift_network_operator_ipsec_state:info"}
           - --whitelist={__name__="openshift:prometheus_tsdb_head_samples_appended_total:sum"}
@@ -443,6 +445,7 @@ objects:
           - --whitelist={__name__="cluster:mcd_nodes_with_unsupported_packages:count"}
           - --whitelist={__name__="cluster:mcd_total_unsupported_packages:sum"}
           - --whitelist={__name__="cluster:memory_usage_bytes:sum"}
+          - --whitelist={__name__="cluster:mtv_migrations_status_total:sum", provider=~"ova|vsphere|openstack|openshift|ovirt|awsec2", target=~"Local|Remote", mode=~"Cold|Warm|RCM", status=~"Succeeded|Failed|Canceled"}
           - --whitelist={__name__="cluster:network_attachment_definition_enabled_instance_up:max"}
           - --whitelist={__name__="cluster:network_attachment_definition_instances:max"}
           - --whitelist={__name__="cluster:node_instance_type_count:sum"}
@@ -554,6 +557,7 @@ objects:
           - --whitelist={__name__="ols:rest_api_query_calls_total:5xx"}
           - --whitelist={__name__="openshift:build_by_strategy:sum"}
           - --whitelist={__name__="openshift:cpu_usage_cores:sum"}
+          - --whitelist={__name__="openshift:gateway_api_usage:count",gateway_class_type=~"openshift|not-openshift"}
           - --whitelist={__name__="openshift:memory_usage_bytes:sum"}
           - --whitelist={__name__="openshift:openshift_network_operator_ipsec_state:info"}
           - --whitelist={__name__="openshift:prometheus_tsdb_head_samples_appended_total:sum"}
