@@ -628,8 +628,8 @@ func createGatewayService(m clusters.TemplateMaps, namespace string, conf *clust
 		Spec: corev1.ServiceSpec{
 			Type:                  corev1.ServiceTypeClusterIP,
 			SessionAffinity:       corev1.ServiceAffinityNone,
-			InternalTrafficPolicy: &[]corev1.ServiceInternalTrafficPolicyType{corev1.ServiceInternalTrafficPolicyCluster}[0],
-			IPFamilyPolicy:        &[]corev1.IPFamilyPolicyType{corev1.IPFamilyPolicySingleStack}[0],
+			InternalTrafficPolicy: &[]corev1.ServiceInternalTrafficPolicy{corev1.ServiceInternalTrafficPolicyCluster}[0],
+			IPFamilyPolicy:        &[]corev1.IPFamilyPolicy{corev1.IPFamilyPolicySingleStack}[0],
 			IPFamilies:            []corev1.IPFamily{corev1.IPv4Protocol},
 			Ports:                 ports,
 			Selector:              selectorLabels,
