@@ -355,6 +355,17 @@ func GenerateRBAC() *ObservatoriumRBAC {
 		skipConventionCheck: true,
 	})
 
+	// rosa-core read/write
+	// Special request of extra read account.
+	attachBinding(&obsRBAC, BindingOpts{
+		name:                "0174b0a8-649a-4a95-bdff-9592f41b0de4",
+		tenant:              telemeterTenant,
+		signals:             []Resource{MetricsResource},
+		perms:               []rbac.Permission{rbac.Write}, // Write only
+		envs:                []env{productionEnv},
+		skipConventionCheck: true,
+	})
+
 	// RHTAP
 	// Reader and Writer serviceaccount
 	attachBinding(&obsRBAC, BindingOpts{
