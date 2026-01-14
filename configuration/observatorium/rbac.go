@@ -365,6 +365,18 @@ func GenerateRBAC() *ObservatoriumRBAC {
 		envs:    []env{stagingEnv, productionEnv},
 	})
 
+	// RHTAP - SREP -special access request
+	// Reader and Writer serviceaccount
+	attachBinding(&obsRBAC, BindingOpts{
+		name:                "aed46b58-abb5-4b1e-831f-a5678de691e0",
+		tenant:              rhtapTenant,
+		signals:             []Resource{MetricsResource},
+		perms:               []rbac.Permission{rbac.Read, rbac.Write},
+		envs:                []env{stagingEnv},
+		skipConventionCheck: true,
+		withConcreteName:    true,
+	})
+
 	// RHEL
 	// Reader serviceaccount
 	attachBinding(&obsRBAC, BindingOpts{
@@ -431,6 +443,8 @@ type BindingOpts struct {
 	perms               []rbac.Permission
 	envs                []env
 	skipConventionCheck bool
+	// withConcreteName is used to bypass name generation logic and use the name as is.
+	withConcreteName bool
 }
 
 func (bo *BindingOpts) WithServiceAccountName(n string) *BindingOpts {
@@ -510,9 +524,11 @@ func attachBinding(o *ObservatoriumRBAC, opts BindingOpts) {
 			mimic.Panicf(errMsg)
 		}
 
-		n := fmt.Sprintf("service-account-%s-%s", opts.name, e)
-		if e == productionEnv {
+		var n string
+		if e == productionEnv || opts.withConcreteName {
 			n = fmt.Sprintf("service-account-%s", opts.name)
+		} else {
+			n = fmt.Sprintf("service-account-%s-%s", opts.name, e)
 		}
 
 		subs = append(subs, rbac.Subject{Name: n, Kind: rbac.User})

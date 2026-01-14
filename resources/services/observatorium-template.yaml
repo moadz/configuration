@@ -966,6 +966,13 @@ objects:
           "name": "service-account-observatorium-rhtap-staging"
         - "kind": "user"
           "name": "service-account-observatorium-rhtap"
+      - "name": "aed46b58-abb5-4b1e-831f-a5678de691e0"
+        "roles":
+        - "rhtap-metrics-read"
+        - "rhtap-metrics-write"
+        "subjects":
+        - "kind": "user"
+          "name": "service-account-aed46b58-abb5-4b1e-831f-a5678de691e0"
       - "name": "observatorium-rhel-read"
         "roles":
         - "rhel-metrics-read"
