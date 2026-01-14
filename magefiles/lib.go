@@ -12,6 +12,7 @@ import (
 	"github.com/observatorium/observatorium/configuration_go/kubegen/workload"
 	templatev1 "github.com/openshift/api/template/v1"
 	monv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	"github.com/rhobs/configuration/clusters"
 	appsv1 "k8s.io/api/apps/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 
@@ -33,6 +34,21 @@ const (
 	openShiftClusterMonitoringLabelValue = "app-sre"
 	openshiftCustomerMonitoringNamespace = "openshift-customer-monitoring"
 )
+
+var migratedClusters = []clusters.ClusterName{
+	clusters.ClusterRHOBSUSWestIntegration,
+	clusters.ClusterRHOBSUSEastOneStaging,
+	clusters.ClusterRHOBSUSWestTwoStaging,
+}
+
+func isMigratedCluster(config clusters.ClusterConfig) bool {
+	for _, cluster := range migratedClusters {
+		if config.Name == cluster {
+			return true
+		}
+	}
+	return false
+}
 
 type resourceRequirements struct {
 	cpuRequest    string

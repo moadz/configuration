@@ -21,7 +21,7 @@ import (
 
 func (b Build) DefaultLokiStack(config clusters.ClusterConfig) {
 	// For rhobss01ue1 and rhobsi01uw2 clusters, generate logs bundle with individual resources
-	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+	if isMigratedCluster(config) {
 		if err := generateLogsBundle(config); err != nil {
 			log.Printf("Error generating logs bundle: %v", err)
 		}

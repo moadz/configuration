@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: thanos-compactor
+    app.kubernetes.io/managed-by: thanos-operator
+    app.kubernetes.io/name: thanos-compact
+    app.kubernetes.io/part-of: thanos
+    prometheus: app-sre
+  name: thanos-compact
+  namespace: openshift-customer-monitoring
+spec:
+  endpoints:
+  - interval: 30s
+    path: /metrics
+    port: http
+  namespaceSelector:
+    matchNames:
+    - rhobs-stage
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: thanos-compactor
+      app.kubernetes.io/managed-by: thanos-operator
+      app.kubernetes.io/name: thanos-compact
+      app.kubernetes.io/part-of: thanos

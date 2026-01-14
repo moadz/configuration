@@ -27,7 +27,7 @@ const (
 // https://github.com/thanos-community/thanos-operator/tree/main/config/crd/bases
 func (b Build) ThanosOperatorCRDS(config clusters.ClusterConfig) error {
 	// For rhobss01ue1 and rhobsi01uw2 clusters, CRDs are handled in metrics bundle
-	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+	if isMigratedCluster(config) {
 		return nil // CRDs are generated as part of metrics bundle
 	}
 	gen := b.generator(config, "thanos-operator-crds")
@@ -82,7 +82,7 @@ func crds(gen *mimic.Generator) error {
 
 func (b Build) ThanosOperator(config clusters.ClusterConfig) error {
 	// For rhobss01ue1 and rhobsi01uw2 clusters, operator is handled in metrics bundle
-	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+	if isMigratedCluster(config) {
 		return nil // Operator is generated as part of metrics bundle
 	}
 

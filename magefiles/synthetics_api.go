@@ -283,7 +283,7 @@ func createSyntheticsApiServiceMonitor(config *syntheticsApiConfig) *monitoringv
 
 func (b Build) SyntheticsApi(config clusters.ClusterConfig) {
 	// For rhobss01ue1 and rhobsi01uw2 clusters, generate synthetics bundle with individual resources
-	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+	if isMigratedCluster(config) {
 		if err := generateSyntheticsBundle(config); err != nil {
 			log.Printf("Error generating synthetics bundle: %v", err)
 		}

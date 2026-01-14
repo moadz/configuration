@@ -49,7 +49,7 @@ func (b Build) Gateway(config clusters.ClusterConfig) error {
 		return b.generator(config, gatewayName)
 	}
 	// For rhobss01ue1 and rhobsi01uw2 clusters, generate gateway bundle with individual resources
-	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+	if isMigratedCluster(config) {
 		return generateGatewayBundle(config)
 	}
 	return gateway(config, fn)

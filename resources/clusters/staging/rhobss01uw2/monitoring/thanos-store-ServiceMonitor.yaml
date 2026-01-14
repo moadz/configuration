@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: object-storage-gateway
+    app.kubernetes.io/managed-by: thanos-operator
+    app.kubernetes.io/name: thanos-store
+    app.kubernetes.io/part-of: thanos
+    prometheus: app-sre
+  name: thanos-store
+  namespace: openshift-customer-monitoring
+spec:
+  endpoints:
+  - interval: 30s
+    path: /metrics
+    port: http
+  namespaceSelector:
+    matchNames:
+    - rhobs-stage
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: object-storage-gateway
+      app.kubernetes.io/managed-by: thanos-operator
+      app.kubernetes.io/name: thanos-store
+      app.kubernetes.io/part-of: thanos

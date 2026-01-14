@@ -27,7 +27,7 @@ import (
 
 func (b Build) DefaultThanosStack(config clusters.ClusterConfig) {
 	// For rhobss01ue1 and rhobsi01uw2 clusters, generate metrics bundle with individual resources
-	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+	if isMigratedCluster(config) {
 		if err := generateMetricsBundle(config); err != nil {
 			log.Printf("Error generating metrics bundle: %v", err)
 		}

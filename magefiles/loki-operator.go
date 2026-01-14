@@ -41,7 +41,7 @@ const (
 // This is synced from the ref lokiRef at https://gitlab.cee.redhat.com/openshift-logging/konflux-log-storage
 func (b Build) LokiOperatorCRDS(config clusters.ClusterConfig) error {
 	// For rhobss01ue1 and rhobsi01uw2 clusters, CRDs are handled in logs bundle
-	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+	if isMigratedCluster(config) {
 		return nil // CRDs are generated as part of logs bundle
 	}
 	gen := b.generator(config, "loki-operator-crds")
@@ -84,7 +84,7 @@ func lokiCRD(gen *mimic.Generator, templates clusters.TemplateMaps) error {
 
 func (b Build) LokiOperator(config clusters.ClusterConfig) {
 	// For rhobss01ue1 and rhobsi01uw2 clusters, operator is handled in logs bundle
-	if config.Name == "rhobss01ue1" || config.Name == "rhobsi01uw2" {
+	if isMigratedCluster(config) {
 		return // Operator is generated as part of logs bundle
 	}
 
