@@ -959,7 +959,7 @@ objects:
           "name": "service-account-4cbd24b0-3aed-4b03-839a-f4515b199a5d"
       - "name": "0174b0a8-649a-4a95-bdff-9592f41b0de4"
         "roles":
-        - "telemeter-metrics-write"
+        - "telemeter-metrics-read"
         "subjects":
         - "kind": "user"
           "name": "service-account-0174b0a8-649a-4a95-bdff-9592f41b0de4"

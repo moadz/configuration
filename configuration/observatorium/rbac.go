@@ -361,7 +361,7 @@ func GenerateRBAC() *ObservatoriumRBAC {
 		name:                "0174b0a8-649a-4a95-bdff-9592f41b0de4",
 		tenant:              telemeterTenant,
 		signals:             []Resource{MetricsResource},
-		perms:               []rbac.Permission{rbac.Write}, // Write only
+		perms:               []rbac.Permission{rbac.Read},
 		envs:                []env{productionEnv},
 		skipConventionCheck: true,
 	})
