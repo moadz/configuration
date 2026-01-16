@@ -1,3 +1,4 @@
+# place in ~/.config/gimme/gimme.yaml
 browser: Safari
 vpn: "London (LCY)"
 
@@ -9,6 +10,13 @@ clusters:
       prometheus: "https://prometheus.rhobss01ue1.devshift.net/"
       alertmanager: "https://alertmanager.rhobss01ue1.devshift.net/"
       cidr: "10.170.83.0/24"
+      bastion: "bastion.ci.int.devshift.net"
+    - name: "rhobss01uw2"
+      region: "uw2"
+      console: "https://console-openshift-console.apps.rhobss01uw2.fjsa.p1.openshiftapps.com/"
+      prometheus: "https://prometheus.rhobss01uw2.devshift.net/"
+      alertmanager: "https://alertmanager.rhobss01uw2.devshift.net/"
+      cidr: "10.170.84.0/24"
       bastion: "bastion.ci.int.devshift.net"
   int:
     - name: "rhobsi01uw2"
