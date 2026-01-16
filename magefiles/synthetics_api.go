@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/rhobs/configuration/clusters"
 
@@ -357,8 +356,8 @@ func generateSyntheticsBundle(config clusters.ClusterConfig) error {
 	}
 
 	for i, obj := range syntheticsObjs {
-		resourceKind := getSyntheticsResourceKind(obj)
-		resourceName := getSyntheticsResourceName(obj)
+		resourceKind := getResourceKind(obj)
+		resourceName := getKubernetesResourceName(obj)
 		filename := fmt.Sprintf("%02d-%s-%s.yaml", i+1, resourceName, resourceKind)
 		bundleGen.Add(filename, encoding.GhodssYAML(obj))
 	}
@@ -485,64 +484,6 @@ func createBundleSyntheticsApiDeployment(config *syntheticsApiConfig, m clusters
 		},
 	}
 	return deployment
-}
-
-// getSyntheticsResourceKind returns the Kind field from a Kubernetes object for synthetics resources
-func getSyntheticsResourceKind(obj runtime.Object) string {
-	switch obj.(type) {
-	case *appsv1.StatefulSet:
-		return "StatefulSet"
-	case *appsv1.Deployment:
-		return "Deployment"
-	case *corev1.Service:
-		return "Service"
-	case *corev1.ServiceAccount:
-		return "ServiceAccount"
-	case *corev1.ConfigMap:
-		return "ConfigMap"
-	case *rbacv1.Role:
-		return "Role"
-	case *rbacv1.RoleBinding:
-		return "RoleBinding"
-	case *rbacv1.ClusterRole:
-		return "ClusterRole"
-	case *rbacv1.ClusterRoleBinding:
-		return "ClusterRoleBinding"
-	default:
-		// Try to get the kind from TypeMeta as a fallback
-		if gvk := obj.GetObjectKind().GroupVersionKind(); gvk.Kind != "" {
-			return gvk.Kind
-		}
-		// If TypeMeta doesn't have Kind, try to infer from type name
-		objType := fmt.Sprintf("%T", obj)
-		if objType != "" && len(objType) > 1 {
-			// Extract the last part after the dot and asterisk (e.g., "*v1.StatefulSet" -> "StatefulSet")
-			parts := strings.Split(objType, ".")
-			if len(parts) > 0 {
-				typeName := parts[len(parts)-1]
-				return typeName
-			}
-		}
-		return "Unknown"
-	}
-}
-
-// getSyntheticsResourceName extracts a meaningful name from a synthetics Kubernetes object
-func getSyntheticsResourceName(obj runtime.Object) string {
-	if obj == nil {
-		return "unknown"
-	}
-
-	switch o := obj.(type) {
-	case metav1.Object:
-		name := o.GetName()
-		if name != "" {
-			return name
-		}
-	}
-
-	// Fallback to the object type
-	return "unnamed"
 }
 
 // createConsolidatedSyntheticsServiceMonitors creates ServiceMonitors for synthetics components

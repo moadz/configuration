@@ -61,8 +61,8 @@ func generateAlertmanagerBundle(config clusters.ClusterConfig) error {
 	}
 
 	for i, obj := range alertmanagerObjs {
-		resourceKind := getAlertmanagerResourceKind(obj)
-		resourceName := getAlertmanagerResourceName(obj)
+		resourceKind := getResourceKind(obj)
+		resourceName := getKubernetesResourceName(obj)
 		filename := fmt.Sprintf("%02d-%s-%s.yaml", i+1, resourceName, resourceKind)
 		bundleGen.Add(filename, encoding.GhodssYAML(obj))
 	}
@@ -116,36 +116,6 @@ func createAlertmanager(config *alertmanagerConfig) *monitoringv1.Alertmanager {
 			Replicas: config.Replicas,
 		},
 	}
-}
-
-// getAlertmanagerResourceKind returns the Kind field from a Kubernetes object for alertmanager resources
-func getAlertmanagerResourceKind(obj runtime.Object) string {
-	switch obj.(type) {
-	case *monitoringv1.Alertmanager:
-		return "Alertmanager"
-	default:
-		if gvk := obj.GetObjectKind().GroupVersionKind(); gvk.Kind != "" {
-			return gvk.Kind
-		}
-		return "Unknown"
-	}
-}
-
-// getAlertmanagerResourceName extracts a meaningful name from an alertmanager Kubernetes object
-func getAlertmanagerResourceName(obj runtime.Object) string {
-	if obj == nil {
-		return "unknown"
-	}
-
-	switch o := obj.(type) {
-	case metav1.Object:
-		name := o.GetName()
-		if name != "" {
-			return name
-		}
-	}
-
-	return "unnamed"
 }
 
 // createAlertmanagerServiceMonitors creates ServiceMonitors for alertmanager components

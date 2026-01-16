@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"maps"
+	"os"
 	"time"
 
 	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
+	kitlog "github.com/go-kit/log"
 	"github.com/observatorium/observatorium/configuration_go/abstr/kubernetes/alertmanager"
 	kghelpers "github.com/observatorium/observatorium/configuration_go/kubegen/helpers"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
@@ -41,6 +44,14 @@ const (
 )
 
 func (b Build) Alertmanager(config clusters.ClusterConfig) {
+	// For migrated clusters, generate alertmanager bundle with individual resources
+	if isMigratedCluster(config) {
+		if err := generateAlertmanagerBundleFromTemplate(config); err != nil {
+			log.Printf("Error generating alertmanager bundle: %v", err)
+		}
+		return
+	}
+
 	gen := b.generator(config, "alertmanager")
 
 	// TODO: @moadz Extract Alertmanager options to an envTemplate in template.go
@@ -210,4 +221,53 @@ func alertmanagerPostProcess(manifests []runtime.Object, namespace string) encod
 				},
 			},
 		))
+}
+
+// generateAlertmanagerBundleFromTemplate generates individual alertmanager component resources for bundle deployment
+// This function reuses the existing template-based alertmanager generation but outputs individual files instead
+func generateAlertmanagerBundleFromTemplate(config clusters.ClusterConfig) error {
+	ns := config.Namespace
+
+	// Create bundle generator for individual resource files
+	bundleGen := &mimic.Generator{}
+	bundleGen = bundleGen.With("resources", "clusters", string(config.Environment), string(config.Name), "alertmanager", "bundle")
+	bundleGen.Logger = kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stdout))
+
+	// Generate alertmanager objects using existing template logic
+	k8s := alertmanagerKubernetes(alertManagerOptions(), manifestOptions{
+		namespace: ns,
+		image:     defaultAlertManagerImage,
+		imageTag:  defaultAlertManagerImageTag,
+		resourceRequirements: resourceRequirements{
+			cpuRequest:    defaultAlertmanagerCPURequest,
+			cpuLimit:      defaultAlertmanagerCPULimit,
+			memoryRequest: defaultAlertmanagerMemoryRequest,
+			memoryLimit:   defaultAlertmanagerMemoryLimit,
+		},
+	})
+
+	manifests := k8s.Objects()
+
+	// Extract and handle ServiceMonitor separately
+	var sm *monv1.ServiceMonitor
+	sm, manifests = getAndRemoveObject[*monv1.ServiceMonitor](manifests, "")
+
+	// Generate individual resource files for each alertmanager component
+	for i, obj := range manifests {
+		resourceKind := getResourceKind(obj)
+		resourceName := getKubernetesResourceName(obj)
+		filename := fmt.Sprintf("%02d-%s-%s.yaml", i+1, resourceName, resourceKind)
+		bundleGen.Add(filename, encoding.GhodssYAML(obj))
+	}
+
+	// Generate the bundle files
+	bundleGen.Generate()
+
+	// Add ServiceMonitor to monitoring bundle if it exists
+	if sm != nil {
+		monBundle := GetMonitoringBundle(config)
+		monBundle.AddServiceMonitor(sm)
+	}
+
+	return nil
 }

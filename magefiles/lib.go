@@ -10,6 +10,7 @@ import (
 	kghelpers "github.com/observatorium/observatorium/configuration_go/kubegen/helpers"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/workload"
+	routev1 "github.com/openshift/api/route/v1"
 	templatev1 "github.com/openshift/api/template/v1"
 	monv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
@@ -348,6 +349,12 @@ func getResourceKind(obj runtime.Object) string {
 		return "Role"
 	case *rbacv1.RoleBinding:
 		return "RoleBinding"
+	case *routev1.Route:
+		return "Route"
+	case *monv1.Alertmanager:
+		return "Alertmanager"
+	case *monv1.ServiceMonitor:
+		return "ServiceMonitor"
 	default:
 		// Try to get the kind from TypeMeta as a fallback
 		if gvk := obj.GetObjectKind().GroupVersionKind(); gvk.Kind != "" {
@@ -365,6 +372,24 @@ func getResourceKind(obj runtime.Object) string {
 		}
 		return "Unknown"
 	}
+}
+
+// getKubernetesResourceName extracts a meaningful name from a Kubernetes object
+func getKubernetesResourceName(obj runtime.Object) string {
+	if obj == nil {
+		return "unknown"
+	}
+
+	switch o := obj.(type) {
+	case metav1.Object:
+		name := o.GetName()
+		if name != "" {
+			return name
+		}
+	}
+
+	// Fallback to the object type
+	return "unnamed"
 }
 
 // createServiceSelectorLabels creates labels for service selectors, removing version labels that go stale
