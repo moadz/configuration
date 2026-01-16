@@ -252,8 +252,12 @@ func generateAlertmanagerBundleFromTemplate(config clusters.ClusterConfig) error
 	var sm *monv1.ServiceMonitor
 	sm, manifests = getAndRemoveObject[*monv1.ServiceMonitor](manifests, "")
 
+	// Apply the same post-processing that the template version uses
+	// This adds the Route and modifies the ServiceAccount with OAuth annotations
+	processedManifests := alertmanagerPostProcessForBundle(manifests, ns)
+
 	// Generate individual resource files for each alertmanager component
-	for i, obj := range manifests {
+	for i, obj := range processedManifests {
 		resourceKind := getResourceKind(obj)
 		resourceName := getKubernetesResourceName(obj)
 		filename := fmt.Sprintf("%02d-%s-%s.yaml", i+1, resourceName, resourceKind)
@@ -270,4 +274,55 @@ func generateAlertmanagerBundleFromTemplate(config clusters.ClusterConfig) error
 	}
 
 	return nil
+}
+
+// alertmanagerPostProcessForBundle applies the same post-processing as alertmanagerPostProcess
+// but returns the processed manifests directly for bundle generation instead of wrapping in template
+func alertmanagerPostProcessForBundle(manifests []runtime.Object, namespace string) []runtime.Object {
+	service := kghelpers.GetObject[*corev1.Service](manifests, alertManagerName)
+	service.ObjectMeta.Annotations[servingCertSecretNameAnnotation] = alertmanagerTLSSecret
+	service.Spec.Ports = append(service.Spec.Ports, corev1.ServicePort{
+		Name:       "https",
+		Port:       8443,
+		TargetPort: intstr.FromInt32(8443),
+	})
+	
+	// Add annotations for openshift oauth so that the route to access the query ui works
+	serviceAccount := kghelpers.GetObject[*corev1.ServiceAccount](manifests, "")
+	if serviceAccount.Annotations == nil {
+		serviceAccount.Annotations = map[string]string{}
+	}
+	serviceAccount.Annotations[serviceRedirectAnnotation] = fmt.Sprintf(`{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"%s"}}`, alertManagerName)
+
+	// Add route for oauth-proxy
+	manifests = append(manifests, &routev1.Route{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Route",
+			APIVersion: routev1.SchemeGroupVersion.String(),
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      alertManagerName,
+			Namespace: namespace,
+			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").ObjectMeta.Labels),
+			Annotations: map[string]string{
+				"cert-manager.io/issuer-kind": "ClusterIssuer",
+				"cert-manager.io/issuer-name": "letsencrypt-prod-http",
+			},
+		},
+		Spec: routev1.RouteSpec{
+			Port: &routev1.RoutePort{
+				TargetPort: intstr.FromString("https"),
+			},
+			TLS: &routev1.TLSConfig{
+				Termination:                   routev1.TLSTerminationReencrypt,
+				InsecureEdgeTerminationPolicy: routev1.InsecureEdgeTerminationPolicyRedirect,
+			},
+			To: routev1.RouteTargetReference{
+				Kind: "Service",
+				Name: alertManagerName,
+			},
+		},
+	})
+
+	return manifests
 }

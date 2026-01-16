@@ -1,6 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: alertmanager-tls
   labels:
     app.kubernetes.io/component: alertmanager
     app.kubernetes.io/instance: observatorium
@@ -14,6 +16,9 @@ spec:
     port: 9093
     protocol: TCP
     targetPort: 9093
+  - name: https
+    port: 8443
+    targetPort: 8443
   selector:
     app.kubernetes.io/component: alertmanager
     app.kubernetes.io/instance: observatorium
