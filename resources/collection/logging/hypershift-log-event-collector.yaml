@@ -22,6 +22,9 @@ parameters:
   - name: NAMESPACE
     displayName: Namespace
     value: "openshift-logging"
+  - name: SUFFIX
+    description: "Optional suffix for resource names to support multiple deployments per hive cluster"
+    value: ''
 
 objects:
   - apiVersion: hive.openshift.io/v1
@@ -29,7 +32,7 @@ objects:
     metadata:
       labels:
         managed.openshift.io/osd: 'true'
-      name: rhobs-logs-event-router
+      name: rhobs-logs-event-router${SUFFIX}
     spec:
       resourceApplyMode: Sync
       clusterDeploymentSelector:
