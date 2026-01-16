@@ -31,14 +31,16 @@ parameters:
     value: openshift-observability-operator
   - name: SECRET_NAME
     value: hypershift-telemeter-client
-
+  - name: SUFFIX
+    description: "Optional suffix for resource names to support multiple deployments per hive cluster"
+    value: ''
 objects:
   - apiVersion: hive.openshift.io/v1
     kind: SelectorSyncSet
     metadata:
       labels:
         managed.openshift.io/osd: 'true'
-      name: rhobs-hcp-monitoring-stack
+      name: rhobs-hcp-monitoring-stack${SUFFIX}
     spec:
       resourceApplyMode: Sync
       enableResourceTemplates: true

@@ -10,6 +10,9 @@ parameters:
   - name: SECTORS
     description: String array of Sectors targeted for SC/MC clusters e.g. '["sector-1", "sector-2"]'
     value: '["main"]'
+  - name: SUFFIX
+    description: "Optional suffix for resource names to support multiple deployments per hive cluster"
+    value: ''
 
 objects:
 - apiVersion: hive.openshift.io/v1
@@ -17,7 +20,7 @@ objects:
   metadata:
     labels:
       managed.openshift.io/osd: 'true'
-    name: rhobs-logs-cluster-log-forwarder
+    name: rhobs-logs-cluster-log-forwarder${SUFFIX}
   spec:
     resourceApplyMode: Sync
     enableResourceTemplates: true
