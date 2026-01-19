@@ -40,7 +40,7 @@ func rhobsi01uw2Tenants() observatoriumapi.Tenants {
 					ClientSecret:  "${CLIENT_SECRET}",
 					IssuerURL:     "https://sso.redhat.com/auth/realms/redhat-external",
 					RedirectURL:   "https://observatorium-mst.api.stage.openshift.com/oidc/odfms/callback",
-					UsernameClaim: "preferred_username",
+					UsernameClaim: "client_id",
 				},
 			},
 		},
@@ -52,7 +52,8 @@ func rhobsi01uw2RBAC() cfgobservatorium.ObservatoriumRBAC {
 	opts.WithServiceAccountName("d4045e4b-7b9c-46fc-8af0-5d483d9d205b").
 		WithTenant(cfgobservatorium.HcpTenant).
 		WithSignals([]cfgobservatorium.Resource{cfgobservatorium.MetricsResource, cfgobservatorium.LogsResource, cfgobservatorium.ProbesResource}).
-		WithPerms([]rbac.Permission{rbac.Read, rbac.Write})
+		WithPerms([]rbac.Permission{rbac.Read, rbac.Write}).
+		WithRawSubjectName()
 
 	config := cfgobservatorium.GenerateClusterRBAC(opts)
 	return *config

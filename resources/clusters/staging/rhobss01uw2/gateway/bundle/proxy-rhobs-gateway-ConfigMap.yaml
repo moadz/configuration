@@ -12,7 +12,7 @@ data:
       - hcp-probes-write
       subjects:
       - kind: user
-        name: service-account-45b1e1f4-6e17-4858-8f66-158320f6ac71
+        name: 45b1e1f4-6e17-4858-8f66-158320f6ac71
     roles:
     - name: hcp-metrics-read
       permissions:

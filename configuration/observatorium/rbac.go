@@ -456,6 +456,9 @@ type BindingOpts struct {
 	skipConventionCheck bool
 	// withConcreteName is used to bypass name generation logic and use the name as is.
 	withConcreteName bool
+	// withRawSubjectName skips the "service-account-" prefix, using the name exactly as provided.
+	// Use this for OIDC client credentials flow where the token's client_id claim is the raw UUID.
+	withRawSubjectName bool
 }
 
 func (bo *BindingOpts) WithServiceAccountName(n string) *BindingOpts {
@@ -475,6 +478,14 @@ func (bo *BindingOpts) WithSignals(signals []Resource) *BindingOpts {
 
 func (bo *BindingOpts) WithPerms(perms []rbac.Permission) *BindingOpts {
 	bo.perms = perms
+	return bo
+}
+
+// WithRawSubjectName configures the binding to use the service account name exactly as provided,
+// without adding the "service-account-" prefix. Use this for OIDC client credentials flow
+// where the gateway's usernameClaim is set to "client_id" and the token contains the raw UUID.
+func (bo *BindingOpts) WithRawSubjectName() *BindingOpts {
+	bo.withRawSubjectName = true
 	return bo
 }
 
@@ -536,7 +547,10 @@ func attachBinding(o *ObservatoriumRBAC, opts BindingOpts) {
 		}
 
 		var n string
-		if e == productionEnv || opts.withConcreteName {
+		if opts.withRawSubjectName {
+			// Use the name exactly as provided (for OIDC client credentials flow with client_id claim)
+			n = opts.name
+		} else if e == productionEnv || opts.withConcreteName {
 			n = fmt.Sprintf("service-account-%s", opts.name)
 		} else {
 			n = fmt.Sprintf("service-account-%s-%s", opts.name, e)
