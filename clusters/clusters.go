@@ -21,14 +21,26 @@ const (
 	EnvironmentProduction  ClusterEnvironment = "production"
 )
 
+// MonitoringAPIGroup represents the API group used for the monitoring resources.
+type MonitoringAPIGroup string
+
+const (
+	// CoreosMonitoringAPIGroup generates resources with the upstream's API Group (it is the default).
+	CoreosMonitoringAPIGroup MonitoringAPIGroup = "monitoring.coreos.com"
+
+	// RHOBSMonitoringAPIGroup generates resources with the Cluster Observability Operator's API Group.
+	RHOBSMonitoringAPIGroup MonitoringAPIGroup = "monitoring.rhobs"
+)
+
 // ClusterConfig holds the configuration for a specific cluster deployment
 type ClusterConfig struct {
-	Name          ClusterName
-	Environment   ClusterEnvironment
-	Namespace     string
-	Templates     TemplateMaps
-	GatewayConfig *GatewayConfig
-	BuildSteps    []string
+	Name               ClusterName
+	Environment        ClusterEnvironment
+	Namespace          string
+	Templates          TemplateMaps
+	GatewayConfig      *GatewayConfig
+	BuildSteps         []string
+	MonitoringAPIGroup MonitoringAPIGroup
 }
 
 type GatewayConfig struct {

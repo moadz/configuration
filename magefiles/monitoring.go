@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
 	"github.com/go-kit/log"
 	monv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -28,43 +30,45 @@ func NewMonitoringBundle(config clusters.ClusterConfig) *MonitoringBundle {
 
 // AddServiceMonitor adds a ServiceMonitor to the monitoring bundle
 func (mb *MonitoringBundle) AddServiceMonitor(sm *monv1.ServiceMonitor) {
-	if sm != nil {
-		mb.serviceMonitors = append(mb.serviceMonitors, sm)
+	if sm == nil {
+		return
 	}
+
+	mb.serviceMonitors = append(mb.serviceMonitors, sm)
 }
 
-// Generate creates the monitoring bundle files
+// Generate creates the monitoring bundle files.
 func (mb *MonitoringBundle) Generate() error {
 	if len(mb.serviceMonitors) == 0 {
 		return nil // No ServiceMonitors to generate
 	}
 
-	gen := &mimic.Generator{}
+	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
+	gen := &mimic.Generator{
+		FilePool: mimic.FilePool{
+			Logger: logger,
+		},
+	}
 	gen = gen.With("resources", "clusters", string(mb.config.Environment), string(mb.config.Name), "monitoring")
-	gen.Logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
 
-	// Generate individual ServiceMonitor files as pure Kubernetes resources
-	for i, sm := range mb.serviceMonitors {
+	// Generate individual ServiceMonitor files as pure Kubernetes resources.
+	for _, sm := range mb.serviceMonitors {
 		if sm == nil {
-			continue // Skip nil ServiceMonitors
+			_ = logger.Log("msg", "found nil ServiceMonitor")
+			continue
 		}
 
-		if smObj, ok := sm.(*monv1.ServiceMonitor); ok && smObj != nil {
-			// Process ServiceMonitor to ensure it has proper values (no template variables)
-			processedSM := mb.processServiceMonitorForBundle(smObj)
-
-			name := processedSM.Name
-			if name == "" {
-				name = fmt.Sprintf("unnamed-%d", i)
-			}
-			fileName := fmt.Sprintf("%s-ServiceMonitor.yaml", name)
-			// Generate pure Kubernetes resource (no template wrapping)
-			gen.Add(fileName, encoding.GhodssYAML(processedSM))
-		} else {
-			// Fallback for non-ServiceMonitor objects
-			fileName := fmt.Sprintf("service-monitor-%d.yaml", i)
-			gen.Add(fileName, encoding.GhodssYAML(sm))
+		smObj := sm.(*monv1.ServiceMonitor)
+		if smObj.Name == "" {
+			panic("missing name for ServiceMonitor")
 		}
+		fileName := fmt.Sprintf("%s-ServiceMonitor.yaml", smObj.Name)
+
+		// Process ServiceMonitor to ensure it has proper values (no template variables).
+		processedSM := mb.processServiceMonitorForBundle(smObj)
+
+		// Generate pure Kubernetes resource (no template wrapping).
+		gen.Add(fileName, encoding.GhodssYAML(processedSM))
 	}
 
 	gen.Generate()
@@ -72,7 +76,7 @@ func (mb *MonitoringBundle) Generate() error {
 }
 
 // processServiceMonitorForBundle processes a ServiceMonitor to ensure it's a pure Kubernetes resource.
-func (mb *MonitoringBundle) processServiceMonitorForBundle(sm *monv1.ServiceMonitor) *monv1.ServiceMonitor {
+func (mb *MonitoringBundle) processServiceMonitorForBundle(sm *monv1.ServiceMonitor) runtime.Object {
 	// Create a copy to avoid modifying the original
 	processed := sm.DeepCopy()
 
@@ -92,13 +96,31 @@ func (mb *MonitoringBundle) processServiceMonitorForBundle(sm *monv1.ServiceMoni
 		processed.Spec.NamespaceSelector.MatchNames = []string{mb.config.Namespace}
 	}
 
-	// Add required prometheus label if not present
+	// Add required prometheus label if not present.
 	if processed.Labels == nil {
 		processed.Labels = make(map[string]string)
 	}
 	processed.Labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
 
-	return processed
+	return updateAPIGroup(processed, mb.config.MonitoringAPIGroup)
+}
+
+func updateAPIGroup(o runtime.Object, apiGroup clusters.MonitoringAPIGroup) runtime.Object {
+	if apiGroup == "" {
+		return o
+	}
+
+	// Update the API Group if required.
+	unstructuredObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(o)
+	if err != nil {
+		// It should never happen.
+		panic(err)
+	}
+
+	unstructuredPtr := &unstructured.Unstructured{Object: unstructuredObj}
+	apiGroupVersion := strings.Split(unstructuredPtr.GetAPIVersion(), "/")
+	unstructuredPtr.SetAPIVersion(fmt.Sprintf("%s/%s", apiGroup, apiGroupVersion[1]))
+	return unstructuredPtr
 }
 
 // Global monitoring bundle registry per cluster

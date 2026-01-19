@@ -102,6 +102,7 @@ func newBundleAlertmanagerConfig(namespace string) *alertmanagerConfig {
 
 // createAlertmanager creates an Alertmanager CR using observability-operator
 func createAlertmanager(config *alertmanagerConfig) *monitoringv1.Alertmanager {
+	//TODO(simonpasquier): make it consistent with the ServiceMonitor's API Group.
 	return &monitoringv1.Alertmanager{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Alertmanager",
