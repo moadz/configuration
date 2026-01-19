@@ -13,17 +13,6 @@ data:
       subjects:
       - kind: user
         name: service-account-d4045e4b-7b9c-46fc-8af0-5d483d9d205b
-    - name: 45b1e1f4-6e17-4858-8f66-158320f6ac71
-      roles:
-      - hcp-metrics-read
-      - hcp-metrics-write
-      - hcp-logs-read
-      - hcp-logs-write
-      - hcp-probes-read
-      - hcp-probes-write
-      subjects:
-      - kind: user
-        name: service-account-45b1e1f4-6e17-4858-8f66-158320f6ac71
     roles:
     - name: hcp-metrics-read
       permissions:
