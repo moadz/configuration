@@ -49,7 +49,7 @@ func rhobss01ue1Tenants() observatoriumapi.Tenants {
 
 func rhobss01ue1RBAC() cfgobservatorium.ObservatoriumRBAC {
 	opts := &cfgobservatorium.BindingOpts{}
-	opts.WithServiceAccountName("45b1e1f4-6e17-4858-8f66-158320f6ac71").
+	opts.WithServiceAccountName("d4045e4b-7b9c-46fc-8af0-5d483d9d205b").
 		WithTenant(cfgobservatorium.HcpTenant).
 		WithSignals([]cfgobservatorium.Resource{cfgobservatorium.MetricsResource, cfgobservatorium.LogsResource, cfgobservatorium.ProbesResource}).
 		WithPerms([]rbac.Permission{rbac.Read, rbac.Write}).
