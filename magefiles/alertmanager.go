@@ -286,7 +286,7 @@ func alertmanagerPostProcessForBundle(manifests []runtime.Object, namespace stri
 		Port:       8443,
 		TargetPort: intstr.FromInt32(8443),
 	})
-	
+
 	// Add annotations for openshift oauth so that the route to access the query ui works
 	serviceAccount := kghelpers.GetObject[*corev1.ServiceAccount](manifests, "")
 	if serviceAccount.Annotations == nil {
