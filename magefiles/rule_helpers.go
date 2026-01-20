@@ -19,8 +19,8 @@ const schemaPath = "/openshift/prometheus-rule-1.yml"
 var (
 	// Needed appSRE labels for prom-operator PromethuesRule file.
 	ruleFileLabels = map[string]string{
-		"prometheus": "app-sre",
-		"role":       "alert-rules",
+		openshiftCustomerMonitoringLabel: openShiftClusterMonitoringLabelValue,
+		"role":                           "alert-rules",
 	}
 
 	promRuleTypeMeta = metav1.TypeMeta{

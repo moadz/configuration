@@ -120,8 +120,6 @@ func createAlertmanager(config *alertmanagerConfig) *monitoringv1.Alertmanager {
 
 // createAlertmanagerServiceMonitors creates ServiceMonitors for alertmanager components
 func createAlertmanagerServiceMonitors(namespace string) []runtime.Object {
-	const openshiftCustomerMonitoringNamespace = "openshift-customer-monitoring"
-
 	return []runtime.Object{
 		&monitoringv1.ServiceMonitor{
 			TypeMeta: metav1.TypeMeta{
@@ -129,8 +127,7 @@ func createAlertmanagerServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "rhobs-alertmanager",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "rhobs-alertmanager",
 				Labels: map[string]string{
 					"app.kubernetes.io/component": "alertmanager",
 				},

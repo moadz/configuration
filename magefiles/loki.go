@@ -314,8 +314,6 @@ func getLokiResourceName(obj runtime.Object) string {
 
 // createConsolidatedLokiServiceMonitors creates ServiceMonitors for Loki components
 func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
-	const openshiftCustomerMonitoringNamespace = "openshift-customer-monitoring"
-
 	return []runtime.Object{
 		// Loki Operator Controller Manager
 		&monitoringv1.ServiceMonitor{
@@ -324,8 +322,7 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-operator-controller-manager-metrics",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-operator-controller-manager-metrics",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "monitoring",
 					"app.kubernetes.io/created-by": "loki-operator",
@@ -359,8 +356,7 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-compactor-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-compactor-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "compactor",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -398,8 +394,7 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-distributor-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-distributor-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "distributor",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -437,8 +432,7 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-index-gateway-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-index-gateway-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "index-gateway",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -476,8 +470,7 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-ingester-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-ingester-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "ingester",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -515,8 +508,7 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-querier-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-querier-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "querier",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -554,8 +546,7 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-query-frontend-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-query-frontend-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "query-frontend",
 					"app.kubernetes.io/created-by": "lokistack-controller",

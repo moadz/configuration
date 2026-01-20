@@ -31,8 +31,13 @@ const (
 
 	serviceMonitorTemplate = "service-monitor-template.yaml"
 
+	// openshiftCustomerMonitoringLabel and
+	// openShiftClusterMonitoringLabelValue are label's key and value added to
+	// all monitoring resources.
 	openshiftCustomerMonitoringLabel     = "prometheus"
 	openShiftClusterMonitoringLabelValue = "app-sre"
+
+	// openshiftCustomerMonitoringNamespace is the namespace where monitoring resources should be deployed.
 	openshiftCustomerMonitoringNamespace = "openshift-customer-monitoring"
 )
 

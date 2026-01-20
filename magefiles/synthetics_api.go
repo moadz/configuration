@@ -249,7 +249,6 @@ func createSyntheticsApiServiceMonitor(config *syntheticsApiConfig) *monitoringv
 	labels := deepCopyMap(config.Labels)
 	// Remove version label as it goes stale
 	delete(labels, "app.kubernetes.io/version")
-	labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
 
 	return &monitoringv1.ServiceMonitor{
 		TypeMeta: metav1.TypeMeta{
@@ -257,9 +256,8 @@ func createSyntheticsApiServiceMonitor(config *syntheticsApiConfig) *monitoringv
 			APIVersion: "monitoring.coreos.com/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.Name,
-			Namespace: openshiftCustomerMonitoringNamespace,
-			Labels:    labels,
+			Name:   config.Name,
+			Labels: labels,
 		},
 		Spec: monitoringv1.ServiceMonitorSpec{
 			Endpoints: []monitoringv1.Endpoint{
@@ -488,8 +486,6 @@ func createBundleSyntheticsApiDeployment(config *syntheticsApiConfig, m clusters
 
 // createConsolidatedSyntheticsServiceMonitors creates ServiceMonitors for synthetics components
 func createConsolidatedSyntheticsServiceMonitors(namespace string) []runtime.Object {
-	const openshiftCustomerMonitoringNamespace = "openshift-customer-monitoring"
-
 	return []runtime.Object{
 		// Synthetics API
 		&monitoringv1.ServiceMonitor{
@@ -498,8 +494,7 @@ func createConsolidatedSyntheticsServiceMonitors(namespace string) []runtime.Obj
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "synthetics-api",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "synthetics-api",
 				Labels: map[string]string{
 					"app.kubernetes.io/component": "synthetics-api",
 				},
@@ -530,8 +525,7 @@ func createConsolidatedSyntheticsServiceMonitors(namespace string) []runtime.Obj
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "synthetics-agent",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "synthetics-agent",
 				Labels: map[string]string{
 					"app.kubernetes.io/component": "synthetics-agent",
 				},
@@ -562,8 +556,7 @@ func createConsolidatedSyntheticsServiceMonitors(namespace string) []runtime.Obj
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "synthetics-bb-exporter",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "synthetics-bb-exporter",
 				Labels: map[string]string{
 					"app.kubernetes.io/name": "blackbox-exporter",
 				},

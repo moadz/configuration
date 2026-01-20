@@ -336,7 +336,6 @@ func createCacheServiceMonitor(config *memcachedConfig) *monitoringv1.ServiceMon
 	labels := deepCopyMap(config.Labels)
 	// Remove version label as it goes stale
 	delete(labels, "app.kubernetes.io/version")
-	labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
 
 	return &monitoringv1.ServiceMonitor{
 		TypeMeta: metav1.TypeMeta{
@@ -344,9 +343,8 @@ func createCacheServiceMonitor(config *memcachedConfig) *monitoringv1.ServiceMon
 			APIVersion: "monitoring.coreos.com/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.Name,
-			Namespace: openshiftCustomerMonitoringNamespace,
-			Labels:    labels,
+			Name:   config.Name,
+			Labels: labels,
 		},
 		Spec: monitoringv1.ServiceMonitorSpec{
 			Endpoints: []monitoringv1.Endpoint{

@@ -1127,7 +1127,7 @@ func gatewayServiceMonitor(m clusters.TemplateMaps, matchNS string, conf *cluste
 	labels, selectorLabels := gatewayLabels(m)
 	// Remove version label from metadata as it goes stale
 	delete(labels, "app.kubernetes.io/version")
-	labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
+
 	endpoints := []monitoringv1.Endpoint{
 		{
 			Port:     "internal",
@@ -1151,9 +1151,8 @@ func gatewayServiceMonitor(m clusters.TemplateMaps, matchNS string, conf *cluste
 
 	return &monitoringv1.ServiceMonitor{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "rhobs-gateway",
-			Namespace: openshiftCustomerMonitoringNamespace,
-			Labels:    labels,
+			Name:   "rhobs-gateway",
+			Labels: labels,
 		},
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ServiceMonitor",

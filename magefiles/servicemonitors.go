@@ -58,8 +58,7 @@ func thanosOperatorServiceMonitor(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-operator-controller-manager-metrics",
-				Namespace: "openshift-customer-monitoring",
+				Name: "thanos-operator-controller-manager-metrics",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "monitoring",
 					"app.kubernetes.io/created-by": "thanos-operator",
@@ -67,7 +66,6 @@ func thanosOperatorServiceMonitor(namespace string) []runtime.Object {
 					"app.kubernetes.io/managed-by": "rhobs",
 					"app.kubernetes.io/name":       "servicemonitor",
 					"app.kubernetes.io/part-of":    "thanos-operator",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -114,14 +112,12 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-compact",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-compact",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-compactor",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-compact",
 					"app.kubernetes.io/part-of":    "thanos",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -152,14 +148,12 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-store",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-store",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "object-storage-gateway",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-store",
 					"app.kubernetes.io/part-of":    "thanos",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -190,14 +184,12 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-receive-ingester",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-receive-ingester",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-receive-ingester",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-receive",
 					"app.kubernetes.io/part-of":    "thanos",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -228,14 +220,12 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-query",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-query",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "query-layer",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-query",
 					"app.kubernetes.io/part-of":    "thanos",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -265,14 +255,12 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-query-frontend",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-query-frontend",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-query-frontend",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-query-frontend",
 					"app.kubernetes.io/part-of":    "thanos",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -302,14 +290,12 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-receive-router",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-receive-router",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-receive-router",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-receive",
 					"app.kubernetes.io/part-of":    "thanos",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -339,14 +325,12 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-ruler",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-ruler",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "rule-evaluation-engine",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-ruler",
 					"app.kubernetes.io/part-of":    "thanos",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -384,8 +368,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-compact-rhobs",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-compact-rhobs",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-compactor",
 					"app.kubernetes.io/instance":   "thanos-compact-rhobs",
@@ -424,8 +407,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-compact-telemeter",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-compact-telemeter",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-compactor",
 					"app.kubernetes.io/instance":   "thanos-compact-telemeter",
@@ -464,8 +446,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-query-rhobs",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-query-rhobs",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "query-layer",
 					"app.kubernetes.io/instance":   "thanos-query-rhobs",
@@ -506,8 +487,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-query-frontend-rhobs",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-query-frontend-rhobs",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "query-frontend",
 					"app.kubernetes.io/instance":   "thanos-query-frontend-rhobs",
@@ -547,8 +527,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-receive-ingester-rhobs-default",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-receive-ingester-rhobs-default",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-receive-ingester",
 					"app.kubernetes.io/instance":   "thanos-receive-ingester-rhobs-default",
@@ -589,8 +568,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-receive-ingester-rhobs-telemeter",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-receive-ingester-rhobs-telemeter",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-receive-ingester",
 					"app.kubernetes.io/instance":   "thanos-receive-ingester-rhobs-telemeter",
@@ -631,8 +609,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-receive-router-rhobs",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-receive-router-rhobs",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "thanos-receive-router",
 					"app.kubernetes.io/instance":   "thanos-receive-router-rhobs",
@@ -671,8 +648,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-store-default",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-store-default",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":       "object-storage-gateway",
 					"app.kubernetes.io/instance":        "thanos-store-default",
@@ -714,8 +690,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-store-telemeter-0to2w",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-store-telemeter-0to2w",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":       "object-storage-gateway",
 					"app.kubernetes.io/instance":        "thanos-store-telemeter-0to2w",
@@ -757,8 +732,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-store-telemeter-2wto90d",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-store-telemeter-2wto90d",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":       "object-storage-gateway",
 					"app.kubernetes.io/instance":        "thanos-store-telemeter-2wto90d",
@@ -800,8 +774,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-store-telemeter-90dplus",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-store-telemeter-90dplus",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":       "object-storage-gateway",
 					"app.kubernetes.io/instance":        "thanos-store-telemeter-90dplus",
@@ -843,8 +816,7 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "thanos-ruler",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "thanos-ruler",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "rule-evaluation-engine",
 					"app.kubernetes.io/managed-by": "thanos-operator",
@@ -874,9 +846,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 			},
 		},
 	}
-	for _, obj := range objs {
-		obj.(*monitoringv1.ServiceMonitor).ObjectMeta.Labels["prometheus"] = "app-sre"
-	}
 	return objs
 }
 
@@ -888,8 +857,7 @@ func lokiOperatorServiceMonitor(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-operator-controller-manager-metrics",
-				Namespace: "openshift-customer-monitoring",
+				Name: "loki-operator-controller-manager-metrics",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "monitoring",
 					"app.kubernetes.io/created-by": "loki-operator",
@@ -897,7 +865,6 @@ func lokiOperatorServiceMonitor(namespace string) []runtime.Object {
 					"app.kubernetes.io/managed-by": "rhobs",
 					"app.kubernetes.io/name":       "servicemonitor",
 					"app.kubernetes.io/part-of":    "loki-operator",
-					"prometheus":                   "app-sre",
 				},
 			},
 			Spec: monitoringv1.ServiceMonitorSpec{
@@ -932,8 +899,7 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-compactor-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-compactor-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "compactor",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -970,8 +936,7 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-distributor-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-distributor-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "distributor",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -1008,8 +973,7 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-index-gateway-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-index-gateway-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "index-gateway",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -1046,8 +1010,7 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-ingester-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-ingester-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "ingester",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -1084,8 +1047,7 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-querier-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-querier-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "querier",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -1122,8 +1084,7 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Kind:       "ServiceMonitor",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "loki-query-frontend-http",
-				Namespace: openshiftCustomerMonitoringNamespace,
+				Name: "loki-query-frontend-http",
 				Labels: map[string]string{
 					"app.kubernetes.io/component":  "query-frontend",
 					"app.kubernetes.io/created-by": "lokistack-controller",
@@ -1154,9 +1115,6 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				},
 			},
 		},
-	}
-	for _, obj := range objs {
-		obj.(*monitoringv1.ServiceMonitor).ObjectMeta.Labels["prometheus"] = "app-sre"
 	}
 	return objs
 }

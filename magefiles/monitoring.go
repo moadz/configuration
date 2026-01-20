@@ -71,15 +71,15 @@ func (mb *MonitoringBundle) Generate() error {
 	return nil
 }
 
-// processServiceMonitorForBundle processes a ServiceMonitor to ensure it's a pure Kubernetes resource
+// processServiceMonitorForBundle processes a ServiceMonitor to ensure it's a pure Kubernetes resource.
 func (mb *MonitoringBundle) processServiceMonitorForBundle(sm *monv1.ServiceMonitor) *monv1.ServiceMonitor {
 	// Create a copy to avoid modifying the original
 	processed := sm.DeepCopy()
 
-	// Ensure namespace is set to the monitoring namespace (not template variable)
-	processed.Namespace = "openshift-customer-monitoring"
+	// Ensure that the namespace is set to the monitoring namespace.
+	processed.Namespace = openshiftCustomerMonitoringNamespace
 
-	// Ensure NamespaceSelector points to the actual cluster namespace (not template variable)
+	// Ensure NamespaceSelector points to the actual cluster namespace (and not a template variable).
 	if processed.Spec.NamespaceSelector.MatchNames != nil {
 		for i, ns := range processed.Spec.NamespaceSelector.MatchNames {
 			// Replace template variables with actual namespace
@@ -96,7 +96,7 @@ func (mb *MonitoringBundle) processServiceMonitorForBundle(sm *monv1.ServiceMoni
 	if processed.Labels == nil {
 		processed.Labels = make(map[string]string)
 	}
-	processed.Labels["prometheus"] = "app-sre"
+	processed.Labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
 
 	return processed
 }
