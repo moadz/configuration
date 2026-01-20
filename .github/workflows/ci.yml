@@ -2,28 +2,24 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  generate-integration:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v6
-    - name: Set up Go
-      uses: actions/setup-go@v6
-      with:
-        go-version: 1.25
-    - name: Install mage
-      run: go install github.com/magefile/mage@latest
-    - name: Generate integration cluster's resources
-      run: rm -rf resources/clusters/integration/rhobsi01uw2 && mage build:cluster rhobsi01uw2
-    - name: Git status
-      run: git status
-    - name: Check clean directory
-      run: test -z "$(git status --porcelain)"
+  rhobsi01uw2:
+    uses: ./.github/workflows/generate.yaml
+    with:
+      cluster: rhobsi01uw2
+  rhobss01ue1:
+    uses: ./.github/workflows/generate.yaml
+    with:
+      cluster: rhobss01ue1
+  rhobss01uw2:
+    uses: ./.github/workflows/generate.yaml
+    with:
+      cluster: rhobss01uw2
   build:
     runs-on: ubuntu-latest
     steps:

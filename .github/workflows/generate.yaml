@@ -1,0 +1,25 @@
+name: Reusable workflow to verify the generation of a cluster's manifests.
+on:
+  workflow_call:
+    inputs:
+      cluster:
+        required: true
+        type: string
+
+jobs:
+  generate-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: 1.25
+    - name: Install mage
+      run: go install github.com/magefile/mage@latest
+    - name: Generate ${{ inputs.cluster }} cluster's resources
+      run: rm -rf resources/clusters/integration/${{ inputs.cluster }} && mage build:cluster ${{ inputs.cluster }}
+    - name: Git status
+      run: git status
+    - name: Check clean directory
+      run: test -z "$(git status --porcelain)"
