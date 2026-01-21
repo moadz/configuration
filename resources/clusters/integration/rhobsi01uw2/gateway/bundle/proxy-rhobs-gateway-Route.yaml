@@ -12,7 +12,7 @@ metadata:
   name: rhobs-gateway
   namespace: rhobs-int
 spec:
-  host: rhobs.us-west-2.api.integration.openshift.com
+  host: rhobs.us-west-2-0.api.integration.openshift.com
   port:
     targetPort: public
   tls:
