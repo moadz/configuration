@@ -227,7 +227,7 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Name:      "thanos-query",
 				Namespace: openshiftCustomerMonitoringNamespace,
 				Labels: map[string]string{
-					"app.kubernetes.io/component":  "thanos-query",
+					"app.kubernetes.io/component":  "query-layer",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-query",
 					"app.kubernetes.io/part-of":    "thanos",
@@ -247,7 +247,7 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				},
 				Selector: metav1.LabelSelector{
 					MatchLabels: map[string]string{
-						"app.kubernetes.io/component":  "thanos-query",
+						"app.kubernetes.io/component":  "query-layer",
 						"app.kubernetes.io/managed-by": "thanos-operator",
 						"app.kubernetes.io/name":       "thanos-query",
 						"app.kubernetes.io/part-of":    "thanos",
