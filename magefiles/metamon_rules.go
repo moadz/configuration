@@ -101,6 +101,7 @@ func ThanosPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePrometheu
 		thanosrules.WithStoreDashboardURL(dashboardThanosStore),
 		thanosrules.WithRuleDashboardURL(dashboardThanosRule),
 		thanosrules.WithServiceLabelValue(rhobsNextServiceLabel),
+		thanosrules.WithServiceSelectorSuffix("-rhobs"),
 	)
 
 	if err != nil {

@@ -77,9 +77,13 @@ func thanosOperatorServiceMonitor(namespace string) []runtime.Object {
 						Path:            "/metrics",
 						Port:            "https",
 						Scheme:          ptr.To(monitoringv1.Scheme("https")),
-						TLSConfig: &monitoringv1.TLSConfig{
-							SafeTLSConfig: monitoringv1.SafeTLSConfig{
-								InsecureSkipVerify: ptr.To(true),
+						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
+							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
+								TLSConfig: &monitoringv1.TLSConfig{
+									SafeTLSConfig: monitoringv1.SafeTLSConfig{
+										InsecureSkipVerify: ptr.To(true),
+									},
+								},
 							},
 						},
 					},

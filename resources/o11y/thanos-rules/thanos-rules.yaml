@@ -22,7 +22,7 @@ spec:
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactisdown
-      expr: absent(up{job=~"thanos-compact.*"} == 1)
+      expr: absent(up{job=~"thanos-compact-rhobs.*"} == 1)
       for: 5m
       labels:
         service: rhobs.regional
@@ -34,7 +34,7 @@ spec:
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosqueryisdown
-      expr: absent(up{job=~"thanos-query.*"} == 1)
+      expr: absent(up{job=~"thanos-query-rhobs.*"} == 1)
       for: 5m
       labels:
         service: rhobs.regional
@@ -46,7 +46,7 @@ spec:
           Prometheus target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveisdown
-      expr: absent(up{job=~"thanos-receive-router.*"} == 1)
+      expr: absent(up{job=~"thanos-receive-router-rhobs.*"} == 1)
       for: 5m
       labels:
         service: rhobs.regional
@@ -58,7 +58,7 @@ spec:
           Prometheus target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveisdown
-      expr: absent(up{job=~"thanos-receive-ingester.*"} == 1)
+      expr: absent(up{job=~"thanos-receive-ingester-rhobs.*"} == 1)
       for: 5m
       labels:
         service: rhobs.regional
@@ -70,7 +70,7 @@ spec:
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleisdown
-      expr: absent(up{job=~"thanos-ruler.*"} == 1)
+      expr: absent(up{job=~"thanos-ruler-rhobs.*"} == 1)
       for: 5m
       labels:
         service: rhobs.regional
@@ -82,7 +82,7 @@ spec:
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoreisdown
-      expr: absent(up{job=~"thanos-store.*"} == 1)
+      expr: absent(up{job=~"thanos-store-rhobs.*"} == 1)
       for: 5m
       labels:
         service: rhobs.regional
@@ -96,7 +96,7 @@ spec:
           once. There are {{$value}} in {{$labels.namespace}} instances running.
         message: Thanos Compact has multiple instances running.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompactmultiplerunning
-      expr: sum by (namespace, job) (up{job=~"thanos-compact.*"} > 1)
+      expr: sum by (namespace, job) (up{job=~"thanos-compact-rhobs.*"} > 1)
       for: 5m
       labels:
         service: rhobs.regional
@@ -108,7 +108,7 @@ spec:
           to run and now is halted.
         message: Thanos Compact has failed to run and is now halted.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanoscompacthalted
-      expr: thanos_compact_halted{job=~"thanos-compact.*"} == 1
+      expr: thanos_compact_halted{job=~"thanos-compact-rhobs.*"} == 1
       for: 5m
       labels:
         service: rhobs.regional
@@ -123,10 +123,12 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job) (
-                  rate(thanos_compact_group_compactions_failures_total{job=~"thanos-compact.*"}[5m])
+                  rate(thanos_compact_group_compactions_failures_total{job=~"thanos-compact-rhobs.*"}[5m])
                 )
               /
-                sum by (namespace, job) (rate(thanos_compact_group_compactions_total{job=~"thanos-compact.*"}[5m]))
+                sum by (namespace, job) (
+                  rate(thanos_compact_group_compactions_total{job=~"thanos-compact-rhobs.*"}[5m])
+                )
             )
           *
             100
@@ -146,10 +148,12 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job) (
-                  rate(thanos_objstore_bucket_operation_failures_total{job=~"thanos-compact.*"}[5m])
+                  rate(thanos_objstore_bucket_operation_failures_total{job=~"thanos-compact-rhobs.*"}[5m])
                 )
               /
-                sum by (namespace, job) (rate(thanos_objstore_bucket_operations_total{job=~"thanos-compact.*"}[5m]))
+                sum by (namespace, job) (
+                  rate(thanos_objstore_bucket_operations_total{job=~"thanos-compact-rhobs.*"}[5m])
+                )
             )
           *
             100
@@ -171,7 +175,7 @@ spec:
                   time()
                 -
                   max by (namespace, job) (
-                    max_over_time(thanos_objstore_bucket_last_successful_upload_time{job=~"thanos-compact.*"}[1d])
+                    max_over_time(thanos_objstore_bucket_last_successful_upload_time{job=~"thanos-compact-rhobs.*"}[1d])
                   )
               )
             /
@@ -196,10 +200,10 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job) (
-                  rate(http_requests_total{code=~"5..",handler="query",job=~"thanos-query.*"}[5m])
+                  rate(http_requests_total{code=~"5..",handler="query",job=~"thanos-query-rhobs.*"}[5m])
                 )
               /
-                sum by (namespace, job) (rate(http_requests_total{handler="query",job=~"thanos-query.*"}[5m]))
+                sum by (namespace, job) (rate(http_requests_total{handler="query",job=~"thanos-query-rhobs.*"}[5m]))
             )
           *
             100
@@ -220,11 +224,11 @@ spec:
             (
                 sum by (namespace, job) (
                   rate(
-                    grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded",job=~"thanos-query.*"}[5m]
+                    grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded",job=~"thanos-query-rhobs.*"}[5m]
                   )
                 )
               /
-                sum by (namespace, job) (rate(grpc_server_started_total{job=~"thanos-query.*"}[5m]))
+                sum by (namespace, job) (rate(grpc_server_started_total{job=~"thanos-query-rhobs.*"}[5m]))
             )
           *
             100
@@ -243,9 +247,11 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosquerygrpcclienterrorrate
       expr: |2-
             (
-                sum by (namespace, job) (rate(grpc_client_handled_total{grpc_code!="OK",job=~"thanos-query.*"}[5m]))
+                sum by (namespace, job) (
+                  rate(grpc_client_handled_total{grpc_code!="OK",job=~"thanos-query-rhobs.*"}[5m])
+                )
               /
-                sum by (namespace, job) (rate(grpc_client_started_total{job=~"thanos-query.*"}[5m]))
+                sum by (namespace, job) (rate(grpc_client_started_total{job=~"thanos-query-rhobs.*"}[5m]))
             )
           *
             100
@@ -265,10 +271,12 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job) (
-                  rate(thanos_query_store_apis_dns_failures_total{job=~"thanos-query.*"}[5m])
+                  rate(thanos_query_store_apis_dns_failures_total{job=~"thanos-query-rhobs.*"}[5m])
                 )
               /
-                sum by (namespace, job) (rate(thanos_query_store_apis_dns_lookups_total{job=~"thanos-query.*"}[5m]))
+                sum by (namespace, job) (
+                  rate(thanos_query_store_apis_dns_lookups_total{job=~"thanos-query-rhobs.*"}[5m])
+                )
             )
           *
             100
@@ -289,14 +297,14 @@ spec:
             histogram_quantile(
               0.99,
               sum by (namespace, job, le) (
-                rate(http_request_duration_seconds_bucket{handler="query",job=~"thanos-query.*"}[5m])
+                rate(http_request_duration_seconds_bucket{handler="query",job=~"thanos-query-rhobs.*"}[5m])
               )
             )
           >
             90
         and
             sum by (namespace, job) (
-              rate(http_request_duration_seconds_count{handler="query",job=~"thanos-query.*"}[5m])
+              rate(http_request_duration_seconds_count{handler="query",job=~"thanos-query-rhobs.*"}[5m])
             )
           >
             0
@@ -316,11 +324,11 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job) (
-                  rate(http_requests_total{code=~"5..",handler="receive",job=~"thanos-receive-router.*"}[5m])
+                  rate(http_requests_total{code=~"5..",handler="receive",job=~"thanos-receive-router-rhobs.*"}[5m])
                 )
               /
                 sum by (namespace, job) (
-                  rate(http_requests_total{handler="receive",job=~"thanos-receive-router.*"}[5m])
+                  rate(http_requests_total{handler="receive",job=~"thanos-receive-router-rhobs.*"}[5m])
                 )
             )
           *
@@ -342,14 +350,18 @@ spec:
             histogram_quantile(
               0.99,
               sum by (namespace, job, le) (
-                rate(http_request_duration_seconds_bucket{handler="receive",job=~"thanos-receive-router.*"}[5m])
+                rate(
+                  http_request_duration_seconds_bucket{handler="receive",job=~"thanos-receive-router-rhobs.*"}[5m]
+                )
               )
             )
           >
             10
         and
             sum by (namespace, job) (
-              rate(http_request_duration_seconds_count{handler="receive",job=~"thanos-receive-router.*"}[5m])
+              rate(
+                http_request_duration_seconds_count{handler="receive",job=~"thanos-receive-router-rhobs.*"}[5m]
+              )
             )
           >
             0
@@ -370,20 +382,20 @@ spec:
           (
                 (
                     sum by (namespace, job) (
-                      rate(thanos_receive_replications_total{job=~"thanos-receive-router.*",result="error"}[5m])
+                      rate(thanos_receive_replications_total{job=~"thanos-receive-router-rhobs.*",result="error"}[5m])
                     )
                   /
                     sum by (namespace, job) (
-                      rate(thanos_receive_replications_total{job=~"thanos-receive-router.*"}[5m])
+                      rate(thanos_receive_replications_total{job=~"thanos-receive-router-rhobs.*"}[5m])
                     )
                 )
               >
                 (
                     max by (namespace, job) (
-                      floor(thanos_receive_replication_factor{job=~"thanos-receive-router.*"} + 1 / 2)
+                      floor(thanos_receive_replication_factor{job=~"thanos-receive-router-rhobs.*"} + 1 / 2)
                     )
                   /
-                    max by (namespace, job) (thanos_receive_hashring_nodes{job=~"thanos-receive-router.*"})
+                    max by (namespace, job) (thanos_receive_hashring_nodes{job=~"thanos-receive-router-rhobs.*"})
                 )
             *
               100
@@ -402,11 +414,11 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job) (
-                  rate(thanos_receive_forward_requests_total{job=~"thanos-receive-router.*",result="error"}[5m])
+                  rate(thanos_receive_forward_requests_total{job=~"thanos-receive-router-rhobs.*",result="error"}[5m])
                 )
               /
                 sum by (namespace, job) (
-                  rate(thanos_receive_forward_requests_total{job=~"thanos-receive-router.*"}[5m])
+                  rate(thanos_receive_forward_requests_total{job=~"thanos-receive-router-rhobs.*"}[5m])
                 )
             )
           *
@@ -427,11 +439,11 @@ spec:
       expr: |2-
           (
               sum by (namespace, job) (
-                rate(thanos_receive_hashrings_file_errors_total{job=~"thanos-receive-router.*"}[5m])
+                rate(thanos_receive_hashrings_file_errors_total{job=~"thanos-receive-router-rhobs.*"}[5m])
               )
             /
               sum by (namespace, job) (
-                rate(thanos_receive_hashrings_file_refreshes_total{job=~"thanos-receive-router.*"}[5m])
+                rate(thanos_receive_hashrings_file_refreshes_total{job=~"thanos-receive-router-rhobs.*"}[5m])
               )
           )
         >
@@ -449,7 +461,7 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceiveconfigreloadfailure
       expr: |2-
           avg by (namespace, job) (
-            thanos_receive_config_last_reload_successful{job=~"thanos-receive-router.*"}
+            thanos_receive_config_last_reload_successful{job=~"thanos-receive-router-rhobs.*"}
           )
         !=
           1
@@ -465,11 +477,11 @@ spec:
         message: Thanos Receive has not uploaded latest data to object storage.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivenoupload
       expr: |2-
-          (up{job=~"thanos-receive-ingester.*"} - 1)
+          (up{job=~"thanos-receive-ingester-rhobs.*"} - 1)
         + on (namespace, job, instance)
           (
               sum by (namespace, job, instance) (
-                increase(thanos_shipper_uploads_total{job=~"thanos-receive-ingester.*"}[3h])
+                increase(thanos_shipper_uploads_total{job=~"thanos-receive-ingester-rhobs.*"}[3h])
               )
             ==
               0
@@ -487,7 +499,7 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivelimitsconfigreloadfailure
       expr: |2-
           sum by (namespace, job) (
-            increase(thanos_receive_limits_config_reload_err_total{job=~"thanos-receive-router.*"}[5m])
+            increase(thanos_receive_limits_config_reload_err_total{job=~"thanos-receive-router-rhobs.*"}[5m])
           )
         >
           0
@@ -504,7 +516,9 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivelimitshighmetamonitoringqueriesfailurerate
       expr: |2-
               sum by (namespace, job) (
-                increase(thanos_receive_metamonitoring_failed_queries_total{job=~"thanos-receive-router.*"}[5m])
+                increase(
+                  thanos_receive_metamonitoring_failed_queries_total{job=~"thanos-receive-router-rhobs.*"}[5m]
+                )
               )
             /
               20
@@ -525,7 +539,9 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosreceivetenantlimitedbyheadseries
       expr: |2-
           sum by (namespace, job, tenant) (
-            increase(thanos_receive_head_series_limited_requests_total{job=~"thanos-receive-router.*"}[5m])
+            increase(
+              thanos_receive_head_series_limited_requests_total{job=~"thanos-receive-router-rhobs.*"}[5m]
+            )
           )
         >
           0
@@ -546,11 +562,11 @@ spec:
             (
                 sum by (namespace, job) (
                   rate(
-                    grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded",job=~"thanos-store.*"}[5m]
+                    grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded",job=~"thanos-store-rhobs.*"}[5m]
                   )
                 )
               /
-                sum by (namespace, job) (rate(grpc_server_started_total{job=~"thanos-store.*"}[5m]))
+                sum by (namespace, job) (rate(grpc_server_started_total{job=~"thanos-store-rhobs.*"}[5m]))
             )
           *
             100
@@ -570,10 +586,12 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job) (
-                  rate(thanos_objstore_bucket_operation_failures_total{job=~"thanos-store.*"}[5m])
+                  rate(thanos_objstore_bucket_operation_failures_total{job=~"thanos-store-rhobs.*"}[5m])
                 )
               /
-                sum by (namespace, job) (rate(thanos_objstore_bucket_operations_total{job=~"thanos-store.*"}[5m]))
+                sum by (namespace, job) (
+                  rate(thanos_objstore_bucket_operations_total{job=~"thanos-store-rhobs.*"}[5m])
+                )
             )
           *
             100
@@ -594,14 +612,14 @@ spec:
             histogram_quantile(
               0.99,
               sum by (namespace, job, le) (
-                rate(thanos_objstore_bucket_operation_duration_seconds_bucket{job=~"thanos-store.*"}[5m])
+                rate(thanos_objstore_bucket_operation_duration_seconds_bucket{job=~"thanos-store-rhobs.*"}[5m])
               )
             )
           >
             7
         and
             sum by (namespace, job) (
-              rate(thanos_objstore_bucket_operation_duration_seconds_count{job=~"thanos-store.*"}[5m])
+              rate(thanos_objstore_bucket_operation_duration_seconds_count{job=~"thanos-store-rhobs.*"}[5m])
             )
           >
             0
@@ -620,7 +638,7 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulequeueisdroppingalerts
       expr: |2-
           sum by (namespace, job, instance) (
-            rate(thanos_alert_queue_alerts_dropped_total{job=~"thanos-ruler.*"}[5m])
+            rate(thanos_alert_queue_alerts_dropped_total{job=~"thanos-ruler-rhobs.*"}[5m])
           )
         >
           0
@@ -637,7 +655,7 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulesenderisfailingalerts
       expr: |2-
           sum by (namespace, job, instance) (
-            rate(thanos_alert_sender_alerts_dropped_total{job=~"thanos-ruler.*"}[5m])
+            rate(thanos_alert_sender_alerts_dropped_total{job=~"thanos-ruler-rhobs.*"}[5m])
           )
         >
           0
@@ -655,11 +673,11 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job, instance) (
-                  rate(prometheus_rule_evaluation_failures_total{job=~"thanos-ruler.*"}[5m])
+                  rate(prometheus_rule_evaluation_failures_total{job=~"thanos-ruler-rhobs.*"}[5m])
                 )
               /
                 sum by (namespace, job, instance) (
-                  rate(prometheus_rule_evaluations_total{job=~"thanos-ruler.*"}[5m])
+                  rate(prometheus_rule_evaluations_total{job=~"thanos-ruler-rhobs.*"}[5m])
                 )
             )
           *
@@ -679,7 +697,7 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosrulehighruleevaluationwarnings
       expr: |2-
           sum by (namespace, job, instance) (
-            rate(thanos_rule_evaluation_with_warnings_total{job=~"thanos-ruler.*"}[5m])
+            rate(thanos_rule_evaluation_with_warnings_total{job=~"thanos-ruler-rhobs.*"}[5m])
           )
         >
           0
@@ -696,11 +714,11 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleruleevaluationlatencyhigh
       expr: |2-
           sum by (namespace, job, instance, rule_group) (
-            prometheus_rule_group_last_duration_seconds{job=~"thanos-ruler.*"}
+            prometheus_rule_group_last_duration_seconds{job=~"thanos-ruler-rhobs.*"}
           )
         >
           sum by (namespace, job, instance, rule_group) (
-            prometheus_rule_group_interval_seconds{job=~"thanos-ruler.*"}
+            prometheus_rule_group_interval_seconds{job=~"thanos-ruler-rhobs.*"}
           )
       for: 5m
       labels:
@@ -717,11 +735,11 @@ spec:
             (
                 sum by (namespace, job, instance) (
                   rate(
-                    grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded",job=~"thanos-ruler.*"}[5m]
+                    grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded",job=~"thanos-ruler-rhobs.*"}[5m]
                   )
                 )
               /
-                sum by (namespace, job, instance) (rate(grpc_server_started_total{job=~"thanos-ruler.*"}[5m]))
+                sum by (namespace, job, instance) (rate(grpc_server_started_total{job=~"thanos-ruler-rhobs.*"}[5m]))
             )
           *
             100
@@ -739,7 +757,9 @@ spec:
         message: Thanos Rule has not been able to reload configuration.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosruleconfigreloadfailure
       expr: |2-
-          avg by (namespace, job, instance) (thanos_rule_config_last_reload_successful{job=~"thanos-ruler.*"})
+          avg by (namespace, job, instance) (
+            thanos_rule_config_last_reload_successful{job=~"thanos-ruler-rhobs.*"}
+          )
         !=
           1
       for: 5m
@@ -756,11 +776,11 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job, instance) (
-                  rate(thanos_rule_query_apis_dns_failures_total{job=~"thanos-ruler.*"}[5m])
+                  rate(thanos_rule_query_apis_dns_failures_total{job=~"thanos-ruler-rhobs.*"}[5m])
                 )
               /
                 sum by (namespace, job, instance) (
-                  rate(thanos_rule_query_apis_dns_lookups_total{job=~"thanos-ruler.*"}[5m])
+                  rate(thanos_rule_query_apis_dns_lookups_total{job=~"thanos-ruler-rhobs.*"}[5m])
                 )
             )
           *
@@ -781,11 +801,11 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job, instance) (
-                  rate(thanos_rule_alertmanagers_dns_failures_total{job=~"thanos-ruler.*"}[5m])
+                  rate(thanos_rule_alertmanagers_dns_failures_total{job=~"thanos-ruler-rhobs.*"}[5m])
                 )
               /
                 sum by (namespace, job, instance) (
-                  rate(thanos_rule_alertmanagers_dns_lookups_total{job=~"thanos-ruler.*"}[5m])
+                  rate(thanos_rule_alertmanagers_dns_lookups_total{job=~"thanos-ruler-rhobs.*"}[5m])
                 )
             )
           *
@@ -808,7 +828,7 @@ spec:
               time()
             -
               max by (namespace, job, instance, group) (
-                prometheus_rule_group_last_evaluation_timestamp_seconds{job=~"thanos-ruler.*"}
+                prometheus_rule_group_last_evaluation_timestamp_seconds{job=~"thanos-ruler-rhobs.*"}
               )
           )
         >
@@ -816,7 +836,7 @@ spec:
               10
             *
               max by (namespace, job, instance, group) (
-                prometheus_rule_group_interval_seconds{job=~"thanos-ruler.*"}
+                prometheus_rule_group_interval_seconds{job=~"thanos-ruler-rhobs.*"}
               )
           )
       for: 5m
@@ -832,12 +852,12 @@ spec:
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosnoruleevaluations
       expr: |2-
             sum by (namespace, job, instance) (
-              rate(prometheus_rule_evaluations_total{job=~"thanos-ruler.*"}[5m])
+              rate(prometheus_rule_evaluations_total{job=~"thanos-ruler-rhobs.*"}[5m])
             )
           <=
             0
         and
-          sum by (namespace, job, instance) (thanos_rule_loaded_rules{job=~"thanos-ruler.*"}) > 0
+          sum by (namespace, job, instance) (thanos_rule_loaded_rules{job=~"thanos-ruler-rhobs.*"}) > 0
       for: 5m
       labels:
         service: rhobs.regional
