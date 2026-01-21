@@ -17,7 +17,7 @@ spec:
     port: metrics
   namespaceSelector:
     matchNames:
-    - rhobs-stage
+    - rhobs-int
   selector:
     matchLabels:
       app.kubernetes.io/component: memcached

@@ -4,10 +4,10 @@ metadata:
   labels:
     app.kubernetes.io/component: memcached
     app.kubernetes.io/instance: rhobs
-    app.kubernetes.io/name: thanos-index-cache
+    app.kubernetes.io/name: thanos-bucket-cache
     app.kubernetes.io/part-of: rhobs
     prometheus: app-sre
-  name: thanos-index-cache
+  name: thanos-bucket-cache
   namespace: openshift-customer-monitoring
 spec:
   endpoints:
@@ -17,10 +17,10 @@ spec:
     port: metrics
   namespaceSelector:
     matchNames:
-    - rhobs-stage
+    - rhobs-int
   selector:
     matchLabels:
       app.kubernetes.io/component: memcached
       app.kubernetes.io/instance: rhobs
-      app.kubernetes.io/name: thanos-index-cache
+      app.kubernetes.io/name: thanos-bucket-cache
       app.kubernetes.io/part-of: rhobs

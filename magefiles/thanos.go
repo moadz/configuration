@@ -2049,6 +2049,12 @@ func generateMetricsBundle(config clusters.ClusterConfig) error {
 		}
 	}
 
+	// Add cache ServiceMonitors to monitoring bundle
+	cacheServiceMonitors := createThanosCacheServiceMonitors(config)
+	for _, sm := range cacheServiceMonitors {
+		monBundle.AddServiceMonitor(sm)
+	}
+
 	// Generate the individual ServiceMonitor files
 	if err := monBundle.Generate(); err != nil {
 		return fmt.Errorf("failed to generate monitoring bundle: %w", err)
@@ -2109,6 +2115,29 @@ func getThanosCacheObjects(namespace string, templates clusters.TemplateMaps) []
 	}
 
 	return objs
+}
+
+// createThanosCacheServiceMonitors creates ServiceMonitors for Thanos cache components
+func createThanosCacheServiceMonitors(config clusters.ClusterConfig) []*monitoringv1.ServiceMonitor {
+	ns := config.Namespace
+	templates := config.Templates
+
+	var serviceMonitors []*monitoringv1.ServiceMonitor
+
+	// Create cache configurations
+	cacheConfigs := []*memcachedConfig{
+		indexCache(templates, ns),
+		bucketCache(templates, ns),
+		queryRangeCache(templates, ns),
+	}
+
+	// Generate ServiceMonitor for each cache
+	for _, cacheConfig := range cacheConfigs {
+		sm := createCacheServiceMonitor(cacheConfig)
+		serviceMonitors = append(serviceMonitors, sm)
+	}
+
+	return serviceMonitors
 }
 
 // getResourceName extracts a meaningful name from a Kubernetes object
