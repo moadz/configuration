@@ -65,7 +65,7 @@ func rhobss01ue1sBuildSteps() []string {
 		StepDefaultThanosStack,
 		StepDefaultLokiStack,
 		StepSyntheticsApi,
-		StepAlertmanagerCR,
+		StepAlertmanager,
 	}
 }
 
