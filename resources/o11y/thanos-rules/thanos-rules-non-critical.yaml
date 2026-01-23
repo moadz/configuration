@@ -82,7 +82,7 @@ spec:
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
         runbook: https://github.com/rhobs/configuration/blob/main/docs/sop/observatorium.md#thanosstoreisdown
-      expr: absent(up{job=~"thanos-store-rhobs.*"} == 1)
+      expr: absent(up{job=~"thanos-store-.*"} == 1)
       for: 5m
       labels:
         service: rhobs.regional
@@ -562,11 +562,11 @@ spec:
             (
                 sum by (namespace, job) (
                   rate(
-                    grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded",job=~"thanos-store-rhobs.*"}[5m]
+                    grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded",job=~"thanos-store-.*"}[5m]
                   )
                 )
               /
-                sum by (namespace, job) (rate(grpc_server_started_total{job=~"thanos-store-rhobs.*"}[5m]))
+                sum by (namespace, job) (rate(grpc_server_started_total{job=~"thanos-store-.*"}[5m]))
             )
           *
             100
@@ -586,11 +586,11 @@ spec:
       expr: |2-
             (
                 sum by (namespace, job) (
-                  rate(thanos_objstore_bucket_operation_failures_total{job=~"thanos-store-rhobs.*"}[5m])
+                  rate(thanos_objstore_bucket_operation_failures_total{job=~"thanos-store-.*"}[5m])
                 )
               /
                 sum by (namespace, job) (
-                  rate(thanos_objstore_bucket_operations_total{job=~"thanos-store-rhobs.*"}[5m])
+                  rate(thanos_objstore_bucket_operations_total{job=~"thanos-store-.*"}[5m])
                 )
             )
           *
@@ -612,14 +612,14 @@ spec:
             histogram_quantile(
               0.99,
               sum by (namespace, job, le) (
-                rate(thanos_objstore_bucket_operation_duration_seconds_bucket{job=~"thanos-store-rhobs.*"}[5m])
+                rate(thanos_objstore_bucket_operation_duration_seconds_bucket{job=~"thanos-store-.*"}[5m])
               )
             )
           >
             7
         and
             sum by (namespace, job) (
-              rate(thanos_objstore_bucket_operation_duration_seconds_count{job=~"thanos-store-rhobs.*"}[5m])
+              rate(thanos_objstore_bucket_operation_duration_seconds_count{job=~"thanos-store-.*"}[5m])
             )
           >
             0

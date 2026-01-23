@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
 	alertmanagerrules "github.com/perses/community-mixins/pkg/rules/alertmanager"
@@ -8,6 +10,7 @@ import (
 	thanosoperatorrules "github.com/perses/community-mixins/pkg/rules/thanos-operator"
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/internal/lokirules"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // Dashboard URLs
@@ -112,6 +115,7 @@ func ThanosPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePrometheu
 		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
 	}
 	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
+	builder.PrometheusRule.Spec.Groups = ReplaceStoreRhobsWithDefault(builder.PrometheusRule.Spec.Groups)
 
 	return &appInterfacePrometheusRule{
 		Schema:         schemaPath,
@@ -239,6 +243,21 @@ func ReplaceSummaryWithMessage(groups []v1.RuleGroup) []v1.RuleGroup {
 			if groups[i].Rules[j].Annotations["summary"] != "" {
 				groups[i].Rules[j].Annotations["message"] = groups[i].Rules[j].Annotations["summary"]
 				delete(groups[i].Rules[j].Annotations, "summary")
+			}
+		}
+	}
+	return groups
+}
+
+// ReplaceStoreRhobsWithDefault replaces "thanos-store-rhobs" with "thanos-storet"
+// in rule expressions to use the correct store matcher.
+func ReplaceStoreRhobsWithDefault(groups []v1.RuleGroup) []v1.RuleGroup {
+	for i := range groups {
+		for j := range groups[i].Rules {
+			expr := groups[i].Rules[j].Expr.String()
+			if strings.Contains(expr, "thanos-store-rhobs") {
+				newExpr := strings.ReplaceAll(expr, "thanos-store-rhobs", "thanos-store-")
+				groups[i].Rules[j].Expr = intstr.FromString(newExpr)
 			}
 		}
 	}
