@@ -19,7 +19,7 @@ JSONNET_SRC = $(shell find . -type f -not -path './*vendor_jsonnet/*' \( -name '
 JSONNET_VENDOR_DIR = vendor_jsonnet
 
 .PHONY: all
-all: $(JSONNET_VENDOR_DIR) prometheusrules grafana manifests whitelisted_metrics
+all: $(JSONNET_VENDOR_DIR) prometheusrules grafana manifests whitelisted_metrics hcp-rules
 
 $(JSONNET_VENDOR_DIR): $(JB) jsonnetfile.json jsonnetfile.lock.json
 	@$(JB) install --jsonnetpkg-home="$(JSONNET_VENDOR_DIR)"
@@ -66,6 +66,11 @@ go-format: $(GOIMPORTS) $(GOLANGCI_LINT)
 validate: $(OC)
 	@echo ">>>>> Validating OpenShift Templates"
 	find . -type f \( -name '*template.yaml' \) ! -name 'hypershift-token-refresher-template.yaml' ! -name 'hypershift-cluster-log-forwarder-template.yaml' ! -name 'hypershift-monitoring-stack-template.yaml' ! -name 'hcp_rules_template.yaml' | $(XARGS) -I{} $(OC) process -f {} --local -o yaml > /dev/null
+
+.PHONY: hcp-rules
+hcp-rules:
+	@echo ">>>>> Generating HCP tenant rules from split files"
+	./scripts/generate-hcp-rules.sh
 
 .PHONY: prometheusrules
 prometheusrules: resources/observability/prometheusrules

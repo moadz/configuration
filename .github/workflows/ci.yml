@@ -31,7 +31,7 @@ jobs:
     - name: Vendor
       run: make vendor_jsonnet
     - name: Build
-      run: make grafana manifests prometheusrules
+      run: make grafana manifests prometheusrules hcp-rules
     - name: Format
       run: make format
     - name: Lint

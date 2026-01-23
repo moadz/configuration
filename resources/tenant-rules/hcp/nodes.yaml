@@ -1,0 +1,176 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-nodes-rules
+  annotations:
+    description: "Template for deploying HCP node health, nodepool, and autoscaler rules to RHOBS"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  # NodePool failure detection
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: nodepool-failure
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: NodePoolFailing
+          interval: 1m
+          rules:
+            - alert: NodePoolFailing
+              expr: hypershift_nodepools:replicas_failure > 0
+              for: 15m
+              labels:
+                severity: warning
+              annotations:
+                message: "{{ $labels.nodepool_name }} nodepool on {{ $labels._id }} is not creating nodes"
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodePoolFailing.md
+                summary: NodePool is not creating nodes
+  # Nodes need upscaling warning
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: nodes-need-upscale
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: NodesNeedUpscale
+          interval: 1m
+          rules:
+            - alert: NodesNeedUpscale
+              expr: hypershift_cluster:expected_total_nodes{replicas_failure_all_nodepools="0"} > hypershift_cluster:current_ready_nodes{replicas_failure_all_nodepools="0"} + 1
+              for: 60m
+              labels:
+                severity: warning
+              annotations:
+                message: "HCP cluster {{ $labels._id }} is short on nodes"
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodesNeedUpscale.md
+                summary: Nodes need upscaling
+  # Cluster autoscaler down
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: cluster-autoscaler-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: cluster-autoscaler.rules
+          interval: 1m
+          rules:
+            # This alert fires when the number of ready cluster-autoscaler pods is 0.
+            # In HCP, we expect 1 for each cluster where autoscaler is enabled.
+            - alert: ClusterAutoscalerDown
+              annotations:
+                description: "There are 0 Ready 'cluster-autoscaler' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/ClusterAutoscalerAlert.md
+                summary: No Ready cluster-autoscaler pods.
+              labels:
+                severity: critical
+              expr: cluster_autoscaler:pod_status_ready == 0
+              for: 15m
+  # Node health rules - resource usage, readiness, conditions
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: nodes-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: NodesRules
+          interval: 30s
+          rules:
+            - alert: NodeHighResourceUsage
+              expr: hypershift_node:high_usage
+              for: 30m
+              labels:
+                severity: warning
+              annotations:
+                summary: "High {{ $labels.resource }} usage on node {{ $labels.node }}"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeHighResourceUsage.md"
+                description: "Node {{ $labels.node }} has {{ $labels.resource }} usage above {{ $labels.threshold }} (current value: {{ $value | humanizePercentage }}) for more than 30 minutes."
+            - alert: NodeNotReady
+              expr: hypershift_node:ready == 0
+              for: 30m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Node {{ $labels.node }} is not ready"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeNotReady.md"
+                description: "Node {{ $labels.node }} has not been ready for more than 30 minutes."
+            - alert: NodeInBadCondition
+              expr: hypershift_node:in_bad_condition == 1
+              for: 30m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Node {{ $labels.node }} is in bad condition"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeInBadCondition.md"
+                description: "Condition {{ $labels.condition }} has been triggering on node {{ $labels.node }} for more than 30 minutes."
+  # SRE actionable nodepool failure alerts
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-node-not-joining-nodepool-sre-actionable-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-NodepoolFailureSRE
+          interval: 30s
+          rules:
+            ## Notify SRE when one or more nodepools are having issue while adding node and either nodepool component status is unavailable or nodepool has ignition payload hash mismatch
+            - alert: NodepoolFailureSRE
+              annotations:
+                description: "One or more nodepool from the cluster are having issue while adding node(s)"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodepoolFailureSRE.md"
+                summary: "HCP Cluster nodepool having issues while adding nodes"
+              expr: sre:nodepool:provisioning_failure_notify and on (exported_namespace, _mc_id) (sre:nodepool:all_components_available==0 or sre:nodepool:invalid_payload_nodepool_provision_failure)
+              for: 1h
+              labels:
+                otel_collect: "true"
+                severity: warning
+  # Request serving nodes need upscale alerts
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-nodes-need-upscale-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-RequestServingNodesNeedUpscale
+          interval: 30s
+          rules:
+            ## If the CPU or Memory consumption is excessive, a critical alert to SRE to assign a new request serving node size.
+            - alert: RequestServingNodesNeedUpscale
+              annotations:
+                description: "The cluster's request serving nodes have been undersized for 1 hour and need to be assigned to a bigger request serving node pair."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/RequestServingNodesNeedUpscale.md
+                summary: "HCP Request Serving Nodes Need Upsizing"
+              expr: count(sre:node_request_serving:excessive_consumption_cpu or sre:node_request_serving:excessive_consumption_memory) by (request_node, _mc_id)
+              for: 1h
+              labels:
+                severity: critical
+                otel_collect: "true"

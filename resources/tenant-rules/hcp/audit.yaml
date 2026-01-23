@@ -1,0 +1,50 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-audit-rules
+  annotations:
+    description: "Template for deploying HCP audit webhook CloudWatch rules to RHOBS"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: audit-webhook-error
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: AuditWebhookCloudWatchErrors
+          interval: 60s
+          rules:
+            - alert: AuditWebhookIncorrectCloudwatchConfiguration
+              annotations:
+                description: "The audit webhook cloudwatch configuration for {{ $labels.namespace }} has been invalid for 5 minutes."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/howto/customer-cw-audit-forwarding-for-hcp.md
+                summary: "Audit webhook cloudwatch configuration invalid"
+              expr: sum by (region, env, _mc_id, namespace, _id) (splunkforwarder_audit_filter_cloudwatch_configuration_invalid{}) > 0
+              for: 5m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: AuditWebhookCloudWatchErrors
+              annotations:
+                description: "The audit webhook cloudwatch integration for {{ $labels.namespace }} is experiencing problems."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/AuditWebhookCloudWatchErrors.md
+                summary: "Audit webhook cloudwatch error"
+              expr: |
+                (sum(splunkforwarder_audit_filter_cloudwatch_enabled) by (_id, _mc_id, namespace, region, env))
+                * on (_id, _mc_id, namespace, region, env)
+                (sum(rate(splunkforwarder_audit_filter_cloudwatch_errors_total[10m])) by (_id, _mc_id, namespace, region, env)) > 0
+              for: 10m
+              labels:
+                severity: warning
+                otel_collect: "true"

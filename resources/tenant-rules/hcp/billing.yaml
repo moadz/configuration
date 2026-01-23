@@ -1,0 +1,37 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-billing-rules
+  annotations:
+    description: "Template for deploying HCP billing recording rules to RHOBS"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: billing-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: BillingRules
+          interval: 30s
+          rules:
+            - alert: BillingMetricMissing
+              annotations:
+                description: "Recording rule hostedcluster:hypershift_cluster_vcpus:max is not defined for cluster {{ $labels._id }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/BillingMetricMissing.md
+                summary: Recording rule used for the billing is not defined
+              expr: |
+                hypershift_cluster_vcpus_computation_error or (hypershift_cluster_silence_alerts unless on(_id, _mc_id) hostedcluster:hypershift_cluster_vcpus:max)
+              for: 30m
+              labels:
+                severity: critical

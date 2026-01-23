@@ -1,0 +1,79 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-observability-rules
+  annotations:
+    description: "Template for deploying HCP observability rules to RHOBS (watchdog, prometheus targets)"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  # Watchdog and DeadMansSnitch
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: watchdog
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: watchdog
+          interval: 30s
+          rules:
+            # This alert fires when the `watchdog` heartbeat metric for a specific `_id` is missing.
+            # If this fires, alerts for the referenced `_id` are not processing, meaning that
+            # other alerts for that _id are not able to fire and a loss of observability has occurred.
+            - alert: DeadMansSnitch
+              annotations:
+                summary: "No `watchdog` heartbeat for {{ $labels._id }} detected"
+                description: "No `watchdog` heartbeat for {{ $labels._id }} detected. This means the alerting stack is not functioning properly and alerts may not fire."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/DeadMansSnitch.md"
+              expr: sum by (_id, _mc_id, region, sector) (vector(1)) unless on (_id) (watchdog)
+              for: 15m
+              labels:
+                severity: critical
+            # Recording rule for watchdog heartbeat
+            - record: watchdog
+              expr: vector(1)
+  # Prometheus target health alerts - ServiceMonitors and PodMonitors
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-prometheus-target-alerting
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-prometheus-target-alerting
+          interval: 1m
+          rules:
+            - alert: HCPPrometheusPodMonitorDown
+              expr: sre:hcp_podmonitor_up:sum{name!~"karpenter"} == 0
+              for: 30m
+              labels:
+                severity: critical
+              annotations:
+                summary: "PodMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} is down."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/HCPPrometheusPodMonitorDown.md"
+                description: "PodMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} has been down for 30m."
+            # Until https://issues.redhat.com/browse/OCPBUGS-55399 is resolved, node-tuning-operator metrics do not work in HyperShift
+            # Until https://issues.redhat.com//browse/OCPBUGS-62851 is resolved, cluster-version-operator metrics do not work in HyperShift
+            # Until <BUG_NEEDED> is resolved, ovnkube-control-plane metrics do not work in HyperShift
+            # hypershift_cluster_waiting_initial_avaibility_duration_seconds is used to not alert in case the cluster is in installing state.
+            - alert: HCPPrometheusServiceMonitorDown
+              expr: (sre:hcp_servicemonitor_up:sum{name!~"node-tuning-operator|ovnkube-control-plane|cluster-version-operator"} == 0) unless on (_id) hypershift_cluster_waiting_initial_avaibility_duration_seconds
+              for: 30m
+              labels:
+                severity: critical
+              annotations:
+                summary: "ServiceMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} is down."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/HCPPrometheusServiceMonitorDown.md"
+                description: "ServiceMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} has been down for 30m."

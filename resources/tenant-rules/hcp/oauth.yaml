@@ -1,0 +1,48 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-oauth-rules
+  annotations:
+    description: "Template for deploying HCP OAuth service health rules to RHOBS"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: oauth-service-health
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: OauthServiceRules
+          interval: 30s
+          rules:
+            - alert: OauthServiceDeploymentDegraded
+              annotations:
+                description: "An Oauth Service deployment does not have the expected number of replicas."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/OauthServiceDeploymentDegraded.md
+                summary: "An Oauth Service deployment does not have the expected number of available replicas."
+              expr: |
+                sre:oauth:deployment_pods_unavailable > 0
+              for: 10m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: OauthServiceDeploymentDown
+              annotations:
+                description: There are no ready Oauth Service pods in the HCP Namespace.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/OauthServiceDeploymentDown.md
+                summary: There are no ready Oauth Service pods in the HCP Namespace.
+              labels:
+                severity: warning
+                otel_collect: "true"
+              expr: sre:sre:oauth:pod_status_ready == 0
+              for: 15m

@@ -1,0 +1,212 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-api-server-rules
+  annotations:
+    description: "Template for deploying HCP API server rules to RHOBS"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  # Recording rules for kube-apiserver error budget burn calculations
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: kube-api-error-budget-burn
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: kube-api-error-budget-burn
+          interval: 30s
+          rules:
+            - record: sre:kube_apiserver:pod_status_ready
+              expr: sum by (_id, _mc_id) (kube_pod_status_ready{pod=~"kube-apiserver.*", namespace=~"ocm-.*-.*", condition="true"})
+            - record: sre:openshift_apiserver:pod_status_ready
+              expr: sum by (_id, _mc_id) (kube_pod_status_ready{pod=~"openshift-apiserver.*", namespace=~"ocm-.*-.*", condition="true"})
+            - record: sre:kube_apiserver:deployment_pods_unavailable
+              expr: sum by (_id, _mc_id) (kube_deployment_status_replicas_unavailable{deployment="kube-apiserver", namespace=~"ocm-.*-.*"})
+            - record: sre:openshift_apiserver:deployment_pods_unavailable
+              expr: sum by (_id, _mc_id) (kube_deployment_status_replicas_unavailable{deployment="openshift-apiserver", namespace=~"ocm-.*-.*"})
+  # Probe-based SLO alerts for API server availability
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: api
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: api-SLOs-probe
+          interval: 30s
+          rules:
+            - alert: api-ErrorBudgetBurn
+              annotations:
+                message: "High error budget burn for openshift api"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                        label_replace(
+                            label_replace((
+
+                    1-(sum by (probe_url, mc_name, _mc_id, sector, region, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[5m]))/ sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[5m])))> (14.40*(1-0.990)) and sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[5m])) > 5
+                    and
+                    1-(sum by (probe_url, mc_name, _mc_id, sector, region, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[1h]))/ sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[1h])))> (14.40*(1-0.990)) and sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[1h])) > 60
+                            ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                        "_id_or_ns", "$0", "_id", ".+")
+                    unless on (_id_or_ns) (
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                        or
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*")),
+                    "_id_or_ns", "", "_id_or_ns", ".*")
+              labels:
+                long_window: 1h
+                namespace: openshift-route-monitor-operator
+                severity: critical
+                short_window: 5m
+                otel_collect: "true"
+            - alert: api-ErrorBudgetBurn
+              annotations:
+                message: "High error budget burn for openshift api"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                        label_replace(
+                            label_replace((
+
+                    1-(sum by (probe_url, mc_name, _mc_id, sector, region, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[30m]))/ sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[30m])))> (6*(1-0.990)) and sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[30m])) > 30
+                    and
+                    1-(sum by (probe_url, mc_name, _mc_id, sector, region, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[6h]))/ sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[6h])))> (6*(1-0.990)) and sum by (probe_url, mc_name, _mc_id, sector, region, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[6h])) > 360
+                            ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                        "_id_or_ns", "$0", "_id", ".+")
+                    unless on (_id_or_ns) (
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                        or
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*")),
+                    "_id_or_ns", "", "_id_or_ns", ".*")
+              labels:
+                long_window: 6h
+                namespace: openshift-route-monitor-operator
+                severity: critical
+                short_window: 30m
+                otel_collect: "true"
+            - alert: api-ErrorBudgetBurn
+              annotations:
+                message: "High error budget burn for openshift api"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                    label_replace((
+
+                1-(sum by (probe_url, region, sector, _mc_id, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[2h]))/ sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[2h])))> (3*(1-0.990)) and sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[2h])) > 120
+                and
+                1-(sum by (probe_url, region, sector, _mc_id, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[1d]))/ sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[1d])))> (3*(1-0.990)) and sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[1d])) > 1440
+                        ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                    "_id_or_ns", "$0", "_id", ".+")
+                unless on (_id_or_ns) (
+                    label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                    or
+                    label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*"))
+              for: 1h
+              labels:
+                long_window: 1d
+                namespace: openshift-route-monitor-operator
+                severity: warning
+                short_window: 2h
+                otel_collect: "true"
+            - alert: api-ErrorBudgetBurn
+              annotations:
+                message: "High error budget burn for openshift api"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                    label_replace((
+
+                1-(sum by (probe_url, region, sector, _mc_id, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[6h]))/ sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[6h])))> (1*(1-0.990)) and sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[6h])) > 360
+                and
+                1-(sum by (probe_url, region, sector, _mc_id, _id)(sum_over_time(probe_success{probe_url=~".*api.*"}[3d]))/ sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[3d])))> (1*(1-0.990)) and sum by (probe_url, region, sector, _mc_id, _id)(count_over_time(probe_success{probe_url=~".*api.*"}[3d])) > 4320
+                        ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                    "_id_or_ns", "$0", "_id", ".+")
+                unless on (_id_or_ns) (
+                    label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                    or
+                    label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*"))
+              for: 3h
+              labels:
+                long_window: 3d
+                namespace: openshift-route-monitor-operator
+                severity: warning
+                short_window: 6h
+                otel_collect: "true"
+  # KubeAPIServer and OpenshiftAPIServer availability alerts
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-kube-apiserver-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: osd-kube-apiserver-rules
+          interval: 1m
+          rules:
+            # This alert fires when sre:kube_apiserver:pod_status_ready equals 0 for 15 minutes,
+            # indicating no ready KubeAPIServer pods and blocking all cluster operations.
+            - alert: KubeAPIServerDown
+              annotations:
+                description: The KubeAPIServer pods in the HCP Namespace are not ready, blocking all cluster operations.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeAPIServerDown.md
+                summary: No ready KubeAPIServer pods in the HCP namespace.
+              labels:
+                severity: critical
+                otel_collect: "true"
+              expr: sre:kube_apiserver:pod_status_ready == 0
+              for: 15m
+            # This alert fires when sre:kube_apiserver:deployment_pods_unavailable is greater than 0
+            # for 15 minutes, indicating partial degradation.
+            - alert: KubeAPIServerDegraded
+              annotations:
+                description: "A KubeAPIServer deployment in the HCP namespace has unavailable replicas, risking reduced capacity or latency."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeAPIServerDegraded.md
+                summary: "Unavailable replicas in KubeAPIServer deployment in the HCP namespace."
+              expr: |
+                sre:kube_apiserver:deployment_pods_unavailable > 0
+              for: 15m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            # This alert fires when sre:openshift_apiserver:pod_status_ready equals 0 for 15 minutes,
+            # indicating no ready openshiftAPIServer pods.
+            - alert: OpenshiftAPIServerDown
+              annotations:
+                description: The OpenShiftAPIServer pods in the HCP Namespace are not ready, blocking openshift-specific operations to be blocked.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/OpenshiftAPIServerDown.md
+                summary: No ready OpenShiftAPIServer pods in the HCP namespace.
+              labels:
+                severity: critical
+                otel_collect: "true"
+              expr: sre:openshift_apiserver:pod_status_ready == 0
+              for: 15m
+            # This alert fires when sre:openshift_apiserver:deployment_pods_unavailable is greater than 0
+            # for 15 minutes, indicating partial degradation.
+            - alert: OpenshiftAPIServerDegraded
+              annotations:
+                description: "An OpenShiftAPIServer deployment in the HCP namespace has unavailable replicas, risking reduced capacity or latency."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/OpenshiftAPIServerDegraded.md
+                summary: "Unavailable replicas in OpenShiftAPIServer deployment in the HCP namespace."
+              expr: |
+                sre:openshift_apiserver:deployment_pods_unavailable > 0
+              for: 15m
+              labels:
+                severity: warning
+                otel_collect: "true"

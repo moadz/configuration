@@ -1,0 +1,50 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-splunk-rules
+  annotations:
+    description: "Template for deploying HCP Splunk/SAE deployment rules to RHOBS"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sae-deployment
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: SAEDeploymentErrors
+          interval: 60s
+          rules:
+            - alert: SAEDeploymentMissing
+              annotations:
+                description: "The SAE deployment is missing for {{ $labels.namespace }}. Splunk audit log forwarding is not functional."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/SAEDeploymentMissing.md
+                summary: "SAE deployment missing"
+              expr: |
+                (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_labels{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"}))
+                unless on (_id, _mc_id, namespace)
+                (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} > 0))
+              for: 15m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: SAEDeploymentDown
+              annotations:
+                description: "The SAE deployment for {{ $labels.namespace }} has 0 available replicas. Splunk audit log forwarding is not functional."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/SAEDeploymentDown.md
+                summary: "SAE deployment down"
+              expr: kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} == 0
+              for: 15m
+              labels:
+                severity: critical
+                otel_collect: "true"

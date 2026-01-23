@@ -1,0 +1,170 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-control-plane-rules
+  annotations:
+    description: "Template for deploying HCP control plane rules to RHOBS (etcd, kube-controller-manager, kube-scheduler)"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  # etcd rules - leader elections, database quota monitoring
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-etcd-rules
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: sre-etcd-rules
+          interval: 30s
+          rules:
+            # Cribbed from https://github.com/openshift/cluster-etcd-operator/blob/3fc88b0392f731df592a484d2a3b452712cf7ece/manifests/0000_90_etcd-operator_03_prometheusrule.yaml#L13-L22
+            # Modified for ROSA HCP.
+            - alert: etcdNoLeader
+              annotations:
+                summary: etcd cluster has no leader
+                description: 'etcd cluster "{{ $labels.job }}": member {{ $labels.instance }} has no leader.'
+                runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-etcd-operator/etcdNoLeader.md
+              expr: etcd_server_has_leader{job=~".*etcd.*", _id!=""} == 0
+              for: 1m
+              labels:
+                severity: critical
+            # Cribbed from https://github.com/openshift/cluster-etcd-operator/blob/3fc88b0392f731df592a484d2a3b452712cf7ece/manifests/0000_90_etcd-operator_03_prometheusrule.yaml#L157-L165
+            # Modified for ROSA HCP.
+            - alert: etcdHighNumberOfLeaderChanges
+              annotations:
+                summary: etcd cluster has high number of leader changes.
+                description: 'etcd cluster "{{ $labels.job }}": {{ $value }} average leader changes within the last 10 minutes. Frequent elections may be a sign of insufficient resources, high network latency, or disruptions by other components and should be investigated.'
+              expr: avg by (_id, _mc_id) (changes(etcd_server_is_leader{_id!=""}[10m])) > 5
+              for: 5m
+              labels:
+                severity: warning
+            # etcdDatabaseQuotaLowSpace alerts - cribbed from cluster-etcd-operator
+            # 65% threshold - info
+            - alert: etcdDatabaseQuotaLowSpace
+              annotations:
+                description: 'etcd cluster for "{{ $labels._id }}": database size is 65% of the defined quota on etcd instance {{ $labels.instance }}, please defrag or increase the quota as the writes to etcd will be disabled when it is full.'
+                summary: etcd cluster database is using >= 65% of the defined quota.
+              expr: |
+                (
+                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                  /
+                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                )
+                * 100 > 65
+              for: 10m
+              labels:
+                severity: info
+            # 75% threshold - warning
+            - alert: etcdDatabaseQuotaLowSpace
+              annotations:
+                description: 'etcd cluster for "{{ $labels._id }}": database size is 75% of the defined quota on etcd instance {{ $labels.instance }}, please defrag or increase the quota as the writes to etcd will be disabled when it is full.'
+                summary: etcd cluster database is using >= 75% of the defined quota.
+              expr: |
+                (
+                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                  /
+                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                )
+                * 100 > 75
+              for: 10m
+              labels:
+                severity: warning
+            # 85% threshold - critical
+            - alert: etcdDatabaseQuotaLowSpace
+              annotations:
+                description: 'etcd cluster for "{{ $labels._id }}": database size is 85% of the defined quota on etcd instance {{ $labels.instance }}, please defrag or increase the quota as the writes to etcd will be disabled when it is full.'
+                runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-etcd-operator/etcdDatabaseQuotaLowSpace.md
+                summary: etcd cluster database is running full.
+              expr: |
+                (
+                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                  /
+                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                )
+                * 100 > 85
+              for: 10m
+              labels:
+                severity: critical
+  # kube-controller-manager rules
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: kube-controller-manager
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: osd-kube-controller-manager
+          interval: 1m
+          rules:
+            - record: sre:kube_controller_manager:pod_status_ready
+              expr: sum by (_id, _mc_id) (kube_pod_status_ready{pod=~"kube-controller-manager.*", namespace=~"ocm-.*-.*", condition="true"})
+            # This alert uses the sre:kube_controller_manager:pod_status_ready rule.
+            # In HCP, we expect 2 pods, so this alert fires when there are 0.
+            - alert: KubeControllerManagerDown
+              annotations:
+                description: "There are 0 Ready 'kube-controller-manager' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeControllerManagerDown.md
+                summary: No Ready kube-controller-manager pods.
+              labels:
+                severity: critical
+              expr: sre:kube_controller_manager:pod_status_ready == 0
+              for: 15m
+            # This alert fires when there is only 1 ready pod (degraded state).
+            - alert: KubeControllerManagerDegraded
+              annotations:
+                description: "There is not at least 2 Ready 'kube-controller-manager' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeControllerManagerDown.md
+                summary: Minimum Ready kube-controller-manager Pods not met.
+              labels:
+                severity: warning
+              expr: sre:kube_controller_manager:pod_status_ready == 1
+              for: 15m
+  # kube-scheduler rules
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: kube-scheduler
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: osd-kube-scheduler
+          interval: 1m
+          rules:
+            - record: sre:kube_scheduler:pod_status_ready
+              expr: sum by (_id, _mc_id) (kube_pod_status_ready{pod=~"kube-scheduler.*", namespace=~"ocm-.*-.*", condition="true"})
+            # This alert uses the sre:kube-scheduler:pod_status_ready rule.
+            # In HCP, we expect 2 pods, so this alert fires when there are 0.
+            - alert: KubeSchedulerDown
+              annotations:
+                description: "There are 0 Ready 'kube-scheduler' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeSchedulerDown.md
+                summary: No Ready kube-scheduler pods.
+              labels:
+                severity: critical
+              expr: sre:kube_scheduler:pod_status_ready == 0
+              for: 15m
+            # This alert fires when there is only 1 ready pod (degraded state).
+            - alert: KubeSchedulerDegraded
+              annotations:
+                description: "There is not at least 2 Ready 'kube-scheduler' Pods for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeSchedulerDown.md
+                summary: Minimum Ready kube-scheduler Pods not met.
+              labels:
+                severity: warning
+              expr: sre:kube_scheduler:pod_status_ready == 1
+              for: 15m

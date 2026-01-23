@@ -1,0 +1,50 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-hcp-cluster-operators-rules
+  annotations:
+    description: "Template for deploying HCP ClusterOperator health rules to RHOBS"
+parameters:
+  - name: NAMESPACE
+    description: Namespace to deploy the rules to
+    required: true
+  - name: TENANT
+    description: Tenant to deploy the rules to
+    required: true
+objects:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: cluster-operators
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: cluster-operators
+          interval: 60s
+          rules:
+            # hypershift_cluster_waiting_initial_avaibility_duration_seconds is used to not alert
+            # in case the cluster is in installing state. This would create noise (e.g. audit webhook
+            # servicemonitor is deployed before the cluster is available - but can't start if KAS is not up).
+            - alert: ClusterOperatorDegraded
+              annotations:
+                summary: "Cluster operator is in degraded state."
+                description: "The {{ $labels.name }} operator is reporting a degraded state for {{ $labels._id }}."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/cluster_operators/ClusterOperatorDegraded.md"
+              expr: (cluster_operator_conditions{condition="Degraded"} == 1) unless on (_id) hypershift_cluster_waiting_initial_avaibility_duration_seconds
+              for: 60m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: ClusterOperatorDown
+              annotations:
+                summary: "Cluster operator is unavailable."
+                description: "The {{ $labels.name }} operator is unavailable for {{ $labels._id }}."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/cluster_operators/ClusterOperatorDown.md"
+              expr: (cluster_operator_conditions{condition="Available"} == 0) unless on (_id) hypershift_cluster_waiting_initial_avaibility_duration_seconds
+              for: 60m
+              labels:
+                severity: critical
+                otel_collect: "true"
