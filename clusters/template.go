@@ -416,7 +416,7 @@ func DefaultBaseTemplate() TemplateMaps {
 		StorageSize: ParamMap[v1alpha1.StorageSize]{
 			StoreDefault:           "10Gi",
 			ReceiveIngestorDefault: "10Gi",
-			CompactDefault:         "10Gi",
+			CompactDefault:         "50Gi",
 			Ruler:                  "10Gi",
 		},
 		ObjectStorageBucket: ParamMap[v1alpha1.ObjectStorageConfig]{

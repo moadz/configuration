@@ -96,6 +96,6 @@ spec:
     seccompProfile:
       type: RuntimeDefault
   storage:
-    size: 10Gi
+    size: 50Gi
   version: 0dcacf2a5108328d537dbcf59fcabc9b69f08a2b
 status: {}
