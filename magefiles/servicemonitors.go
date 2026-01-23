@@ -72,7 +72,6 @@ func thanosOperatorServiceMonitor(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						BearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token",
-						Path:            "/metrics",
 						Port:            "https",
 						Scheme:          ptr.To(monitoringv1.Scheme("https")),
 						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
@@ -103,7 +102,6 @@ func thanosOperatorServiceMonitor(namespace string) []runtime.Object {
 
 func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object {
 	interval30s := monitoringv1.Duration("30s")
-	metricsPath := "/metrics"
 	objs := []runtime.Object{
 		// Single ServiceMonitor for all Thanos Compact instances
 		&monitoringv1.ServiceMonitor{
@@ -124,7 +122,6 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -160,7 +157,6 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -196,7 +192,6 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -232,7 +227,6 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -267,7 +261,6 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "public",
 					},
 				},
@@ -302,7 +295,6 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -337,7 +329,6 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -360,7 +351,6 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 
 func createThanosServiceMonitors(namespace string) []runtime.Object {
 	interval30s := monitoringv1.Duration("30s")
-	metricsPath := "/metrics"
 	objs := []runtime.Object{
 		&monitoringv1.ServiceMonitor{
 			TypeMeta: metav1.TypeMeta{
@@ -382,7 +372,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -421,7 +410,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -461,7 +449,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -502,7 +489,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: "30s",
-						Path:     "/metrics",
 						Port:     "http",
 					},
 				},
@@ -542,7 +528,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -583,7 +568,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -623,7 +607,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -664,7 +647,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -706,7 +688,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -748,7 +729,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -790,7 +770,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -828,7 +807,6 @@ func createThanosServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "http",
 					},
 				},
@@ -870,7 +848,6 @@ func lokiOperatorServiceMonitor(namespace string) []runtime.Object {
 			Spec: monitoringv1.ServiceMonitorSpec{
 				Endpoints: []monitoringv1.Endpoint{
 					{
-						Path: "/metrics",
 						Port: "metrics",
 					},
 				},
@@ -891,7 +868,6 @@ func lokiOperatorServiceMonitor(namespace string) []runtime.Object {
 
 func createLokiServiceMonitors(namespace string) []runtime.Object {
 	interval30s := monitoringv1.Duration("30s")
-	metricsPath := "/metrics"
 	objs := []runtime.Object{
 		&monitoringv1.ServiceMonitor{
 			TypeMeta: metav1.TypeMeta{
@@ -912,7 +888,6 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "metrics",
 					},
 				},
@@ -949,7 +924,6 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "metrics",
 					},
 				},
@@ -986,7 +960,6 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "metrics",
 					},
 				},
@@ -1023,7 +996,6 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "metrics",
 					},
 				},
@@ -1060,7 +1032,6 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "metrics",
 					},
 				},
@@ -1097,7 +1068,6 @@ func createLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Path:     metricsPath,
 						Port:     "metrics",
 					},
 				},

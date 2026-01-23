@@ -10,7 +10,6 @@ spec:
   endpoints:
   - honorLabels: true
     interval: 30s
-    path: /metrics
     port: synthetics-api
   namespaceSelector:
     matchNames:

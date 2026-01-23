@@ -1131,12 +1131,10 @@ func gatewayServiceMonitor(m clusters.TemplateMaps, matchNS string, conf *cluste
 	endpoints := []monitoringv1.Endpoint{
 		{
 			Port:     "internal",
-			Path:     "/metrics",
 			Interval: "30s",
 		},
 		{
 			Port:     "metrics",
-			Path:     "/metrics",
 			Interval: "30s",
 		},
 	}
@@ -1144,7 +1142,6 @@ func gatewayServiceMonitor(m clusters.TemplateMaps, matchNS string, conf *cluste
 	if conf.AMSURL() != "" {
 		endpoints = append(endpoints, monitoringv1.Endpoint{
 			Port:     "opa-ams-metrics",
-			Path:     "/metrics",
 			Interval: "30s",
 		})
 	}

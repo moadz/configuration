@@ -263,7 +263,6 @@ func createSyntheticsApiServiceMonitor(config *syntheticsApiConfig) *monitoringv
 			Endpoints: []monitoringv1.Endpoint{
 				{
 					Port:        "metrics",
-					Path:        "/metrics",
 					Interval:    monitoringv1.Duration("30s"),
 					HonorLabels: true,
 				},
@@ -504,7 +503,6 @@ func createConsolidatedSyntheticsServiceMonitors(namespace string) []runtime.Obj
 					{
 						HonorLabels: true,
 						Interval:    "30s",
-						Path:        "/metrics",
 						Port:        "synthetics-api",
 					},
 				},
@@ -535,7 +533,6 @@ func createConsolidatedSyntheticsServiceMonitors(namespace string) []runtime.Obj
 					{
 						HonorLabels: true,
 						Interval:    "30s",
-						Path:        "/metrics",
 						Port:        "http-metrics",
 					},
 				},
@@ -566,7 +563,6 @@ func createConsolidatedSyntheticsServiceMonitors(namespace string) []runtime.Obj
 					{
 						HonorLabels: true,
 						Interval:    "30s",
-						Path:        "/metrics",
 						Port:        "http",
 					},
 				},

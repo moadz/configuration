@@ -12,7 +12,6 @@ metadata:
 spec:
   endpoints:
   - interval: 30s
-    path: /metrics
     port: public
   namespaceSelector:
     matchNames:

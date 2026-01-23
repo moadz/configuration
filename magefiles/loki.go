@@ -335,7 +335,6 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 			Spec: monitoringv1.ServiceMonitorSpec{
 				Endpoints: []monitoringv1.Endpoint{
 					{
-						Path: "/metrics",
 						Port: "metrics",
 					},
 				},
@@ -369,7 +368,6 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: "30s",
-						Path:     "/metrics",
 						Port:     "metrics",
 					},
 				},
@@ -407,7 +405,6 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: "30s",
-						Path:     "/metrics",
 						Port:     "metrics",
 					},
 				},
@@ -445,7 +442,6 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: "30s",
-						Path:     "/metrics",
 						Port:     "metrics",
 					},
 				},
@@ -483,7 +479,6 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: "30s",
-						Path:     "/metrics",
 						Port:     "metrics",
 					},
 				},
@@ -521,7 +516,6 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: "30s",
-						Path:     "/metrics",
 						Port:     "metrics",
 					},
 				},
@@ -559,7 +553,6 @@ func createConsolidatedLokiServiceMonitors(namespace string) []runtime.Object {
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: "30s",
-						Path:     "/metrics",
 						Port:     "metrics",
 					},
 				},

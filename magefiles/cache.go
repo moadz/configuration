@@ -350,7 +350,6 @@ func createCacheServiceMonitor(config *memcachedConfig) *monitoringv1.ServiceMon
 			Endpoints: []monitoringv1.Endpoint{
 				{
 					Port:        "metrics",
-					Path:        "/metrics",
 					Interval:    monitoringv1.Duration("30s"),
 					HonorLabels: true,
 				},

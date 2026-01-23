@@ -13,8 +13,7 @@ metadata:
   namespace: openshift-customer-monitoring
 spec:
   endpoints:
-  - path: /metrics
-    port: metrics
+  - port: metrics
   namespaceSelector:
     matchNames:
     - rhobs-stage

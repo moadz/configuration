@@ -138,7 +138,6 @@ func createAlertmanagerServiceMonitors(namespace string) []runtime.Object {
 					{
 						HonorLabels: true,
 						Interval:    "30s",
-						Path:        "/metrics",
 						Port:        "web",
 					},
 				},
