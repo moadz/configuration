@@ -52,7 +52,7 @@ To facilitate this, we provide a Mage target `mage sync:operator` that automates
 This allows us to keep the image versions in sync with the CRDs they support.
 
 The target requires two parameters:
-1. `operator`: The name of the operator to synchronize and should be one of (`thanos`).
+1. `operator`: The name of the operator to synchronize and should be one of (`thanos`, `loki`).
 2. The commit hash for the fork we want to sync to or "latest" to sync to the latest commit on the supported branch.
 
 For `thanos`, this is the commit hash on https://github.com/rhobs/rhobs-konflux-thanos-operator
