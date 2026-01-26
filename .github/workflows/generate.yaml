@@ -18,8 +18,11 @@ jobs:
     - name: Install mage
       run: go install github.com/magefile/mage@latest
     - name: Generate ${{ inputs.cluster }} cluster's resources
-      run: rm -rf resources/clusters/integration/${{ inputs.cluster }} && mage build:cluster ${{ inputs.cluster }}
+      run: rm -rf resources/clusters/*/${{ inputs.cluster }} && mage build:cluster ${{ inputs.cluster }}
     - name: Git status
       run: git status
     - name: Check clean directory
       run: test -z "$(git status --porcelain)"
+    - name: Show differences
+      run: git diff
+      if: ${{ failure() }}

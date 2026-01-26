@@ -20,6 +20,10 @@ jobs:
     uses: ./.github/workflows/generate.yaml
     with:
       cluster: rhobss01uw2
+  rhobsp01ue1:
+    uses: ./.github/workflows/generate.yaml
+    with:
+      cluster: rhobsp01ue1
   build:
     runs-on: ubuntu-latest
     steps:
