@@ -26,3 +26,11 @@ clusters:
       alertmanager: "https://alertmanager.rhobsi01uw2.devshift.net/"
       cidr: "10.170.65.0/24"
       bastion: "bastion.ci.int.devshift.net"
+  prod:
+    - name: "rhobsp01ue1"
+      region: "ue1"
+      console: "https://console-openshift-console.apps.rhobsp01ue1.y9ya.p1.openshiftapps.com/"
+      prometheus: "https://prometheus.rhobsp01ue1.devshift.net/"
+      alertmanager: "https://alertmanager.rhobsp01ue1.devshift.net/"
+      cidr: "10.170.85.0/24"
+      bastion: "bastion.ci.int.devshift.net"
