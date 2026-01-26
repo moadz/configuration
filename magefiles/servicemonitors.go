@@ -251,7 +251,7 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "thanos-query-frontend",
 				Labels: map[string]string{
-					"app.kubernetes.io/component":  "thanos-query-frontend",
+					"app.kubernetes.io/component":  "query-frontend",
 					"app.kubernetes.io/managed-by": "thanos-operator",
 					"app.kubernetes.io/name":       "thanos-query-frontend",
 					"app.kubernetes.io/part-of":    "thanos",
@@ -261,7 +261,7 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				Endpoints: []monitoringv1.Endpoint{
 					{
 						Interval: interval30s,
-						Port:     "public",
+						Port:     "http",
 					},
 				},
 				NamespaceSelector: monitoringv1.NamespaceSelector{
@@ -269,7 +269,7 @@ func createConsolidatedThanosServiceMonitors(namespace string) []runtime.Object 
 				},
 				Selector: metav1.LabelSelector{
 					MatchLabels: map[string]string{
-						"app.kubernetes.io/component":  "thanos-query-frontend",
+						"app.kubernetes.io/component":  "query-frontend",
 						"app.kubernetes.io/managed-by": "thanos-operator",
 						"app.kubernetes.io/name":       "thanos-query-frontend",
 						"app.kubernetes.io/part-of":    "thanos",
