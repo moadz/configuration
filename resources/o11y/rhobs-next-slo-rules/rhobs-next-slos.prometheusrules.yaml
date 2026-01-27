@@ -22,7 +22,7 @@ spec:
       record: http_requests:increase4w
     - alert: SLOMetricAbsent
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /receive handler is burning too much error budget to guarantee
@@ -106,7 +106,7 @@ spec:
       record: http_requests:burnrate4d
     - alert: APIMetricsWriteAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /receive handler is burning too much error budget to guarantee
@@ -128,7 +128,7 @@ spec:
         slo: api-metrics-write-availability-slo
     - alert: APIMetricsWriteAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /receive handler is burning too much error budget to guarantee
@@ -150,7 +150,7 @@ spec:
         slo: api-metrics-write-availability-slo
     - alert: APIMetricsWriteAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /receive handler is burning too much error budget to guarantee
@@ -172,7 +172,7 @@ spec:
         slo: api-metrics-write-availability-slo
     - alert: APIMetricsWriteAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /receive handler is burning too much error budget to guarantee
@@ -235,7 +235,7 @@ spec:
       record: http_requests:increase4w
     - alert: SLOMetricAbsent
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /query handler is burning too much error budget to guarantee
@@ -319,7 +319,7 @@ spec:
       record: http_requests:burnrate4d
     - alert: APIMetricsQueryAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /query handler is burning too much error budget to guarantee
@@ -341,7 +341,7 @@ spec:
         slo: api-metrics-query-availability-slo
     - alert: APIMetricsQueryAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /query handler is burning too much error budget to guarantee
@@ -363,7 +363,7 @@ spec:
         slo: api-metrics-query-availability-slo
     - alert: APIMetricsQueryAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /query handler is burning too much error budget to guarantee
@@ -385,7 +385,7 @@ spec:
         slo: api-metrics-query-availability-slo
     - alert: APIMetricsQueryAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query handler is burning too much error budget to guarantee
           availability SLOs.
         message: API /query handler is burning too much error budget to guarantee
@@ -448,7 +448,7 @@ spec:
       record: http_requests:increase4w
     - alert: SLOMetricAbsent
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
         message: API /query_range handler is burning too much error budget to guarantee
@@ -532,7 +532,7 @@ spec:
       record: http_requests:burnrate4d
     - alert: APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
         message: API /query_range handler is burning too much error budget to guarantee
@@ -554,7 +554,7 @@ spec:
         slo: api-metrics-query-range-availability-slo
     - alert: APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
         message: API /query_range handler is burning too much error budget to guarantee
@@ -576,7 +576,7 @@ spec:
         slo: api-metrics-query-range-availability-slo
     - alert: APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
         message: API /query_range handler is burning too much error budget to guarantee
@@ -598,7 +598,7 @@ spec:
         slo: api-metrics-query-range-availability-slo
     - alert: APIMetricsQueryRangeAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: API /query_range handler is burning too much error budget to
           guarantee availability SLOs.
         message: API /query_range handler is burning too much error budget to guarantee
@@ -659,7 +659,7 @@ spec:
       record: thanos_alert_sender_alerts_dropped:increase4w
     - alert: SLOMetricAbsent
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
         message: API Thanos Rule is burning too much error budget to guarantee availability
@@ -726,7 +726,7 @@ spec:
       record: thanos_alert_sender_alerts_dropped:burnrate4d
     - alert: APIAlertmanagerAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
         message: API Thanos Rule is burning too much error budget to guarantee availability
@@ -745,7 +745,7 @@ spec:
         slo: api-alerting-availability-slo
     - alert: APIAlertmanagerAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
         message: API Thanos Rule is burning too much error budget to guarantee availability
@@ -764,7 +764,7 @@ spec:
         slo: api-alerting-availability-slo
     - alert: APIAlertmanagerAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
         message: API Thanos Rule is burning too much error budget to guarantee availability
@@ -783,7 +783,7 @@ spec:
         slo: api-alerting-availability-slo
     - alert: APIAlertmanagerAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: API Thanos Rule failing to send alerts to Alertmanager and is
           burning too much error budget to guarantee availability SLOs.
         message: API Thanos Rule is burning too much error budget to guarantee availability
@@ -841,7 +841,7 @@ spec:
       record: alertmanager_notifications_failed:increase4w
     - alert: SLOMetricAbsent
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
         message: API Alertmanager is burning too much error budget to guarantee availability
@@ -909,7 +909,7 @@ spec:
       record: alertmanager_notifications_failed:burnrate4d
     - alert: APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
         message: API Alertmanager is burning too much error budget to guarantee availability
@@ -929,7 +929,7 @@ spec:
         slo: api-alerting-notif-availability-slo
     - alert: APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
         message: API Alertmanager is burning too much error budget to guarantee availability
@@ -949,7 +949,7 @@ spec:
         slo: api-alerting-notif-availability-slo
     - alert: APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
         message: API Alertmanager is burning too much error budget to guarantee availability
@@ -969,7 +969,7 @@ spec:
         slo: api-alerting-notif-availability-slo
     - alert: APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/50b36e28785705570854022296f14821/alertmanager?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
         description: API Alertmanager failing to deliver alerts to upstream targets
           and is burning too much error budget to guarantee availability SLOs.
         message: API Alertmanager is burning too much error budget to guarantee availability
@@ -1039,7 +1039,7 @@ spec:
       record: http_request_duration_seconds:increase4w
     - alert: SLOMetricAbsent
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
         message: API /receive handler is burning too much latency error budget.
@@ -1056,7 +1056,7 @@ spec:
         slo: api-metrics-write-latency-slo
     - alert: SLOMetricAbsent
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
         message: API /receive handler is burning too much latency error budget.
@@ -1146,7 +1146,7 @@ spec:
       record: http_request_duration_seconds:burnrate4d
     - alert: APIMetricsWriteLatencyErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
         message: API /receive handler is burning too much latency error budget.
@@ -1167,7 +1167,7 @@ spec:
         slo: api-metrics-write-latency-slo
     - alert: APIMetricsWriteLatencyErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
         message: API /receive handler is burning too much latency error budget.
@@ -1188,7 +1188,7 @@ spec:
         slo: api-metrics-write-latency-slo
     - alert: APIMetricsWriteLatencyErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
         message: API /receive handler is burning too much latency error budget.
@@ -1209,7 +1209,7 @@ spec:
         slo: api-metrics-write-latency-slo
     - alert: APIMetricsWriteLatencyErrorBudgetBurning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: API /receive handler is burning too much error budget to guarantee
           latency SLOs.
         message: API /receive handler is burning too much latency error budget.

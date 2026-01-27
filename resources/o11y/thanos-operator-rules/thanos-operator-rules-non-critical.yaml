@@ -18,7 +18,7 @@ spec:
     rules:
     - alert: ThanosOperatorDown
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: The Thanos Operator has been down for more than 5 minutes. No
           reconciliation is happening.
         message: Thanos resources are not being reconciled. Configuration changes
@@ -32,7 +32,7 @@ spec:
         severity: high
     - alert: ThanosOperatorHighReconcileErrorRate
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: Controller {{ $labels.controller }} for resource {{ $labels.namespace
           }}/{{ $labels.resource }} has a high reconciliation error rate of {{ $value
           | humanizePercentage }} over the last 10 minutes.
@@ -61,7 +61,7 @@ spec:
         severity: medium
     - alert: ThanosOperatorReconcileStuck
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: Workqueue for {{ $labels.name }} has items but no reconciliations
           are happening. Controller appears stuck.
         message: Changes to Thanos resources are not being processed.
@@ -82,7 +82,7 @@ spec:
         severity: medium
     - alert: ThanosOperatorWorkQueueGrowth
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: Workqueue depth for {{ $labels.name }} is {{ $value }}, indicating
           the controller cannot keep up with events.
         message: Reconciliation is falling behind. Configuration updates may be delayed.
@@ -97,7 +97,7 @@ spec:
         severity: medium
     - alert: ThanosOperatorSlowReconciliation
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: P99 reconciliation time for {{ $labels.controller }} is {{ $value
           | humanizeDuration }}, which is slow
         message: Configuration changes are taking longer than expected to apply.
@@ -122,7 +122,7 @@ spec:
     rules:
     - alert: ThanosQueryNoEndpointsConfigured
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosQuery resource {{ $labels.namespace }}/{{ $labels.resource
           }} has no store endpoints configured.
         message: Query component cannot retrieve data from any stores. Queries will
@@ -139,7 +139,7 @@ spec:
         severity: medium
     - alert: ThanosQueryServiceWatchReconcileStorm
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosQuery {{ $labels.namespace }}/{{ $labels.resource }} is
           reconciling {{ $value | humanize }} times/sec due to service events.
         message: Excessive reconciliations may indicate service churn or configuration
@@ -161,7 +161,7 @@ spec:
     rules:
     - alert: ThanosReceiveNoHashringsConfigured
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosReceive resource {{ $labels.namespace }}/{{ $labels.resource
           }} has no hashrings configured.
         message: Receive component cannot accept remote write data without hashring
@@ -178,7 +178,7 @@ spec:
         severity: medium
     - alert: ThanosReceiveHashringNoEndpoints
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: Hashring {{ $labels.hashring }} for ThanosReceive {{ $labels.namespace
           }}/{{ $labels.resource }} has no endpoints configured.
         message: Data cannot be distributed to this hashring. Remote write data may
@@ -195,7 +195,7 @@ spec:
         severity: high
     - alert: ThanosReceiveHashringConfigurationChange
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: The hashring configuration for ThanosReceive {{ $labels.namespace
           }}/{{ $labels.resource }} has changed.
         message: Data distribution pattern has changed. This may cause temporary inconsistencies.
@@ -215,7 +215,7 @@ spec:
         severity: info
     - alert: ThanosReceiveEndpointReconcileStorm
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosReceive {{ $labels.namespace }}/{{ $labels.resource }}
           is reconciling {{ $value | humanize }} times/sec due to endpoint events.
         message: Excessive reconciliations may indicate endpoint churn or configuration
@@ -237,7 +237,7 @@ spec:
     rules:
     - alert: ThanosRulerNoQueryEndpointsConfigured
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosRuler resource {{ $labels.namespace }}/{{ $labels.resource
           }} has no query endpoints configured.
         message: Ruler cannot query data for rule evaluation. Recording and alerting
@@ -254,7 +254,7 @@ spec:
         severity: medium
     - alert: ThanosRulerNoPrometheusRulesConfigured
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: No PrometheusRules found for ThanosRuler {{ $labels.namespace
           }}/{{ $labels.resource }}.
         message: No rules from PrometheusRules are being evaluated. This may be expected
@@ -273,7 +273,7 @@ spec:
         severity: medium
     - alert: ThanosRulerNoRulesConfigured
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: No rule configmaps found for ThanosRuler {{ $labels.namespace
           }}/{{ $labels.resource }}.
         message: No rules are being evaluated as no rule configmaps were found. This
@@ -294,7 +294,7 @@ spec:
         severity: medium
     - alert: ThanosRulerConfigMapCreationFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosRuler controller is failing to create ConfigMaps for {{
           $labels.namespace }}/{{ $labels.resource }}.
         message: PrometheusRules cannot be loaded into the Ruler. Rules will not be
@@ -313,7 +313,7 @@ spec:
         severity: high
     - alert: ThanosRulerHighConfigMapCreationRate
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosRuler {{ $labels.namespace }}/{{ $labels.resource }} is
           creating ConfigMaps at {{ $value | humanize }}/sec.
         message: Excessive ConfigMap updates may indicate rule churn and cause unnecessary
@@ -332,7 +332,7 @@ spec:
         severity: medium
     - alert: ThanosRulerWatchReconcileStorm
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosRuler {{ $labels.namespace }}/{{ $labels.resource }} is
           experiencing high reconciliation rate.
         message: Excessive reconciliations may indicate resource churn or configuration
@@ -366,7 +366,7 @@ spec:
     rules:
     - alert: ThanosStoreNoShardsConfigured
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosStore resource {{ $labels.namespace }}/{{ $labels.resource
           }} has 0 shards configured.
         message: This may be expected for single-instance stores. For sharded deployments,
@@ -383,7 +383,7 @@ spec:
         severity: info
     - alert: ThanosStoreShardCreationFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosStore controller is failing to create/update shards for
           {{ $labels.namespace }}/{{ $labels.resource }}.
         message: Store shards cannot be created. Historical data queries may be incomplete
@@ -405,7 +405,7 @@ spec:
     rules:
     - alert: ThanosCompactNoShardsConfigured
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosCompact resource {{ $labels.namespace }}/{{ $labels.resource
           }} has 0 shards configured.
         message: This may be expected for single-instance compactors. For sharded
@@ -422,7 +422,7 @@ spec:
         severity: info
     - alert: ThanosCompactShardCreationFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: ThanosCompact controller is failing to create/update shards for
           {{ $labels.namespace }}/{{ $labels.resource }}.
         message: Compactor shards cannot be created. Data compaction will not occur,
@@ -444,7 +444,7 @@ spec:
     rules:
     - alert: ThanosResourcePausedForLong
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: '{{ $labels.component }} resource {{ $labels.namespace }}/{{
           $labels.resource }} has been in paused state for over 24 hours.'
         message: No reconciliation is happening for this resource. Configuration changes
@@ -463,7 +463,7 @@ spec:
     rules:
     - alert: ThanosOperatorHighWorkqueueRetries
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: Workqueue {{ $labels.name }} has {{ $value | humanize }} retries/sec.
         message: Items are being retried frequently, indicating persistent errors
           or resource issues.
@@ -478,7 +478,7 @@ spec:
         severity: medium
     - alert: ThanosOperatorLongWorkqueueLatency
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/3da9a026333052b2733299a69c302074/thanos-operator?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/72e0e05bef5099e5f049b05fdc429ed4/thanos-operator-controller-manager?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&refresh=30s
         description: P99 queue wait time for {{ $labels.name }} is {{ $value | humanizeDuration
           }}.
         message: Items are waiting too long in queue before processing. Reconciliation

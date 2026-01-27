@@ -60,6 +60,7 @@ type rhobsSLOs struct {
 	totalExpr           string
 	alertName           string
 	sloType             sloType
+	dashboardURL        string
 }
 
 // rhobSLOList is a list of shorthand SLOs.
@@ -78,7 +79,7 @@ func (slos rhobSLOList) GetObjectives() []pyrrav1alpha1.ServiceLevelObjective {
 				Annotations: map[string]string{
 					slo.PropagationLabelsPrefix + "description": s.description,
 					slo.PropagationLabelsPrefix + "summary":     s.summary,
-					slo.PropagationLabelsPrefix + "dashboard":   getGrafanaLink(),
+					slo.PropagationLabelsPrefix + "dashboard":   s.dashboardURL,
 					slo.PropagationLabelsPrefix + "runbook":     getRunbookLink(s.alertName),
 				},
 			},
@@ -124,11 +125,6 @@ func (slos rhobSLOList) GetObjectives() []pyrrav1alpha1.ServiceLevelObjective {
 	return objectives
 }
 
-// getGrafanaLink returns the AppSRE production Grafana dashboard for a particular RHOBS environment.
-func getGrafanaLink() string {
-	return "https://grafana.app-sre.devshift.net/d/283e7002d85c08126681241df2fdb22b/rhobs-next-slos?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m"
-}
-
 // getRunbookLink returns the rhobs/config runbook link for a particular alert.
 func getRunbookLink(alert string) string {
 	return fmt.Sprintf(
@@ -158,6 +154,7 @@ func ObservatoriumSLOs(signal Resource) []pyrrav1alpha1.ServiceLevelObjective {
 				totalExpr:           "http_requests_total{job=\"rhobs-gateway\", handler=\"receive\", group=\"metricsv1\"}",
 				alertName:           "APIMetricsWriteAvailabilityErrorBudgetBurning",
 				sloType:             sloTypeAvailability,
+				dashboardURL:        dashboardThanosReceive,
 			},
 			// Queriers are deployed as separate instances for adhoc and rule queries.
 			// The read availability SLO is split to reflect this deployment topology.
@@ -172,6 +169,7 @@ func ObservatoriumSLOs(signal Resource) []pyrrav1alpha1.ServiceLevelObjective {
 				totalExpr:           "http_requests_total{job=\"rhobs-gateway\", handler=\"query\", group=\"metricsv1\"}",
 				alertName:           "APIMetricsQueryAvailabilityErrorBudgetBurning",
 				sloType:             sloTypeAvailability,
+				dashboardURL:        dashboardThanosQuery,
 			},
 			{
 				name: "api-metrics-query-range-availability-slo",
@@ -184,6 +182,7 @@ func ObservatoriumSLOs(signal Resource) []pyrrav1alpha1.ServiceLevelObjective {
 				totalExpr:           "http_requests_total{job=\"rhobs-gateway\", handler=\"query_range\", group=\"metricsv1\"}",
 				alertName:           "APIMetricsQueryRangeAvailabilityErrorBudgetBurning",
 				sloType:             sloTypeAvailability,
+				dashboardURL:        dashboardThanosQuery,
 			},
 			{
 				name: "api-alerting-availability-slo",
@@ -196,6 +195,7 @@ func ObservatoriumSLOs(signal Resource) []pyrrav1alpha1.ServiceLevelObjective {
 				totalExpr:           "thanos_alert_sender_alerts_dropped_total{container=\"thanos-ruler\"}",
 				alertName:           "APIAlertmanagerAvailabilityErrorBudgetBurning",
 				sloType:             sloTypeAvailability,
+				dashboardURL:        dashboardThanosRule,
 			},
 			{
 				name: "api-alerting-notif-availability-slo",
@@ -208,6 +208,7 @@ func ObservatoriumSLOs(signal Resource) []pyrrav1alpha1.ServiceLevelObjective {
 				totalExpr:           "alertmanager_notifications_failed_total{job=\"alertmanager\"}",
 				alertName:           "APIAlertmanagerNotificationsAvailabilityErrorBudgetBurning",
 				sloType:             sloTypeAvailability,
+				dashboardURL:        dashboardAlertmanager,
 			},
 
 			// Observatorium Metrics Latency SLOs.
@@ -222,6 +223,7 @@ func ObservatoriumSLOs(signal Resource) []pyrrav1alpha1.ServiceLevelObjective {
 				totalExpr:           "http_request_duration_seconds_count{job=\"rhobs-gateway\", handler=\"receive\", group=\"metricsv1\", code=~\"^2..$\"}",
 				alertName:           "APIMetricsWriteLatencyErrorBudgetBurning",
 				sloType:             sloTypeLatency,
+				dashboardURL:        dashboardThanosReceive,
 			},
 			// These are commented out as we are not deploying synthetic avalanche/up jobs to rhobs.regional yet.
 			// We might choose to use other metrics/deploy those later on. For now dropping these SLOs.

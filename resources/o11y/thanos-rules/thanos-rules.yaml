@@ -17,7 +17,7 @@ spec:
     rules:
     - alert: ThanosCompactIsDown
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-compact-overview/thanos-compact-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-compact-rhobs
         description: ThanosCompact has disappeared from {{$labels.namespace}}. Prometheus
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
@@ -29,7 +29,7 @@ spec:
         severity: high
     - alert: ThanosQueryIsDown
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: ThanosQuery has disappeared from {{$labels.namespace}}. Prometheus
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
@@ -41,7 +41,7 @@ spec:
         severity: high
     - alert: ThanosReceiveRouterIsDown
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: ThanosReceiveRouter has disappeared from {{$labels.namespace}}.
           Prometheus target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
@@ -53,7 +53,7 @@ spec:
         severity: high
     - alert: ThanosReceiveIngesterIsDown
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: ThanosReceiveIngester has disappeared from {{$labels.namespace}}.
           Prometheus target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
@@ -65,7 +65,7 @@ spec:
         severity: high
     - alert: ThanosRuleIsDown
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: ThanosRule has disappeared from {{$labels.namespace}}. Prometheus
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
@@ -77,7 +77,7 @@ spec:
         severity: high
     - alert: ThanosStoreIsDown
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-store-overview/thanos-store-gateway-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-store-default&var-namespace={{$labels.namespace}}
         description: ThanosStore has disappeared from {{$labels.namespace}}. Prometheus
           target for the component cannot be discovered.
         message: Thanos component has disappeared from {{$labels.namespace}}.
@@ -91,7 +91,7 @@ spec:
     rules:
     - alert: ThanosCompactMultipleRunning
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-compact-overview/thanos-compact-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-compact-rhobs
         description: No more than one Thanos Compact instance should be running at
           once. There are {{$value}} in {{$labels.namespace}} instances running.
         message: Thanos Compact has multiple instances running.
@@ -103,7 +103,7 @@ spec:
         severity: medium
     - alert: ThanosCompactHalted
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-compact-overview/thanos-compact-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-compact-rhobs
         description: Thanos Compact {{$labels.job}} in {{$labels.namespace}} has failed
           to run and now is halted.
         message: Thanos Compact has failed to run and is now halted.
@@ -115,7 +115,7 @@ spec:
         severity: medium
     - alert: ThanosCompactHighCompactionFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-compact-overview/thanos-compact-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-compact-rhobs
         description: Thanos Compact {{$labels.job}} in {{$labels.namespace}} is failing
           to execute {{$value | humanize}}% of compactions.
         message: Thanos Compact is failing to execute compactions.
@@ -140,7 +140,7 @@ spec:
         severity: medium
     - alert: ThanosCompactBucketHighOperationFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-compact-overview/thanos-compact-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-compact-rhobs
         description: Thanos Compact {{$labels.job}} in {{$labels.namespace}} Bucket
           is failing to execute {{$value | humanize}}% of operations.
         message: Thanos Compact Bucket is having a high number of operation failures.
@@ -165,7 +165,7 @@ spec:
         severity: medium
     - alert: ThanosCompactHasNotRun
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/651943d05a8123e32867b4673963f42b/thanos-compact?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-compact-overview/thanos-compact-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-compact-rhobs
         description: Thanos Compact {{$labels.job}} in {{$labels.namespace}} has not
           uploaded anything for 24 hours.
         message: Thanos Compact has not uploaded anything for last 24 hours.
@@ -192,7 +192,7 @@ spec:
     rules:
     - alert: ThanosQueryHttpRequestQueryErrorRateHigh
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: Thanos Query {{$labels.job}} in {{$labels.namespace}} is failing
           to handle {{$value | humanize}}% of "query" requests.
         message: Thanos Query is failing to handle requests.
@@ -215,7 +215,7 @@ spec:
         severity: high
     - alert: ThanosQueryGrpcServerErrorRate
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: Thanos Query {{$labels.job}} in {{$labels.namespace}} is failing
           to handle {{$value | humanize}}% of requests.
         message: Thanos Query is failing to handle requests.
@@ -240,7 +240,7 @@ spec:
         severity: medium
     - alert: ThanosQueryGrpcClientErrorRate
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: Thanos Query {{$labels.job}} in {{$labels.namespace}} is failing
           to send {{$value | humanize}}% of requests.
         message: Thanos Query is failing to send requests.
@@ -263,7 +263,7 @@ spec:
         severity: medium
     - alert: ThanosQueryHighDNSFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: Thanos Query {{$labels.job}} in {{$labels.namespace}} have {{$value
           | humanize}}% of failing DNS queries for store endpoints.
         message: Thanos Query is having high number of DNS failures.
@@ -288,7 +288,7 @@ spec:
         severity: medium
     - alert: ThanosQueryInstantLatencyHigh
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/98fde97ddeaf2981041745f1f2ba68c2/thanos-query?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-query-overview/thanos-query-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=thanos-query-rhobs
         description: Thanos Query {{$labels.job}} in {{$labels.namespace}} has a 99th
           percentile latency of {{$value}} seconds for instant queries.
         message: Thanos Query has high latency for queries.
@@ -316,7 +316,7 @@ spec:
     rules:
     - alert: ThanosReceiveHttpRequestErrorRateHigh
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.job}} in {{$labels.namespace}} is failing
           to handle {{$value | humanize}}% of requests.
         message: Thanos Receive is failing to handle requests.
@@ -341,7 +341,7 @@ spec:
         severity: high
     - alert: ThanosReceiveHttpRequestLatencyHigh
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.job}} in {{$labels.namespace}} has a
           99th percentile latency of {{ $value }} seconds for requests.
         message: Thanos Receive has high HTTP requests latency.
@@ -371,7 +371,7 @@ spec:
         severity: high
     - alert: ThanosReceiveHighReplicationFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.job}} in {{$labels.namespace}} is failing
           to replicate {{$value | humanize}}% of requests.
         message: Thanos Receive is having high number of replication failures.
@@ -406,7 +406,7 @@ spec:
         severity: medium
     - alert: ThanosReceiveHighForwardRequestFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.job}} in {{$labels.namespace}} is failing
           to forward {{$value | humanize}}% of requests.
         message: Thanos Receive is failing to forward requests.
@@ -431,7 +431,7 @@ spec:
         severity: high
     - alert: ThanosReceiveHighHashringFileRefreshFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.job}} in {{$labels.namespace}} is failing
           to refresh hashring file, {{$value | humanize}} of attempts failed.
         message: Thanos Receive is failing to refresh hasring file.
@@ -454,7 +454,7 @@ spec:
         severity: medium
     - alert: ThanosReceiveConfigReloadFailure
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.job}} in {{$labels.namespace}} has not
           been able to reload hashring configurations.
         message: Thanos Receive is failing to reload hashring configurations.
@@ -471,7 +471,7 @@ spec:
         severity: medium
     - alert: ThanosReceiveNoUpload
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.instance}} in {{$labels.namespace}}
           has not uploaded latest data to object storage.
         message: Thanos Receive has not uploaded latest data to object storage.
@@ -492,7 +492,7 @@ spec:
         severity: high
     - alert: ThanosReceiveLimitsConfigReloadFailure
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.job}} in {{$labels.namespace}} has not
           been able to reload the limits configuration.
         message: Thanos Receive has not been able to reload the limits configuration.
@@ -509,7 +509,7 @@ spec:
         severity: medium
     - alert: ThanosReceiveLimitsHighMetaMonitoringQueriesFailureRate
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive {{$labels.job}} in {{$labels.namespace}} is failing
           for {{$value | humanize}}% of meta monitoring queries.
         message: Thanos Receive has not been able to update the number of head series.
@@ -532,7 +532,7 @@ spec:
         severity: medium
     - alert: ThanosReceiveTenantLimitedByHeadSeries
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/916a852b00ccc5ed81056644718fa4fb/thanos-receive?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-receive-overview/thanos-receive-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-router_job=thanos-receive-router-rhobs&var-ingester_job=thanos-receive-ingester-rhobs-default&var-namespace={{$labels.namespace}}&var-tenant=EFD08939-FE1D-41A1-A28A-BE9A9BC68003
         description: Thanos Receive tenant {{$labels.tenant}} in {{$labels.namespace}}
           is limited by head series.
         message: Thanos Receive tenant is limited by head series.
@@ -553,7 +553,7 @@ spec:
     rules:
     - alert: ThanosStoreGrpcErrorRate
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-store-overview/thanos-store-gateway-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-store-default&var-namespace={{$labels.namespace}}
         description: Thanos Store {{$labels.job}} in {{$labels.namespace}} is failing
           to handle {{$value | humanize}}% of requests.
         message: Thanos Store is failing to handle gRPC requests.
@@ -578,7 +578,7 @@ spec:
         severity: medium
     - alert: ThanosStoreBucketHighOperationFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-store-overview/thanos-store-gateway-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-store-default&var-namespace={{$labels.namespace}}
         description: Thanos Store {{$labels.job}} in {{$labels.namespace}} Bucket
           is failing to execute {{$value | humanize}}% of operations.
         message: Thanos Store Bucket is failing to execute operations.
@@ -603,7 +603,7 @@ spec:
         severity: medium
     - alert: ThanosStoreObjstoreOperationLatencyHigh
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/e832e8f26403d95fac0ea1c59837588b/thanos-store?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-store-overview/thanos-store-gateway-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-store-default&var-namespace={{$labels.namespace}}
         description: Thanos Store {{$labels.job}} in {{$labels.namespace}} Bucket
           has a 99th percentile latency of {{$value}} seconds for the bucket operations.
         message: Thanos Store is having high latency for bucket operations.
@@ -631,7 +631,7 @@ spec:
     rules:
     - alert: ThanosRuleQueueIsDroppingAlerts
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.instance}} in {{$labels.namespace}} is
           failing to queue rulehelpers.
         message: Thanos Rule is failing to queue rulehelpers.
@@ -648,7 +648,7 @@ spec:
         severity: high
     - alert: ThanosRuleSenderIsFailingAlerts
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.instance}} in {{$labels.namespace}} is
           failing to send alerts to alertmanager.
         message: Thanos Rule is failing to send alerts to alertmanager.
@@ -665,7 +665,7 @@ spec:
         severity: high
     - alert: ThanosRuleHighRuleEvaluationFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.instance}} in {{$labels.namespace}} is
           failing to evaluate rules.
         message: Thanos Rule is failing to evaluate rules.
@@ -690,7 +690,7 @@ spec:
         severity: high
     - alert: ThanosRuleHighRuleEvaluationWarnings
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.instance}} in {{$labels.namespace}} has
           high number of evaluation warnings.
         message: Thanos Rule has high number of evaluation warnings.
@@ -707,7 +707,7 @@ spec:
         severity: high
     - alert: ThanosRuleRuleEvaluationLatencyHigh
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.instance}} in {{$labels.namespace}} has
           higher evaluation latency than interval for {{$labels.rule_group}}.
         message: Thanos Rule has high rule evaluation latency.
@@ -726,7 +726,7 @@ spec:
         severity: medium
     - alert: ThanosRuleGrpcErrorRate
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.job}} in {{$labels.namespace}} is failing
           to handle {{$value | humanize}}% of requests.
         message: Thanos Rule is failing to handle grpc requests.
@@ -751,7 +751,7 @@ spec:
         severity: medium
     - alert: ThanosRuleConfigReloadFailure
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.job}} in {{$labels.namespace}} has not
           been able to reload its configuration.
         message: Thanos Rule has not been able to reload configuration.
@@ -768,7 +768,7 @@ spec:
         severity: high
     - alert: ThanosRuleQueryHighDNSFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.job}} in {{$labels.namespace}} has {{$value
           | humanize}}% of failing DNS queries for query endpoints.
         message: Thanos Rule is having high number of DNS failures.
@@ -793,7 +793,7 @@ spec:
         severity: medium
     - alert: ThanosRuleAlertmanagerHighDNSFailures
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.instance}} in {{$labels.namespace}} has
           {{$value | humanize}}% of failing DNS queries for Alertmanager endpoints.
         message: Thanos Rule is having high number of DNS failures.
@@ -818,7 +818,7 @@ spec:
         severity: medium
     - alert: ThanosRuleNoEvaluationFor10Intervals
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.job}} in {{$labels.namespace}} has rule
           groups that did not evaluate for at least 10x of their expected interval.
         message: Thanos Rule has rule groups that did not evaluate for 10 intervals.
@@ -845,7 +845,7 @@ spec:
         severity: high
     - alert: ThanosNoRuleEvaluations
       annotations:
-        dashboard: https://grafana.app-sre.devshift.net/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule?orgId=1&refresh=10s&var-datasource={{$externalLabels.cluster}}-prometheus&var-namespace={{$labels.namespace}}&var-job=All&var-pod=All&var-interval=5m
+        dashboard: https://grafana.app-sre.devshift.net/d/thanos-ruler-overview/thanos-ruler-overview?orgId=1&from=now-1h&to=now&timezone=UTC&var-datasource={{$externalLabels.cluster}}-prometheus&var-job=thanos-ruler-rhobs&var-namespace={{$labels.namespace}}
         description: Thanos Rule {{$labels.instance}} in {{$labels.namespace}} did
           not perform any rule evaluations in the past 10 minutes.
         message: Thanos Rule did not perform any rule evaluations.
