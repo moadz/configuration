@@ -1152,7 +1152,7 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 			},
 		}
 		objs = append(objs, route)
-		query.Annotations = map[string]string{
+		query.Spec.QueryFrontend.Annotations = map[string]string{
 			"service.beta.openshift.io/serving-cert-secret-name":               "query-frontend-tls",
 			"serviceaccounts.openshift.io/oauth-redirectreference.application": `{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}`,
 		}
@@ -1628,7 +1628,7 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 			},
 		}
 		objs = append(objs, route)
-		query.Annotations = map[string]string{
+		query.Spec.QueryFrontend.Annotations = map[string]string{
 			"service.beta.openshift.io/serving-cert-secret-name":               "query-frontend-tls",
 			"serviceaccounts.openshift.io/oauth-redirectreference.application": `{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}`,
 		}

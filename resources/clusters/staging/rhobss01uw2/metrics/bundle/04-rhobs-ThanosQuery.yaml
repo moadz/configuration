@@ -1,9 +1,6 @@
 apiVersion: monitoring.thanos.io/v1alpha1
 kind: ThanosQuery
 metadata:
-  annotations:
-    service.beta.openshift.io/serving-cert-secret-name: query-frontend-tls
-    serviceaccounts.openshift.io/oauth-redirectreference.application: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}'
   name: rhobs
   namespace: rhobs-stage
 spec:
@@ -74,6 +71,9 @@ spec:
     - name: oauth-cookie
       secret:
         secretName: oauth-cookie
+    annotations:
+      service.beta.openshift.io/serving-cert-secret-name: query-frontend-tls
+      serviceaccounts.openshift.io/oauth-redirectreference.application: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}'
     baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
     compressResponses: true
     imagePullPolicy: IfNotPresent
