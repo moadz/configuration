@@ -189,10 +189,6 @@ func alertmanagerPostProcess(manifests []runtime.Object, namespace string) encod
 			Name:      alertManagerName,
 			Namespace: namespace,
 			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").ObjectMeta.Labels),
-			Annotations: map[string]string{
-				"cert-manager.io/issuer-kind": "ClusterIssuer",
-				"cert-manager.io/issuer-name": "letsencrypt-devshiftnet-dns",
-			},
 		},
 		Spec: routev1.RouteSpec{
 			Port: &routev1.RoutePort{
@@ -304,10 +300,6 @@ func alertmanagerPostProcessForBundle(manifests []runtime.Object, namespace stri
 			Name:      alertManagerName,
 			Namespace: namespace,
 			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").ObjectMeta.Labels),
-			Annotations: map[string]string{
-				"cert-manager.io/issuer-kind": "ClusterIssuer",
-				"cert-manager.io/issuer-name": "letsencrypt-devshiftnet-dns",
-			},
 		},
 		Spec: routev1.RouteSpec{
 			Port: &routev1.RoutePort{
