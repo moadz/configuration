@@ -72,6 +72,11 @@ hcp-rules:
 	@echo ">>>>> Generating HCP tenant rules from split files"
 	./scripts/generate-hcp-rules.sh
 
+.PHONY: lint-hcp-rules
+lint-hcp-rules: hcp-rules $(PROMTOOL) $(YQ)
+	@echo ">>>>> Linting HCP tenant rules"
+	./scripts/lint-hcp-rules.sh $(PROMTOOL) $(YQ)
+
 .PHONY: prometheusrules
 prometheusrules: resources/observability/prometheusrules
 	$(MAKE) clean
