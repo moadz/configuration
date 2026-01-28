@@ -135,11 +135,11 @@ objects:
                   - action: drop
                     sourceLabels: [__name__, __tmp_allowed]
                     regex: "(container_cpu_usage_seconds_total|container_memory_rss);$"
-                    # We filter MC metrics based on their names
-                    # and
-                    # We forward all metrics with the source label DP as the filtering happens in preceding DP-> MC forwarding side step
-                    # We forward all metrics with the source label MC, MC metrics are filtered in the federation service monitor
-                    # As `sourceLabels: [__name__, source]` results in a concatenation fo the two labels followed by a regexp match with the below, the HCP metrics look like `apiserver_audit_event_total;`, and DP metrics look like `dp_metric_name;DP`, hence the `;.*` and `.*;DP` in the below regexp.
+                  # We filter MC metrics based on their names
+                  # and
+                  # We forward all metrics with the source label DP as the filtering happens in preceding DP-> MC forwarding side step
+                  # We forward all metrics with the source label MC, MC metrics are filtered in the federation service monitor
+                  # As `sourceLabels: [__name__, source]` results in a concatenation fo the two labels followed by a regexp match with the below, the HCP metrics look like `apiserver_audit_event_total;`, and DP metrics look like `dp_metric_name;DP`, hence the `;.*` and `.*;DP` in the below regexp.
                   - action: keep
                     sourceLabels: [__name__, source]
                     regex: "(\
@@ -281,8 +281,8 @@ objects:
             name: rhobs-hypershift-monitoring-stack-prometheus
             namespace: openshift-observability-operator
 
-        # Service monitor to federate Management Cluster CMO metrics
-        # Management Cluster metric filtering is done here
+      # Service monitor to federate the Management Cluster CMO metrics.
+      # Metric filtering is done here.
       - apiVersion: monitoring.rhobs/v1
         kind: ServiceMonitor
         metadata:
@@ -291,7 +291,6 @@ objects:
           name: hypershift-cmo-federate
           namespace: ${OPENSHIFT_MONITORING_NAMESPACE}
         spec:
-          namespaceSelector: { }
           selector:
             matchLabels:
               app.kubernetes.io/component: prometheus
@@ -300,15 +299,29 @@ objects:
               app.kubernetes.io/part-of: openshift-monitoring
           endpoints:
             - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-              bearerTokenSecret:
-                key: ""
               honorLabels: true
               interval: 30s
               relabelings:
                 - targetLabel: source
                   replacement: MC
+                # To avoid out-of-order samples when remote-writing the samples
+                # to RHOBS, we need to do 2 things:
+                # * Use the service name as the target address instead of the
+                #   pod's IP addresses which results in only one target instead
+                #   of the 2 prometheus-k8s pods by default.
+                # * Drop the prometheus-k8s external labels to ensure that
+                #   we send samples with the external labels of the sender
+                #   (rhobs-hypershift-monitoring-stack).
+                #
+                # It also cuts the number of samples being ingested by half.
+                - targetLabel: __address__
+                  replacement: prometheus-k8s.openshift-monitoring.svc:9091
                 - regex: prometheus_replica|prometheus
                   action: labeldrop
+                # Remove the default target labels set by the service discovery
+                # which aren't relevant in case of federation.
+                - action: LabelDrop
+                  regex: pod|namespace|service|endpoint|container
               port: web
               scheme: https
               path: "/federate"
@@ -409,5 +422,3 @@ objects:
                   key: tls.key
                   name: metrics-client-certs
                 serverName: prometheus-k8s.openshift-monitoring.svc
-
-
