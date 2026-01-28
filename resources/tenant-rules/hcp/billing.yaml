@@ -31,7 +31,8 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/BillingMetricMissing.md
                 summary: Recording rule used for the billing is not defined
               expr: |
-                hypershift_cluster_vcpus_computation_error or (hypershift_cluster_silence_alerts unless on(_id, _mc_id) hostedcluster:hypershift_cluster_vcpus:max)
+                (hypershift_cluster_vcpus_computation_error or (hypershift_cluster_silence_alerts unless on(_id, _mc_id) hostedcluster:hypershift_cluster_vcpus:max))
+                unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: critical

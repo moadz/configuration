@@ -30,7 +30,7 @@ objects:
                 description: "The audit webhook cloudwatch configuration for {{ $labels.namespace }} has been invalid for 5 minutes."
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/howto/customer-cw-audit-forwarding-for-hcp.md
                 summary: "Audit webhook cloudwatch configuration invalid"
-              expr: sum by (region, env, _mc_id, namespace, _id) (splunkforwarder_audit_filter_cloudwatch_configuration_invalid{}) > 0
+              expr: (sum by (region, env, _mc_id, namespace, _id) (splunkforwarder_audit_filter_cloudwatch_configuration_invalid{}) > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 5m
               labels:
                 severity: warning
@@ -41,9 +41,11 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/AuditWebhookCloudWatchErrors.md
                 summary: "Audit webhook cloudwatch error"
               expr: |
-                (sum(splunkforwarder_audit_filter_cloudwatch_enabled) by (_id, _mc_id, namespace, region, env))
-                * on (_id, _mc_id, namespace, region, env)
-                (sum(rate(splunkforwarder_audit_filter_cloudwatch_errors_total[10m])) by (_id, _mc_id, namespace, region, env)) > 0
+                (
+                  (sum(splunkforwarder_audit_filter_cloudwatch_enabled) by (_id, _mc_id, namespace, region, env))
+                  * on (_id, _mc_id, namespace, region, env)
+                  (sum(rate(splunkforwarder_audit_filter_cloudwatch_errors_total[10m])) by (_id, _mc_id, namespace, region, env)) > 0
+                ) unless on (_id) hypershift_cluster_alerts_disabled
               for: 10m
               labels:
                 severity: warning

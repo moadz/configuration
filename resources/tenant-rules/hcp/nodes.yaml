@@ -27,7 +27,7 @@ objects:
           interval: 1m
           rules:
             - alert: NodePoolFailing
-              expr: hypershift_nodepools:replicas_failure > 0
+              expr: (hypershift_nodepools:replicas_failure > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: warning
@@ -50,7 +50,7 @@ objects:
           interval: 1m
           rules:
             - alert: NodesNeedUpscale
-              expr: hypershift_cluster:expected_total_nodes{replicas_failure_all_nodepools="0"} > hypershift_cluster:current_ready_nodes{replicas_failure_all_nodepools="0"} + 1
+              expr: (hypershift_cluster:expected_total_nodes{replicas_failure_all_nodepools="0"} > hypershift_cluster:current_ready_nodes{replicas_failure_all_nodepools="0"} + 1) unless on (_id) hypershift_cluster_alerts_disabled
               for: 60m
               labels:
                 severity: warning
@@ -81,7 +81,7 @@ objects:
                 summary: No Ready cluster-autoscaler pods.
               labels:
                 severity: critical
-              expr: cluster_autoscaler:pod_status_ready == 0
+              expr: (cluster_autoscaler:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
   # Node health rules - resource usage, readiness, conditions
   - apiVersion: monitoring.coreos.com/v1
@@ -98,7 +98,7 @@ objects:
           interval: 30s
           rules:
             - alert: NodeHighResourceUsage
-              expr: hypershift_node:high_usage
+              expr: hypershift_node:high_usage unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: warning
@@ -107,7 +107,7 @@ objects:
                 runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeHighResourceUsage.md"
                 description: "Node {{ $labels.node }} has {{ $labels.resource }} usage above {{ $labels.threshold }} (current value: {{ $value | humanizePercentage }}) for more than 30 minutes."
             - alert: NodeNotReady
-              expr: hypershift_node:ready == 0
+              expr: (hypershift_node:ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: warning
@@ -116,7 +116,7 @@ objects:
                 runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeNotReady.md"
                 description: "Node {{ $labels.node }} has not been ready for more than 30 minutes."
             - alert: NodeInBadCondition
-              expr: hypershift_node:in_bad_condition == 1
+              expr: (hypershift_node:in_bad_condition == 1) unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: warning
@@ -144,7 +144,7 @@ objects:
                 description: "One or more nodepool from the cluster are having issue while adding node(s)"
                 runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodepoolFailureSRE.md"
                 summary: "HCP Cluster nodepool having issues while adding nodes"
-              expr: sre:nodepool:provisioning_failure_notify and on (exported_namespace, _mc_id) (sre:nodepool:all_components_available==0 or sre:nodepool:invalid_payload_nodepool_provision_failure)
+              expr: (sre:nodepool:provisioning_failure_notify and on (exported_namespace, _mc_id) (sre:nodepool:all_components_available==0 or sre:nodepool:invalid_payload_nodepool_provision_failure)) unless on (_id) hypershift_cluster_alerts_disabled
               for: 1h
               labels:
                 otel_collect: "true"
@@ -169,7 +169,7 @@ objects:
                 description: "The cluster's request serving nodes have been undersized for 1 hour and need to be assigned to a bigger request serving node pair."
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/RequestServingNodesNeedUpscale.md
                 summary: "HCP Request Serving Nodes Need Upsizing"
-              expr: count(sre:node_request_serving:excessive_consumption_cpu or sre:node_request_serving:excessive_consumption_memory) by (request_node, _mc_id)
+              expr: count(sre:node_request_serving:excessive_consumption_cpu or sre:node_request_serving:excessive_consumption_memory) by (request_node, _mc_id) unless on (_id) hypershift_cluster_alerts_disabled
               for: 1h
               labels:
                 severity: critical

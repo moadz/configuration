@@ -31,9 +31,11 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/SAEDeploymentMissing.md
                 summary: "SAE deployment missing"
               expr: |
-                (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_labels{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"}))
-                unless on (_id, _mc_id, namespace)
-                (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} > 0))
+                (
+                  (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_labels{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"}))
+                  unless on (_id, _mc_id, namespace)
+                  (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} > 0))
+                ) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: warning
@@ -43,7 +45,7 @@ objects:
                 description: "The SAE deployment for {{ $labels.namespace }} has 0 available replicas. Splunk audit log forwarding is not functional."
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/SAEDeploymentDown.md
                 summary: "SAE deployment down"
-              expr: kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} == 0
+              expr: (kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: critical

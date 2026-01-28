@@ -34,7 +34,7 @@ objects:
                 summary: "No `watchdog` heartbeat for {{ $labels._id }} detected"
                 description: "No `watchdog` heartbeat for {{ $labels._id }} detected. This means the alerting stack is not functioning properly and alerts may not fire."
                 runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/DeadMansSnitch.md"
-              expr: sum by (_id, _mc_id, region, sector) (vector(1)) unless on (_id) (watchdog)
+              expr: sum by (_id, _mc_id, region, sector) (vector(1)) unless on (_id) (watchdog or hypershift_cluster_alerts_disabled)
               for: 15m
               labels:
                 severity: critical
@@ -56,7 +56,7 @@ objects:
           interval: 1m
           rules:
             - alert: HCPPrometheusPodMonitorDown
-              expr: sre:hcp_podmonitor_up:sum{name!~"karpenter"} == 0
+              expr: (sre:hcp_podmonitor_up:sum{name!~"karpenter"} == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: critical
@@ -69,7 +69,7 @@ objects:
             # Until <BUG_NEEDED> is resolved, ovnkube-control-plane metrics do not work in HyperShift
             # hypershift_cluster_waiting_initial_avaibility_duration_seconds is used to not alert in case the cluster is in installing state.
             - alert: HCPPrometheusServiceMonitorDown
-              expr: (sre:hcp_servicemonitor_up:sum{name!~"node-tuning-operator|ovnkube-control-plane|cluster-version-operator"} == 0) unless on (_id) hypershift_cluster_waiting_initial_avaibility_duration_seconds
+              expr: (sre:hcp_servicemonitor_up:sum{name!~"node-tuning-operator|ovnkube-control-plane|cluster-version-operator"} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 30m
               labels:
                 severity: critical

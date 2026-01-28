@@ -170,7 +170,7 @@ objects:
               labels:
                 severity: critical
                 otel_collect: "true"
-              expr: sre:kube_apiserver:pod_status_ready == 0
+              expr: (sre:kube_apiserver:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
             # This alert fires when sre:kube_apiserver:deployment_pods_unavailable is greater than 0
             # for 15 minutes, indicating partial degradation.
@@ -180,7 +180,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeAPIServerDegraded.md
                 summary: "Unavailable replicas in KubeAPIServer deployment in the HCP namespace."
               expr: |
-                sre:kube_apiserver:deployment_pods_unavailable > 0
+                (sre:kube_apiserver:deployment_pods_unavailable > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: warning
@@ -195,7 +195,7 @@ objects:
               labels:
                 severity: critical
                 otel_collect: "true"
-              expr: sre:openshift_apiserver:pod_status_ready == 0
+              expr: (sre:openshift_apiserver:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
             # This alert fires when sre:openshift_apiserver:deployment_pods_unavailable is greater than 0
             # for 15 minutes, indicating partial degradation.
@@ -205,7 +205,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/OpenshiftAPIServerDegraded.md
                 summary: "Unavailable replicas in OpenShiftAPIServer deployment in the HCP namespace."
               expr: |
-                sre:openshift_apiserver:deployment_pods_unavailable > 0
+                (sre:openshift_apiserver:deployment_pods_unavailable > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: warning

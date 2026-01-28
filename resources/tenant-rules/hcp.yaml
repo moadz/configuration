@@ -50,7 +50,7 @@ objects:
                 description: The audit webhook cloudwatch configuration for {{ $labels.namespace }} has been invalid for 5 minutes.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/howto/customer-cw-audit-forwarding-for-hcp.md
                 summary: Audit webhook cloudwatch configuration invalid
-              expr: sum by (region, env, _mc_id, namespace, _id) (splunkforwarder_audit_filter_cloudwatch_configuration_invalid{}) > 0
+              expr: (sum by (region, env, _mc_id, namespace, _id) (splunkforwarder_audit_filter_cloudwatch_configuration_invalid{}) > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 5m
               labels:
                 severity: warning
@@ -61,9 +61,11 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/AuditWebhookCloudWatchErrors.md
                 summary: Audit webhook cloudwatch error
               expr: |
-                (sum(splunkforwarder_audit_filter_cloudwatch_enabled) by (_id, _mc_id, namespace, region, env))
-                * on (_id, _mc_id, namespace, region, env)
-                (sum(rate(splunkforwarder_audit_filter_cloudwatch_errors_total[10m])) by (_id, _mc_id, namespace, region, env)) > 0
+                (
+                  (sum(splunkforwarder_audit_filter_cloudwatch_enabled) by (_id, _mc_id, namespace, region, env))
+                  * on (_id, _mc_id, namespace, region, env)
+                  (sum(rate(splunkforwarder_audit_filter_cloudwatch_errors_total[10m])) by (_id, _mc_id, namespace, region, env)) > 0
+                ) unless on (_id) hypershift_cluster_alerts_disabled
               for: 10m
               labels:
                 severity: warning
@@ -87,7 +89,8 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/BillingMetricMissing.md
                 summary: Recording rule used for the billing is not defined
               expr: |
-                hypershift_cluster_vcpus_computation_error or (hypershift_cluster_silence_alerts unless on(_id, _mc_id) hostedcluster:hypershift_cluster_vcpus:max)
+                (hypershift_cluster_vcpus_computation_error or (hypershift_cluster_silence_alerts unless on(_id, _mc_id) hostedcluster:hypershift_cluster_vcpus:max))
+                unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: critical
@@ -105,7 +108,7 @@ objects:
           interval: 1m
           rules:
             - alert: NodePoolFailing
-              expr: hypershift_nodepools:replicas_failure > 0
+              expr: (hypershift_nodepools:replicas_failure > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: warning
@@ -127,7 +130,7 @@ objects:
           interval: 1m
           rules:
             - alert: NodesNeedUpscale
-              expr: hypershift_cluster:expected_total_nodes{replicas_failure_all_nodepools="0"} > hypershift_cluster:current_ready_nodes{replicas_failure_all_nodepools="0"} + 1
+              expr: (hypershift_cluster:expected_total_nodes{replicas_failure_all_nodepools="0"} > hypershift_cluster:current_ready_nodes{replicas_failure_all_nodepools="0"} + 1) unless on (_id) hypershift_cluster_alerts_disabled
               for: 60m
               labels:
                 severity: warning
@@ -155,7 +158,7 @@ objects:
                 summary: No Ready cluster-autoscaler pods.
               labels:
                 severity: critical
-              expr: cluster_autoscaler:pod_status_ready == 0
+              expr: (cluster_autoscaler:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
@@ -171,7 +174,7 @@ objects:
           interval: 30s
           rules:
             - alert: NodeHighResourceUsage
-              expr: hypershift_node:high_usage
+              expr: hypershift_node:high_usage unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: warning
@@ -180,7 +183,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeHighResourceUsage.md
                 description: 'Node {{ $labels.node }} has {{ $labels.resource }} usage above {{ $labels.threshold }} (current value: {{ $value | humanizePercentage }}) for more than 30 minutes.'
             - alert: NodeNotReady
-              expr: hypershift_node:ready == 0
+              expr: (hypershift_node:ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: warning
@@ -189,7 +192,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodeNotReady.md
                 description: Node {{ $labels.node }} has not been ready for more than 30 minutes.
             - alert: NodeInBadCondition
-              expr: hypershift_node:in_bad_condition == 1
+              expr: (hypershift_node:in_bad_condition == 1) unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: warning
@@ -215,7 +218,7 @@ objects:
                 description: One or more nodepool from the cluster are having issue while adding node(s)
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodepoolFailureSRE.md
                 summary: HCP Cluster nodepool having issues while adding nodes
-              expr: sre:nodepool:provisioning_failure_notify and on (exported_namespace, _mc_id) (sre:nodepool:all_components_available==0 or sre:nodepool:invalid_payload_nodepool_provision_failure)
+              expr: (sre:nodepool:provisioning_failure_notify and on (exported_namespace, _mc_id) (sre:nodepool:all_components_available==0 or sre:nodepool:invalid_payload_nodepool_provision_failure)) unless on (_id) hypershift_cluster_alerts_disabled
               for: 1h
               labels:
                 otel_collect: "true"
@@ -238,7 +241,7 @@ objects:
                 description: The cluster's request serving nodes have been undersized for 1 hour and need to be assigned to a bigger request serving node pair.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/RequestServingNodesNeedUpscale.md
                 summary: HCP Request Serving Nodes Need Upsizing
-              expr: count(sre:node_request_serving:excessive_consumption_cpu or sre:node_request_serving:excessive_consumption_memory) by (request_node, _mc_id)
+              expr: count(sre:node_request_serving:excessive_consumption_cpu or sre:node_request_serving:excessive_consumption_memory) by (request_node, _mc_id) unless on (_id) hypershift_cluster_alerts_disabled
               for: 1h
               labels:
                 severity: critical
@@ -262,7 +265,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/OauthServiceDeploymentDegraded.md
                 summary: An Oauth Service deployment does not have the expected number of available replicas.
               expr: |
-                sre:oauth:deployment_pods_unavailable > 0
+                (sre:oauth:deployment_pods_unavailable > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 10m
               labels:
                 severity: warning
@@ -275,7 +278,7 @@ objects:
               labels:
                 severity: warning
                 otel_collect: "true"
-              expr: sre:sre:oauth:pod_status_ready == 0
+              expr: (sre:sre:oauth:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
@@ -295,7 +298,7 @@ objects:
                 summary: No `watchdog` heartbeat for {{ $labels._id }} detected
                 description: No `watchdog` heartbeat for {{ $labels._id }} detected. This means the alerting stack is not functioning properly and alerts may not fire.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/DeadMansSnitch.md
-              expr: sum by (_id, _mc_id, region, sector) (vector(1)) unless on (_id) (watchdog)
+              expr: sum by (_id, _mc_id, region, sector) (vector(1)) unless on (_id) (watchdog or hypershift_cluster_alerts_disabled)
               for: 15m
               labels:
                 severity: critical
@@ -315,7 +318,7 @@ objects:
           interval: 1m
           rules:
             - alert: HCPPrometheusPodMonitorDown
-              expr: sre:hcp_podmonitor_up:sum{name!~"karpenter"} == 0
+              expr: (sre:hcp_podmonitor_up:sum{name!~"karpenter"} == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: critical
@@ -324,7 +327,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/HCPPrometheusPodMonitorDown.md
                 description: PodMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} has been down for 30m.
             - alert: HCPPrometheusServiceMonitorDown
-              expr: (sre:hcp_servicemonitor_up:sum{name!~"node-tuning-operator|ovnkube-control-plane|cluster-version-operator"} == 0) unless on (_id) hypershift_cluster_waiting_initial_avaibility_duration_seconds
+              expr: (sre:hcp_servicemonitor_up:sum{name!~"node-tuning-operator|ovnkube-control-plane|cluster-version-operator"} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 30m
               labels:
                 severity: critical
@@ -350,7 +353,7 @@ objects:
                 summary: Cluster operator is in degraded state.
                 description: The {{ $labels.name }} operator is reporting a degraded state for {{ $labels._id }}.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/cluster_operators/ClusterOperatorDegraded.md
-              expr: (cluster_operator_conditions{condition="Degraded"} == 1) unless on (_id) hypershift_cluster_waiting_initial_avaibility_duration_seconds
+              expr: (cluster_operator_conditions{condition="Degraded"} == 1) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
                 severity: warning
@@ -360,7 +363,7 @@ objects:
                 summary: Cluster operator is unavailable.
                 description: The {{ $labels.name }} operator is unavailable for {{ $labels._id }}.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/cluster_operators/ClusterOperatorDown.md
-              expr: (cluster_operator_conditions{condition="Available"} == 0) unless on (_id) hypershift_cluster_waiting_initial_avaibility_duration_seconds
+              expr: (cluster_operator_conditions{condition="Available"} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
                 severity: critical
@@ -383,7 +386,7 @@ objects:
                 summary: etcd cluster has no leader
                 description: 'etcd cluster "{{ $labels.job }}": member {{ $labels.instance }} has no leader.'
                 runbook_url: https://github.com/openshift/runbooks/blob/master/alerts/cluster-etcd-operator/etcdNoLeader.md
-              expr: etcd_server_has_leader{job=~".*etcd.*", _id!=""} == 0
+              expr: (etcd_server_has_leader{job=~".*etcd.*", _id!=""} == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 1m
               labels:
                 severity: critical
@@ -391,7 +394,7 @@ objects:
               annotations:
                 summary: etcd cluster has high number of leader changes.
                 description: 'etcd cluster "{{ $labels.job }}": {{ $value }} average leader changes within the last 10 minutes. Frequent elections may be a sign of insufficient resources, high network latency, or disruptions by other components and should be investigated.'
-              expr: avg by (_id, _mc_id) (changes(etcd_server_is_leader{_id!=""}[10m])) > 5
+              expr: (avg by (_id, _mc_id) (changes(etcd_server_is_leader{_id!=""}[10m])) > 5) unless on (_id) hypershift_cluster_alerts_disabled
               for: 5m
               labels:
                 severity: warning
@@ -401,11 +404,13 @@ objects:
                 summary: etcd cluster database is using >= 65% of the defined quota.
               expr: |
                 (
-                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
-                  /
-                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
-                )
-                * 100 > 65
+                  (
+                      max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                    /
+                      max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                  )
+                  * 100 > 65
+                ) unless on (_id) hypershift_cluster_alerts_disabled
               for: 10m
               labels:
                 severity: info
@@ -415,11 +420,13 @@ objects:
                 summary: etcd cluster database is using >= 75% of the defined quota.
               expr: |
                 (
-                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
-                  /
-                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
-                )
-                * 100 > 75
+                  (
+                      max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                    /
+                      max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                  )
+                  * 100 > 75
+                ) unless on (_id) hypershift_cluster_alerts_disabled
               for: 10m
               labels:
                 severity: warning
@@ -430,11 +437,13 @@ objects:
                 summary: etcd cluster database is running full.
               expr: |
                 (
-                    max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
-                  /
-                    max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
-                )
-                * 100 > 85
+                  (
+                      max by (_id, _mc_id) (last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m]))
+                    /
+                      max by (_id, _mc_id) (last_over_time(etcd_server_quota_backend_bytes{job=~".*etcd.*"}[5m]))
+                  )
+                  * 100 > 85
+                ) unless on (_id) hypershift_cluster_alerts_disabled
               for: 10m
               labels:
                 severity: critical
@@ -460,7 +469,7 @@ objects:
                 summary: No Ready kube-controller-manager pods.
               labels:
                 severity: critical
-              expr: sre:kube_controller_manager:pod_status_ready == 0
+              expr: (sre:kube_controller_manager:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
             - alert: KubeControllerManagerDegraded
               annotations:
@@ -469,7 +478,7 @@ objects:
                 summary: Minimum Ready kube-controller-manager Pods not met.
               labels:
                 severity: warning
-              expr: sre:kube_controller_manager:pod_status_ready == 1
+              expr: (sre:kube_controller_manager:pod_status_ready == 1) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
@@ -493,7 +502,7 @@ objects:
                 summary: No Ready kube-scheduler pods.
               labels:
                 severity: critical
-              expr: sre:kube_scheduler:pod_status_ready == 0
+              expr: (sre:kube_scheduler:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
             - alert: KubeSchedulerDegraded
               annotations:
@@ -502,7 +511,7 @@ objects:
                 summary: Minimum Ready kube-scheduler Pods not met.
               labels:
                 severity: warning
-              expr: sre:kube_scheduler:pod_status_ready == 1
+              expr: (sre:kube_scheduler:pod_status_ready == 1) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
@@ -657,7 +666,7 @@ objects:
               labels:
                 severity: critical
                 otel_collect: "true"
-              expr: sre:kube_apiserver:pod_status_ready == 0
+              expr: (sre:kube_apiserver:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
             - alert: KubeAPIServerDegraded
               annotations:
@@ -665,7 +674,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeAPIServerDegraded.md
                 summary: Unavailable replicas in KubeAPIServer deployment in the HCP namespace.
               expr: |
-                sre:kube_apiserver:deployment_pods_unavailable > 0
+                (sre:kube_apiserver:deployment_pods_unavailable > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: warning
@@ -678,7 +687,7 @@ objects:
               labels:
                 severity: critical
                 otel_collect: "true"
-              expr: sre:openshift_apiserver:pod_status_ready == 0
+              expr: (sre:openshift_apiserver:pod_status_ready == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
             - alert: OpenshiftAPIServerDegraded
               annotations:
@@ -686,7 +695,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/OpenshiftAPIServerDegraded.md
                 summary: Unavailable replicas in OpenShiftAPIServer deployment in the HCP namespace.
               expr: |
-                sre:openshift_apiserver:deployment_pods_unavailable > 0
+                (sre:openshift_apiserver:deployment_pods_unavailable > 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: warning
@@ -710,9 +719,11 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/SAEDeploymentMissing.md
                 summary: SAE deployment missing
               expr: |
-                (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_labels{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"}))
-                unless on (_id, _mc_id, namespace)
-                (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} > 0))
+                (
+                  (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_labels{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"}))
+                  unless on (_id, _mc_id, namespace)
+                  (sum by (_id, _mc_id, namespace, region, sector) (kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} > 0))
+                ) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: warning
@@ -722,7 +733,7 @@ objects:
                 description: The SAE deployment for {{ $labels.namespace }} has 0 available replicas. Splunk audit log forwarding is not functional.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/SAEDeploymentDown.md
                 summary: SAE deployment down
-              expr: kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} == 0
+              expr: (kube_deployment_status_replicas_available{namespace=~"ocm-.*-.*", deployment="splunk-audit-exporter"} == 0) unless on (_id) hypershift_cluster_alerts_disabled
               for: 15m
               labels:
                 severity: critical
