@@ -257,6 +257,9 @@ objects:
                     sourceLabels:
                       - source
                     targetLabel: source
+                  # Drop all temporary labels.
+                  - action: LabelDrop
+                    regex: "__tmp.*"
           resources:
             requests:
               cpu: 500m
