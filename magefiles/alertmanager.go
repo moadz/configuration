@@ -191,7 +191,7 @@ func alertmanagerPostProcess(manifests []runtime.Object, namespace string) encod
 			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").ObjectMeta.Labels),
 			Annotations: map[string]string{
 				"cert-manager.io/issuer-kind": "ClusterIssuer",
-				"cert-manager.io/issuer-name": "letsencrypt-prod-http",
+				"cert-manager.io/issuer-name": "letsencrypt-devshiftnet-dns",
 			},
 		},
 		Spec: routev1.RouteSpec{
@@ -306,7 +306,7 @@ func alertmanagerPostProcessForBundle(manifests []runtime.Object, namespace stri
 			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").ObjectMeta.Labels),
 			Annotations: map[string]string{
 				"cert-manager.io/issuer-kind": "ClusterIssuer",
-				"cert-manager.io/issuer-name": "letsencrypt-prod-http",
+				"cert-manager.io/issuer-name": "letsencrypt-devshiftnet-dns",
 			},
 		},
 		Spec: routev1.RouteSpec{
