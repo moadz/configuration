@@ -307,6 +307,8 @@ objects:
               relabelings:
                 - targetLabel: source
                   replacement: MC
+                - regex: prometheus_replica|prometheus
+                  action: labeldrop
               port: web
               scheme: https
               path: "/federate"
