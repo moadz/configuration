@@ -80,7 +80,7 @@ objects:
           name: rhobs-hypershift-monitoring-stack
           namespace: ${NAMESPACE}
         spec:
-          resourceSelector: { }
+          resourceSelector: {}
           namespaceSelector:
             matchExpressions:
               - key: hypershift.openshift.io/monitoring
@@ -301,23 +301,24 @@ objects:
             - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
               honorLabels: true
               interval: 30s
+              # To avoid out-of-order samples when remote-writing the samples
+              # to RHOBS, we need to do 2 things:
+              # 1. Use the service name as the target address instead of the
+              #   pod's IP addresses which results in only one target instead
+              #   of the 2 prometheus-k8s pods by default.
+              # 2. Drop the prometheus-k8s external labels to ensure that
+              #   we send samples with the external labels of the sender
+              #   (rhobs-hypershift-monitoring-stack).
+              #
+              # It also cuts the number of samples being ingested by half.
+              metricRelabelings:
+                - regex: prometheus_replica|prometheus
+                  action: labeldrop
               relabelings:
                 - targetLabel: source
                   replacement: MC
-                # To avoid out-of-order samples when remote-writing the samples
-                # to RHOBS, we need to do 2 things:
-                # * Use the service name as the target address instead of the
-                #   pod's IP addresses which results in only one target instead
-                #   of the 2 prometheus-k8s pods by default.
-                # * Drop the prometheus-k8s external labels to ensure that
-                #   we send samples with the external labels of the sender
-                #   (rhobs-hypershift-monitoring-stack).
-                #
-                # It also cuts the number of samples being ingested by half.
                 - targetLabel: __address__
                   replacement: prometheus-k8s.openshift-monitoring.svc:9091
-                - regex: prometheus_replica|prometheus
-                  action: labeldrop
                 # Remove the default target labels set by the service discovery
                 # which aren't relevant in case of federation.
                 - action: LabelDrop
