@@ -329,6 +329,7 @@ objects:
             - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
               honorLabels: true
               interval: 30s
+              scrapeTimeout: 30s
               # To avoid out-of-order samples when remote-writing the samples
               # to RHOBS, we need to do 2 things:
               # 1. Use the service name as the target address instead of the
