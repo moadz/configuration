@@ -93,7 +93,17 @@ objects:
             observability.openshift.io/tech-preview-otlp-output: "enabled"
         spec:
           inputs:
+            - name: eventrouter
+              application:
+                includes:
+                  - container: kube-eventrouter
+                    namespace: openshift-logging
+              type: application
             - name: custom-application
+              application:
+                excludes:
+                  - container: kube-eventrouter
+                    namespace: openshift-logging
               type: application
           serviceAccount:
             name: rhobs-logs
@@ -102,6 +112,8 @@ objects:
               openshiftLabels:
                 cluster_name: "{{ fromCDLabel \"api.openshift.com/name\" }}"
               type: openshiftLabels
+            - name: parse-json
+              type: parse
           pipelines:
             - filterRefs:
                 - cluster-id-filter
@@ -109,6 +121,13 @@ objects:
               inputRefs:
                 - custom-application
                 - infrastructure
+              outputRefs:
+                - loki-remote
+            - filterRefs:
+                - parse-json
+              name: eventrouter-to-loki
+              inputRefs:
+                - eventrouter
               outputRefs:
                 - loki-remote
           outputs:
