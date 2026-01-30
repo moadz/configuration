@@ -564,7 +564,7 @@ objects:
           - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-store-shard-4.${NAMESPACE}.svc.cluster.local
           - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-store-shard-5.${NAMESPACE}.svc.cluster.local
           - --endpoint=dnssrv+_grpc._tcp.${THANOS_RECEIVE_HASHRING_SERVICE_NAME}.${NAMESPACE}.svc.cluster.local
-          - --rule=dnssrv+_grpc._tcp.observatorium-thanos-rule.${NAMESPACE}.svc.cluster.local
+          - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-rule.${NAMESPACE}.svc.cluster.local
           - --web.prefix-header=X-Forwarded-Prefix
           - --query.timeout=15m
           - --query.lookback-delta=15m
@@ -860,7 +860,7 @@ objects:
           - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-store-shard-4.${NAMESPACE}.svc.cluster.local
           - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-store-shard-5.${NAMESPACE}.svc.cluster.local
           - --endpoint=dnssrv+_grpc._tcp.${THANOS_RECEIVE_HASHRING_SERVICE_NAME}.${NAMESPACE}.svc.cluster.local
-          - --rule=dnssrv+_grpc._tcp.observatorium-thanos-rule.${NAMESPACE}.svc.cluster.local
+          - --endpoint=dnssrv+_grpc._tcp.observatorium-thanos-rule.${NAMESPACE}.svc.cluster.local
           - --web.prefix-header=X-Forwarded-Prefix
           - --query.timeout=15m
           - --query.lookback-delta=15m

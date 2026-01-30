@@ -445,8 +445,7 @@ local oauthProxy = import './sidecars/oauth-proxy.libsonnet';
       ] + [
         // todo - @pgough revert after https://issues.redhat.com/browse/RHOBS-112
         'dnssrv+_grpc._tcp.${THANOS_RECEIVE_HASHRING_SERVICE_NAME}.${NAMESPACE}.svc.cluster.local',
-      ],
-      rules: [
+      ] + [
         'dnssrv+_grpc._tcp.%s.%s.svc.cluster.local' % [service.metadata.name, service.metadata.namespace]
         for service in
           [thanos.rule.service]
@@ -533,8 +532,7 @@ local oauthProxy = import './sidecars/oauth-proxy.libsonnet';
       ] + [
         // todo - @pgough revert after https://issues.redhat.com/browse/RHOBS-112
         'dnssrv+_grpc._tcp.${THANOS_RECEIVE_HASHRING_SERVICE_NAME}.${NAMESPACE}.svc.cluster.local',
-      ],
-      rules: [
+      ] + [
         'dnssrv+_grpc._tcp.%s.%s.svc.cluster.local' % [service.metadata.name, service.metadata.namespace]
         for service in
           [thanos.rule.service]
