@@ -160,6 +160,24 @@ objects:
                     regex: "(up|scrape_samples_scraped|scrape_samples_post_metric_relabeling|scrape_series_added|scrape_duration_seconds);(.+)"
                     replacement: "$2"
                     targetLabel: _prometheus_scraper
+                  # Collect metrics about Prometheus rule evaluations.
+                  - action: Replace
+                    sourceLabels: [__name__]
+                    regex: "(prometheus_rule_evaluation_failures_total|prometheus_rule_evaluations_total|prometheus_rule_group_last_duration_seconds)"
+                    replacement: "true"
+                    targetLabel: __tmp_allowed
+                  # Collect metrics about Prometheus TSDB.
+                  - action: Replace
+                    sourceLabels: [__name__]
+                    regex: "(prometheus_tsdb_head_series|prometheus_tsdb_head_samples_appended_total|prometheus_tsdb_head_out_of_order_samples_appended_total|prometheus_tsdb_head_series_created_total)"
+                    replacement: "true"
+                    targetLabel: __tmp_allowed
+                  # Collect metrics about Prometheus remote-write.
+                  - action: Replace
+                    sourceLabels: [__name__]
+                    regex: "(prometheus_remote_storage_samples.*_total|prometheus_remote_storage_shards.*)"
+                    replacement: "true"
+                    targetLabel: __tmp_allowed
                   # We filter MC metrics based on their names
                   # and
                   # We forward all metrics with the source label DP as the filtering happens in preceding DP-> MC forwarding side step
