@@ -124,24 +124,34 @@ objects:
                 metadataConfig:
                   send: false
                 writeRelabelConfigs:
-                  # 1. Mark allowed namespaces
-                  - action: replace
-                    sourceLabels: [namespace]
-                    regex: (ocm-.*|openshift-logging|openshift-observability-operator)
-                    replacement: allowed
+                  # Series sent to RHOBS should be updated with the
+                  # `__tmp_allowed="true"` label. After all series have been
+                  # updated, a final relabeling rule keeps only the matching
+                  # series. This mechanim allows to add new series to the list
+                  # in a granular fashion.
+                  #
+                  #
+                  # Collect CPU and memory metrics from all OCM namespaces.
+                  - action: Replace
+                    sourceLabels: [__name__, namespace]
+                    regex: "(container_cpu_usage_seconds_total|container_memory_rss);(ocm-.+)"
+                    replacement: "true"
                     targetLabel: __tmp_allowed
-                  # 2. Drop CPU/mem metrics from NOT-allowed namespaces
-                  # We match only the metric names but ALSO require __tmp_allowed to be empty.
-                  - action: drop
-                    sourceLabels: [__name__, __tmp_allowed]
-                    regex: "(container_cpu_usage_seconds_total|container_memory_rss);$"
+                  # Collect CPU and memory metrics from the monitoring and logging namespaces.
+                  - action: Replace
+                    sourceLabels: [__name__, namespace]
+                    regex: "(container_cpu_usage_seconds_total|container_memory_rss);(openshift-logging|${NAMESPACE})"
+                    replacement: "true"
+                    targetLabel: __tmp_allowed
                   # We filter MC metrics based on their names
                   # and
                   # We forward all metrics with the source label DP as the filtering happens in preceding DP-> MC forwarding side step
                   # We forward all metrics with the source label MC, MC metrics are filtered in the federation service monitor
                   # As `sourceLabels: [__name__, source]` results in a concatenation fo the two labels followed by a regexp match with the below, the HCP metrics look like `apiserver_audit_event_total;`, and DP metrics look like `dp_metric_name;DP`, hence the `;.*` and `.*;DP` in the below regexp.
-                  - action: keep
+                  - action: Replace
                     sourceLabels: [__name__, source]
+                    targetLabel: __tmp_allowed
+                    replacement: "true"
                     regex: "(\
                       apiserver_audit_error_total;.*|\
                       apiserver_audit_event_total;.*|\
@@ -171,8 +181,6 @@ objects:
                       cluster_autoscaler_failed_scale_ups_total;.*|\
                       cluster_autoscaler:pod_status_ready;.*|\
                       cluster_operator_up;.*|\
-                      container_cpu_usage_seconds_total;.*|\
-                      container_memory_rss;.*|\
                       core_cluster_operator:down:filtered;.*|\
                       etcd_mvcc_db_total_size_in_bytes;.*|\
                       etcd_server_has_leader;.*|\
@@ -248,10 +256,13 @@ objects:
                       kube_deployment_spec_replicas;.*|\
                       kube_node_labels;.*|\
                       )"
-                  # Matches 'no label'.
-                  # Basically: if source is defined already (i.e on the data plane/management cluster), keep the label.
-                  # Otherwise, use MC
-                  - action: replace
+                  # Keep allowed series and drop anything else.
+                  - action: Keep
+                    regex: "true"
+                    source_labels: [__tmp_allowed]
+                  # Add a default `source="MC"` label if the label isn't
+                  # already defined.
+                  - action: Replace
                     regex: $^
                     replacement: MC
                     sourceLabels:
@@ -313,7 +324,7 @@ objects:
               # It also cuts the number of samples being ingested by half.
               metricRelabelings:
                 - regex: prometheus_replica|prometheus
-                  action: labeldrop
+                  action: Labeldrop
               relabelings:
                 - targetLabel: source
                   replacement: MC
