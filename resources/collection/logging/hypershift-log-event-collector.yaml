@@ -106,7 +106,7 @@ objects:
                 component: "eventrouter"
                 logging-infra: "eventrouter"
                 provider: "openshift"
-            replicas: 1
+            replicas: 0
             template:
               metadata:
                 labels:
