@@ -92,6 +92,9 @@ objects:
           annotations:
             observability.openshift.io/tech-preview-otlp-output: "enabled"
         spec:
+          inputs:
+            - name: custom-application
+              type: application
           serviceAccount:
             name: rhobs-logs
           filters:
@@ -104,7 +107,7 @@ objects:
                 - cluster-id-filter
               name: logging-to-loki
               inputRefs:
-                - application
+                - custom-application
                 - infrastructure
               outputRefs:
                 - loki-remote
