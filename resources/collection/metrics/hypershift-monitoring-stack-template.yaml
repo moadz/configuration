@@ -282,7 +282,7 @@ objects:
         metadata:
           labels:
             hive.openshift.io/managed: "true"
-          name: hypershift-ms-view
+          name: rhobs-hypershift-ms-view
         roleRef:
           apiGroup: rbac.authorization.k8s.io
           kind: ClusterRole
