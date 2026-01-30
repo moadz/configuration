@@ -26,7 +26,6 @@ import (
 )
 
 func (b Build) DefaultThanosStack(config clusters.ClusterConfig) {
-	// For rhobss01ue1 and rhobsi01uw2 clusters, generate metrics bundle with individual resources
 	if isMigratedCluster(config) {
 		if err := generateMetricsBundle(config); err != nil {
 			log.Printf("Error generating metrics bundle: %v", err)
@@ -1217,7 +1216,7 @@ func defaultStoreCR(namespace string, templates clusters.TemplateMaps) runtime.O
 			},
 			ShardingStrategy: v1alpha1.ShardingStrategy{
 				Type:   v1alpha1.Block,
-				Shards: 1,
+				Shards: 3,
 			},
 			IndexHeaderConfig: &v1alpha1.IndexHeaderConfig{
 				EnableLazyReader:      ptr.To(true),

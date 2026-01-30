@@ -29,19 +29,18 @@ spec:
     key: thanos.yaml
     name: default-thanos-bucket
     optional: false
-  replicas: 1
+  replicas: 3
   resourceRequirements:
     limits:
-      cpu: 200m
-      memory: 512Mi
+      memory: 20Gi
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 1Gi
   securityContext:
     seccompProfile:
       type: RuntimeDefault
   shardingStrategy:
-    shards: 1
+    shards: 3
     type: block
   storage:
     size: 10Gi

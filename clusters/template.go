@@ -322,12 +322,11 @@ func DefaultBaseTemplate() TemplateMaps {
 		ResourceRequirements: ParamMap[corev1.ResourceRequirements]{
 			StoreDefault: {
 				Limits: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("200m"),
-					corev1.ResourceMemory: resource.MustParse("512Mi"),
+					corev1.ResourceMemory: resource.MustParse("20Gi"),
 				},
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:    resource.MustParse("100m"),
-					corev1.ResourceMemory: resource.MustParse("256Mi"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
 				},
 			},
 			ReceiveRouter: {
@@ -344,42 +343,38 @@ func DefaultBaseTemplate() TemplateMaps {
 			},
 			Ruler: {
 				Limits: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("200m"),
-					corev1.ResourceMemory: resource.MustParse("512Mi"),
+					corev1.ResourceMemory: resource.MustParse("5Gi"),
 				},
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:    resource.MustParse("100m"),
-					corev1.ResourceMemory: resource.MustParse("256Mi"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
 				},
 			},
 			CompactDefault: {
 				Limits: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("200m"),
-					corev1.ResourceMemory: resource.MustParse("512Mi"),
+					corev1.ResourceMemory: resource.MustParse("20Gi"),
 				},
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:    resource.MustParse("100m"),
-					corev1.ResourceMemory: resource.MustParse("256Mi"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
 				},
 			},
 			Query: {
 				Limits: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("200m"),
-					corev1.ResourceMemory: resource.MustParse("512Mi"),
+					corev1.ResourceMemory: resource.MustParse("20Gi"),
 				},
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:    resource.MustParse("100m"),
-					corev1.ResourceMemory: resource.MustParse("256Mi"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
 				},
 			},
 			QueryFrontend: {
 				Limits: corev1.ResourceList{
-					corev1.ResourceCPU:    resource.MustParse("200m"),
-					corev1.ResourceMemory: resource.MustParse("512Mi"),
+					corev1.ResourceMemory: resource.MustParse("20Gi"),
 				},
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:    resource.MustParse("100m"),
-					corev1.ResourceMemory: resource.MustParse("256Mi"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
 				},
 			},
 			Manager: {
@@ -404,12 +399,12 @@ func DefaultBaseTemplate() TemplateMaps {
 			},
 		},
 		Replicas: ParamMap[int32]{
-			StoreDefault:           1,
+			StoreDefault:           3,
 			ReceiveRouter:          3,
 			ReceiveIngestorDefault: 3,
 			Ruler:                  1,
-			Query:                  1,
-			QueryFrontend:          1,
+			Query:                  3,
+			QueryFrontend:          3,
 			CompactDefault:         1,
 			ObservatoriumAPI:       2,
 		},

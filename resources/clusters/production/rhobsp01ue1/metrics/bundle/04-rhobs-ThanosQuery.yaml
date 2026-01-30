@@ -92,14 +92,13 @@ spec:
         key: thanos.yaml
         name: thanos-query-range-cache-memcached
     queryRangeSplitInterval: 48h
-    replicas: 1
+    replicas: 3
     resourceRequirements:
       limits:
-        cpu: 200m
-        memory: 512Mi
+        memory: 20Gi
       requests:
         cpu: 100m
-        memory: 256Mi
+        memory: 1Gi
     securityContext:
       seccompProfile:
         type: RuntimeDefault
@@ -108,14 +107,13 @@ spec:
   - prometheus_replica
   - replica
   - rule_replica
-  replicas: 1
+  replicas: 3
   resourceRequirements:
     limits:
-      cpu: 200m
-      memory: 512Mi
+      memory: 20Gi
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 1Gi
   securityContext:
     seccompProfile:
       type: RuntimeDefault

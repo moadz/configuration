@@ -83,11 +83,10 @@ spec:
     optional: false
   resourceRequirements:
     limits:
-      cpu: 200m
-      memory: 512Mi
+      memory: 20Gi
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 1Gi
   retentionConfig:
     fiveMinutes: 365d
     oneHour: 365d

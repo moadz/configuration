@@ -25,11 +25,10 @@ spec:
   replicas: 1
   resourceRequirements:
     limits:
-      cpu: 200m
-      memory: 512Mi
+      memory: 5Gi
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 1Gi
   retention: 48h
   ruleConfigSelector:
     matchLabels:
