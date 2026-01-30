@@ -143,6 +143,23 @@ objects:
                     regex: "(container_cpu_usage_seconds_total|container_memory_rss);(openshift-logging|${NAMESPACE})"
                     replacement: "true"
                     targetLabel: __tmp_allowed
+                  # Collect Prometheus scrape metrics.
+                  #
+                  # Record the identity of the Prometheus replica in the
+                  # "_prometheus_scraper" label because scrape metrics are
+                  # specific to the local replica and the "prometheus_replica"
+                  # label is already used on the receiving end to deduplicate
+                  # metrics.
+                  - action: Replace
+                    sourceLabels: [__name__]
+                    regex: "(up|scrape_samples_scraped|scrape_samples_post_metric_relabeling|scrape_series_added|scrape_duration_seconds)"
+                    replacement: "true"
+                    targetLabel: __tmp_allowed
+                  - action: Replace
+                    sourceLabels: [__name__, prometheus_replica]
+                    regex: "(up|scrape_samples_scraped|scrape_samples_post_metric_relabeling|scrape_series_added|scrape_duration_seconds);(.+)"
+                    replacement: "$2"
+                    targetLabel: _prometheus_scraper
                   # We filter MC metrics based on their names
                   # and
                   # We forward all metrics with the source label DP as the filtering happens in preceding DP-> MC forwarding side step
