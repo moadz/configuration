@@ -276,7 +276,7 @@ objects:
                   # Keep allowed series and drop anything else.
                   - action: Keep
                     regex: "true"
-                    source_labels: [__tmp_allowed]
+                    sourceLabels: [__tmp_allowed]
                   # Add a default `source="MC"` label if the label isn't
                   # already defined.
                   - action: Replace
