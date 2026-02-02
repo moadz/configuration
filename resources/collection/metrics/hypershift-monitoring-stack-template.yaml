@@ -130,13 +130,13 @@ objects:
                   # Collect CPU and memory metrics from all OCM namespaces.
                   - action: Replace
                     sourceLabels: [__name__, namespace]
-                    regex: "(container_cpu_usage_seconds_total|container_memory_rss);(ocm-.+)"
+                    regex: "(container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_memory_rss);(ocm-.+)"
                     replacement: "true"
                     targetLabel: __tmp_allowed
                   # Collect CPU and memory metrics from the monitoring and logging namespaces.
                   - action: Replace
                     sourceLabels: [__name__, namespace]
-                    regex: "(container_cpu_usage_seconds_total|container_memory_rss);(openshift-logging|${NAMESPACE})"
+                    regex: "(container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_memory_rss);(openshift-logging|${NAMESPACE})"
                     replacement: "true"
                     targetLabel: __tmp_allowed
                   # Collect Prometheus scrape metrics.
@@ -444,6 +444,7 @@ objects:
                   kube_node_labels|\
                   kube_node_role|\
                   container_memory_rss|\
+                  container_memory_working_set_bytes|\
                   container_memory_cache|\
                   cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests|\
                   cluster:namespace:pod_memory:active:kube_pod_container_resource_requests|\
