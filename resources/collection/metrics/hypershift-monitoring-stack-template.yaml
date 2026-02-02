@@ -27,10 +27,6 @@ parameters:
     value: placeholdervalue
   - name: OPENSHIFT_MONITORING_NAMESPACE
     value: openshift-monitoring
-  - name: OBO_NAMESPACE
-    value: openshift-observability-operator
-  - name: SECRET_NAME
-    value: hypershift-telemeter-client
   - name: SUFFIX
     description: "Optional suffix for resource names to support multiple deployments per hive cluster"
     value: ''
@@ -325,7 +321,7 @@ objects:
         subjects:
           - kind: ServiceAccount
             name: rhobs-hypershift-monitoring-stack-prometheus
-            namespace: openshift-observability-operator
+            namespace: ${NAMESPACE}
 
       # Service monitor to federate the Management Cluster CMO metrics.
       # Metric filtering is done here.
