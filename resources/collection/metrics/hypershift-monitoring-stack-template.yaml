@@ -360,7 +360,7 @@ objects:
               # It also cuts the number of samples being ingested by half.
               metricRelabelings:
                 - regex: prometheus_replica|prometheus
-                  action: Labeldrop
+                  action: LabelDrop
               relabelings:
                 - targetLabel: source
                   replacement: MC
