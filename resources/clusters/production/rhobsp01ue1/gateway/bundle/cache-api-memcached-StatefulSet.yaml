@@ -37,11 +37,25 @@ spec:
         - -v
         image: registry.redhat.io/rhel8/memcached:1.5-316
         imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          tcpSocket:
+            port: 11211
         name: memcached
         ports:
         - containerPort: 11211
           name: client
           protocol: TCP
+        readinessProbe:
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 11211
+          timeoutSeconds: 3
         resources: {}
         terminationMessagePolicy: FallbackToLogsOnError
       - args:
