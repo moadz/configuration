@@ -97,13 +97,13 @@ objects:
               application:
                 includes:
                   - container: kube-eventrouter
-                    namespace: rhobs-eventrouter
+                    namespace: openshift-logging
               type: application
             - name: custom-application
               application:
                 excludes:
                   - container: kube-eventrouter
-                    namespace: rhobs-eventrouter
+                    namespace: openshift-logging
               type: application
           serviceAccount:
             name: rhobs-logs

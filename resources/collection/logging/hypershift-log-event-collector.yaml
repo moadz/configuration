@@ -21,7 +21,7 @@ parameters:
     value: "128Mi"
   - name: NAMESPACE
     displayName: Namespace
-    value: "rhobs-eventrouter"
+    value: "openshift-logging"
   - name: SUFFIX
     description: "Optional suffix for resource names to support multiple deployments per hive cluster"
     value: ''
@@ -54,12 +54,6 @@ objects:
               ${{SECTORS}}
 
       resources:
-        - kind: Namespace
-          apiVersion: v1
-          metadata:
-            name: ${NAMESPACE}
-            labels:
-              openshift.io/cluster-monitoring: "true"
         - kind: ServiceAccount
           apiVersion: v1
           metadata:
