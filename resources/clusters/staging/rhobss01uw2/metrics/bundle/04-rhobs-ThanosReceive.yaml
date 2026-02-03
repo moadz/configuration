@@ -48,12 +48,23 @@ spec:
       \ \"retryPolicy\": {\n    \"maxAttempts\": 0,\n    \"initialBackoff\": \"0.1s\",\n
       \   \"backoffMultiplier\": 1,\n    \"retryableStatusCodes\": [\n  \t  \"UNAVAILABLE\"\n
       \   ]\n  }\n}"
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/component: thanos-receive-router
+            topologyKey: kubernetes.io/hostname
+          weight: 100
     baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
     externalLabels:
       receive: "true"
     imagePullPolicy: IfNotPresent
     logFormat: logfmt
     logLevel: info
+    podDisruptionBudgetConfig:
+      enable: true
     replicas: 3
     replicationFactor: 3
     resourceRequirements:

@@ -1280,6 +1280,26 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 							Type: corev1.SeccompProfileTypeRuntimeDefault,
 						},
 					},
+					PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
+						Enable: ptr.To(true),
+					},
+					Affinity: &corev1.Affinity{
+						PodAntiAffinity: &corev1.PodAntiAffinity{
+							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
+								{
+									Weight: 100,
+									PodAffinityTerm: corev1.PodAffinityTerm{
+										TopologyKey: "kubernetes.io/hostname",
+										LabelSelector: &metav1.LabelSelector{
+											MatchLabels: map[string]string{
+												"app.kubernetes.io/component": "thanos-receive-router",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 				Replicas:          clusters.TemplateFn(clusters.ReceiveRouter, templates.Replicas),
 				ReplicationFactor: 3,
