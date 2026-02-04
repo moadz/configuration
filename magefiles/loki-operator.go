@@ -164,26 +164,6 @@ func NewControllerManagerDeployment(namespace string) *appsv1.Deployment {
 							{Name: "RELATED_IMAGE_OPA", Value: "registry.redhat.io/openshift-logging/opa-openshift-rhel9@sha256:06602373b99d694a83b845e9cc6746a4f37a7a6ca6943356fea6ee6dbbccda35"},
 							{Name: "OPERATOR_CONDITION_NAME", Value: "loki-operator.v6.3.0"},
 						},
-						LivenessProbe: &corev1.Probe{
-							ProbeHandler: corev1.ProbeHandler{
-								HTTPGet: &corev1.HTTPGetAction{
-									Path: "/healthz",
-									Port: intstr.FromInt32(8081),
-								},
-							},
-							InitialDelaySeconds: 15,
-							PeriodSeconds:       20,
-						},
-						ReadinessProbe: &corev1.Probe{
-							ProbeHandler: corev1.ProbeHandler{
-								HTTPGet: &corev1.HTTPGetAction{
-									Path: "/readyz",
-									Port: intstr.FromInt32(8081),
-								},
-							},
-							InitialDelaySeconds: 5,
-							PeriodSeconds:       10,
-						},
 					}},
 					TerminationGracePeriodSeconds: ptr.To(int64(10)),
 				},

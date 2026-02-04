@@ -32,22 +32,10 @@ spec:
           value: loki-operator.v6.3.0
         image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-loki-operator:157c2b41c918d4890ce7879f1e8583b6a50ec8a4
         imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8081
-          initialDelaySeconds: 15
-          periodSeconds: 20
         name: manager
         ports:
         - containerPort: 8080
           name: metrics
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 8081
-          initialDelaySeconds: 5
-          periodSeconds: 10
         resources: {}
       nodeSelector:
         kubernetes.io/os: linux
