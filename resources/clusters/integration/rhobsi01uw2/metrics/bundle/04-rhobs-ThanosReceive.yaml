@@ -10,7 +10,17 @@ spec:
       name: default-thanos-bucket
       optional: false
     hashrings:
-    - asyncForwardWorkerCount: 50
+    - affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: thanos-receive-ingester
+                  app.kubernetes.io/instance: thanos-receive-ingester-rhobs-default
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      asyncForwardWorkerCount: 50
       baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
       externalLabels:
         replica: $(POD_NAME)

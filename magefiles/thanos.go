@@ -1330,6 +1330,24 @@ func defaultReceiveCR(namespace string, templates clusters.TemplateMaps) runtime
 									Type: corev1.SeccompProfileTypeRuntimeDefault,
 								},
 							},
+							Affinity: &corev1.Affinity{
+								PodAntiAffinity: &corev1.PodAntiAffinity{
+									PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
+										{
+											Weight: 100,
+											PodAffinityTerm: corev1.PodAffinityTerm{
+												TopologyKey: "kubernetes.io/hostname",
+												LabelSelector: &metav1.LabelSelector{
+													MatchLabels: map[string]string{
+														"app.kubernetes.io/component": "thanos-receive-ingester",
+														"app.kubernetes.io/instance":  "thanos-receive-ingester-rhobs-default",
+													},
+												},
+											},
+										},
+									},
+								},
+							},
 						},
 						ExternalLabels: map[string]string{
 							"replica": "$(POD_NAME)",
