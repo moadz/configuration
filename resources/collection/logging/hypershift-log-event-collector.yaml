@@ -100,26 +100,26 @@ objects:
         - kind: Deployment
           apiVersion: apps/v1
           metadata:
-            name: eventrouter
+            name: rhobs-eventrouter
             namespace: ${NAMESPACE}
             labels:
-              component: "eventrouter"
-              logging-infra: "eventrouter"
+              component: "rhobs-eventrouter"
+              logging-infra: "rhobs-eventrouter"
               provider: "openshift"
           spec:
             selector:
               matchLabels:
-                component: "eventrouter"
-                logging-infra: "eventrouter"
+                component: "rhobs-eventrouter"
+                logging-infra: "rhobs-eventrouter"
                 provider: "openshift"
             replicas: 1
             template:
               metadata:
                 labels:
-                  component: "eventrouter"
-                  logging-infra: "eventrouter"
+                  component: "rhobs-eventrouter"
+                  logging-infra: "rhobs-eventrouter"
                   provider: "openshift"
-                name: eventrouter
+                name: rhobs-eventrouter
               spec:
                 serviceAccount: eventrouter
                 containers:
