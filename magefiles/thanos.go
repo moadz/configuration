@@ -1115,6 +1115,24 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 							Type: corev1.SeccompProfileTypeRuntimeDefault,
 						},
 					},
+					Affinity: &corev1.Affinity{
+						PodAntiAffinity: &corev1.PodAntiAffinity{
+							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
+								{
+									Weight: 100,
+									PodAffinityTerm: corev1.PodAffinityTerm{
+										TopologyKey: "kubernetes.io/hostname",
+										LabelSelector: &metav1.LabelSelector{
+											MatchLabels: map[string]string{
+												"app.kubernetes.io/component": "query-frontend",
+												"app.kubernetes.io/instance":  "thanos-query-frontend-rhobs",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 				Replicas:             clusters.TemplateFn("QUERY_FRONTEND", templates.Replicas),
 				CompressResponses:    true,
@@ -1635,6 +1653,24 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 					SecurityContext: &corev1.PodSecurityContext{
 						SeccompProfile: &corev1.SeccompProfile{
 							Type: corev1.SeccompProfileTypeRuntimeDefault,
+						},
+					},
+					Affinity: &corev1.Affinity{
+						PodAntiAffinity: &corev1.PodAntiAffinity{
+							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
+								{
+									Weight: 100,
+									PodAffinityTerm: corev1.PodAffinityTerm{
+										TopologyKey: "kubernetes.io/hostname",
+										LabelSelector: &metav1.LabelSelector{
+											MatchLabels: map[string]string{
+												"app.kubernetes.io/component": "query-frontend",
+												"app.kubernetes.io/instance":  "thanos-query-frontend-rhobs",
+											},
+										},
+									},
+								},
+							},
 						},
 					},
 				},

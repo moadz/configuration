@@ -81,6 +81,16 @@ spec:
     - name: oauth-cookie
       secret:
         secretName: oauth-cookie
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/component: query-frontend
+                app.kubernetes.io/instance: thanos-query-frontend-rhobs
+            topologyKey: kubernetes.io/hostname
+          weight: 100
     annotations:
       service.beta.openshift.io/serving-cert-secret-name: query-frontend-tls
       serviceaccounts.openshift.io/oauth-redirectreference.application: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}'
