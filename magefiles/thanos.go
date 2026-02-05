@@ -1059,6 +1059,24 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 						Type: corev1.SeccompProfileTypeRuntimeDefault,
 					},
 				},
+				Affinity: &corev1.Affinity{
+					PodAntiAffinity: &corev1.PodAntiAffinity{
+						PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
+							{
+								Weight: 100,
+								PodAffinityTerm: corev1.PodAffinityTerm{
+									TopologyKey: "kubernetes.io/hostname",
+									LabelSelector: &metav1.LabelSelector{
+										MatchLabels: map[string]string{
+											"app.kubernetes.io/component": "query-layer",
+											"app.kubernetes.io/instance":  "thanos-query-rhobs",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 				PodDisruptionBudgetConfig: &v1alpha1.PodDisruptionBudgetConfig{
 					Enable: ptr.To(false),
 				},

@@ -4,6 +4,16 @@ metadata:
   name: rhobs
   namespace: rhobs-production
 spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: query-layer
+              app.kubernetes.io/instance: thanos-query-rhobs
+          topologyKey: kubernetes.io/hostname
+        weight: 100
   baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
   customStoreLabelSelector:
     matchLabels:
