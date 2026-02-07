@@ -211,6 +211,7 @@ objects:
                       cluster_autoscaler_errors_total;.*|\
                       cluster_autoscaler_failed_scale_ups_total;.*|\
                       cluster_autoscaler:pod_status_ready;.*|\
+                      cluster_operator_conditions;.*|\
                       cluster_operator_up;.*|\
                       core_cluster_operator:down:filtered;.*|\
                       etcd_mvcc_db_total_size_in_bytes;.*|\
@@ -270,6 +271,7 @@ objects:
                       sre:nodepool:invalid_payload_nodepool_provision_failure;.*|\
                       vector_component_sent_events_total;.*|\
                       probe_success;.*|\
+                      certmanager_certificate_expiration_timestamp_seconds;.*|\
                       certmanager_certificate_ready_status;.*|\
                       mce_hs_addon_failed_reconcile_count;.*|\
                       mce_hs_addon_total_reconcile_count;.*|\
@@ -453,7 +455,10 @@ objects:
                   etcd_disk_wal_fsync_duration_seconds_bucket|\
                   etcd_network_peer_round_trip_time_seconds_bucket|\
                   etcd_cluster_version|\
-                  ovnkube_master_network_programming_duration_seconds_bucket\"}"
+                  ovnkube_master_network_programming_duration_seconds_bucket|\
+                  cluster_operator_conditions|\
+                  certmanager_certificate_expiration_timestamp_seconds|\
+                  certmanager_certificate_ready_status\"}"
               tlsConfig:
                 ca:
                   configMap:

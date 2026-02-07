@@ -22,24 +22,10 @@ objects:
         operator.thanos.io/tenant: ${TENANT}
     spec:
       groups:
-        - name: OauthServiceRecordingRules
-          interval: 60s
-          rules:
-            - record: sre:oauth:deployment_pods_unavailable
-              expr: |
-                sum by (namespace, _id) ((
-                  label_replace(
-                    min by(namespace, deployment) (
-                      kube_deployment_status_replicas_unavailable{deployment=~"oauth-openshift|openshift-oauth-apiserver", namespace=~"ocm-.*-.*"}
-                    ),
-                    "exported_namespace",
-                    "$1-$2",
-                    "namespace",
-                    "(ocm-[^-]+)-([^-]+)-.*"
-                  )
-                * on (exported_namespace) group_left (_id)
-                  (max by (exported_namespace, _id) (hypershift_cluster_vcpus) * 0 + 1)
-                ))
+        # Note: sre:oauth:deployment_pods_unavailable recording rule runs on the MC
+        # (in the RHOBS monitoring stack namespace) and its result is forwarded via
+        # remote write. It is NOT defined here because kube_deployment_status_replicas_unavailable
+        # is not forwarded to the RHOBS cell.
         - name: OauthServiceRules
           interval: 30s
           rules:
