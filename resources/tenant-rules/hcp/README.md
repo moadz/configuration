@@ -12,6 +12,7 @@ hcp/
 ├── billing.yaml           # Billing metric alerts
 ├── cert-manager.yaml      # TLS certificate health
 ├── cluster-operators.yaml # ClusterOperator health alerts
+├── kube-api-error-budget.yaml # KubeAPI SLO error budget burn
 ├── control-plane.yaml     # etcd, kube-controller-manager, kube-scheduler
 ├── nodes.yaml             # Node health, nodepool, autoscaler
 ├── oauth.yaml             # OAuth service health
@@ -38,6 +39,12 @@ Core control plane component monitoring:
 ### cert-manager.yaml
 TLS certificate health:
 - `cert-manager` - CertManagerCertExpirySoon, CertManagerCertNotReady
+
+### kube-api-error-budget.yaml
+KubeAPI SLO error budget burn (99.99% availability target):
+- `KubeAPIErrorBudgetBurn_1m_eval` - Base counters, short-window error rates (5m-6h), fast/medium burn alerts
+- `KubeAPIErrorBudgetBurn_15m_eval` - Long-window error rates (1d, 3d), slow burn alerts
+- 4 alert variants: 5m/1h (fast), 30m/6h (medium), 2h/1d (slow), 6h/3d (very slow)
 
 ### cluster-operators.yaml
 OpenShift ClusterOperator health:

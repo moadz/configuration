@@ -25,6 +25,7 @@ FILES=(
     "cluster-operators.yaml"
     "control-plane.yaml"
     "api-server.yaml"
+    "kube-api-error-budget.yaml"
     "splunk.yaml"
 )
 
@@ -64,6 +65,7 @@ cat > "$OUTPUT_FILE" << 'HEADER'
 #   - hcp/billing.yaml         (billing metrics)
 #   - hcp/cert-manager.yaml    (TLS certificate health)
 #   - hcp/cluster-operators.yaml (ClusterOperator health)
+#   - hcp/kube-api-error-budget.yaml (KubeAPI SLO error budget burn)
 #   - hcp/control-plane.yaml   (etcd, kube-controller-manager, kube-scheduler)
 #   - hcp/nodes.yaml           (node health, nodepool, autoscaler)
 #   - hcp/oauth.yaml           (OAuth service health)
