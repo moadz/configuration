@@ -48,3 +48,41 @@ objects:
               labels:
                 severity: critical
                 otel_collect: "true"
+        - name: core-cluster-operators
+          interval: 60s
+          rules:
+            - record: hcp_worker_nodes:available_count
+              expr: |
+                label_replace(
+                  count by (exported_namespace, _id)(capi_machine_info{node_healthy="True", ready="True"}),
+                  "namespace",
+                  "$1",
+                  "exported_namespace",
+                  "(.*)")
+            - record: core_cluster_operator:down:filtered
+              expr: |
+                max by (_id, namespace, name, reason) (
+                  cluster_operator_up{name=~"monitoring|network|console|dns|insights|service-ca|kube-storage-version-migrator|image-registry|storage"} == 0
+                )
+                and on (namespace) (hcp_worker_nodes:available_count >= 2)
+                unless on (_id) hypershift_cluster_alerts_disabled
+            - alert: CoreClusterOperatorDown
+              annotations:
+                summary: "Core cluster operator {{ $labels.name }} has been down for 15 minutes."
+                description: "The {{ $labels.name }} operator has been down for 15 minutes, and the components it manages may be unavailable or degraded."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/CoreClusterOperatorDown.md
+              expr: core_cluster_operator:down:filtered{name=~"console|network|monitoring|dns"}
+              for: 15m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: DefaultIngressControllerDegraded
+              annotations:
+                summary: "The default IngressController has been degraded for 30 minutes."
+                description: "The default IngressController is degraded for {{ $labels._id }}. Ingress traffic may be impacted."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/DefaultIngressControllerDegraded.md
+              expr: (max by (_id, condition, name, namespace) (ingress_controller_conditions{name="default", condition="Degraded"} == 1)) unless on (_id) hypershift_cluster_alerts_disabled
+              for: 30m
+              labels:
+                severity: warning
+                otel_collect: "true"

@@ -146,6 +146,84 @@ objects:
                 severity: warning
                 short_window: 6h
                 otel_collect: "true"
+  # Rapid error budget burn for API server (probe-based, >90% failure rate over 3m)
+  # Fires immediately when detecting acute API server incidents
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: api-rapid-burn
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: api-rapid-burn
+          interval: 30s
+          rules:
+            - alert: api-RapidErrorBudgetBurn
+              annotations:
+                message: "Rapid error budget burn detected for openshift api (>90% failure rate)"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md"
+              expr: |-
+                label_replace(
+                        label_replace(
+                            label_replace((
+                1-(sum by (probe_url, apiserver_url, mc_name, _mc_id, sector, region, _id)((sum_over_time(probe_success{probe_url=~".*api.*"}[3m]) or sum_over_time(probe_success{apiserver_url=~".*api.*"}[3m])))/ sum by (probe_url, apiserver_url, mc_name, _mc_id, sector, region, _id)((count_over_time(probe_success{probe_url=~".*api.*"}[3m]) or count_over_time(probe_success{apiserver_url=~".*api.*"}[3m]))))> 0.90 and sum by (probe_url, apiserver_url, mc_name, _mc_id, sector, region, _id)((count_over_time(probe_success{probe_url=~".*api.*"}[3m]) or count_over_time(probe_success{apiserver_url=~".*api.*"}[3m]))) > 3
+                            ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                        "_id_or_ns", "$0", "_id", ".+")
+                    unless on (_id_or_ns) (
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                        or
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*")),
+                    "_id_or_ns", "", "_id_or_ns", ".*")
+              labels:
+                namespace: openshift-route-monitor-operator
+                severity: critical
+                short_window: 3m
+                otel_collect: "true"
+  # KubeAPIServer restart detection and availability alerts
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-kube-apiserver-restarts
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: kube-apiserver-restarts
+          interval: 60s
+          rules:
+            - record: sre:kube_apiserver:container_restarts_total
+              expr: |
+                sum by (namespace, _id) (
+                  label_replace(
+                    kube_pod_container_status_restarts_total{pod=~"kube-apiserver-.*",namespace=~"ocm-.*-.*"},
+                    "exported_namespace",
+                    "$1-$2",
+                    "namespace",
+                    "(ocm-[^-]+)-([^-]+)-.*"
+                    )
+                * on (exported_namespace) group_left (_id)
+                  (max by (exported_namespace, _id) (hypershift_cluster_vcpus) * 0 + 1)
+                )
+            - alert: KubeAPIServerRestartingFrequently
+              annotations:
+                description: "KubeAPIServer pods in the HCP namespace have restarted 3 or more times in the past 30 minutes."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeAPIServerRestartingFrequently.md
+                summary: "KubeAPIServer pods are restarting frequently in the HCP namespace."
+              expr: |
+                (increase(sre:kube_apiserver:container_restarts_total[30m]) >= 3)
+                and on(_id)
+                (
+                  sre:kube_apiserver:container_restarts_total > sre:kube_apiserver:container_restarts_total offset 1h
+                )
+              for: 2m
+              labels:
+                severity: critical
+                otel_collect: "true"
   # KubeAPIServer and OpenshiftAPIServer availability alerts
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule

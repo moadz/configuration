@@ -50,3 +50,24 @@ objects:
               labels:
                 severity: critical
                 otel_collect: "true"
+            - alert: SAEDeploymentDoesNotHaveExpectedReplicas
+              annotations:
+                description: "Splunk Audit Exporter does not have expected number of replicas for {{ $labels.namespace }}."
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/SAEDeploymentDoesNotHaveExpectedReplicas.md
+                summary: "SAE deployment does not have expected replicas"
+              expr: |
+                (
+                  count by (namespace, deployment, _id) (
+                    sum by(namespace, deployment, _id) (
+                      kube_deployment_status_replicas_available{namespace=~"ocm-.*", deployment="audit-webhook"}
+                    )
+                    <
+                    sum by(namespace, deployment, _id) (
+                      kube_deployment_spec_replicas{namespace=~"ocm-.*", deployment="audit-webhook"}
+                    )
+                  ) >= 1
+                ) unless on (_id) hypershift_cluster_alerts_disabled
+              for: 10m
+              labels:
+                severity: warning
+                otel_collect: "true"

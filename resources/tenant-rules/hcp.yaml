@@ -11,6 +11,7 @@
 #   - hcp/api-server.yaml      (kube-apiserver, openshift-apiserver, SLOs)
 #   - hcp/audit.yaml           (audit webhook CloudWatch)
 #   - hcp/billing.yaml         (billing metrics)
+#   - hcp/cert-manager.yaml    (TLS certificate health)
 #   - hcp/cluster-operators.yaml (ClusterOperator health)
 #   - hcp/control-plane.yaml   (etcd, kube-controller-manager, kube-scheduler)
 #   - hcp/nodes.yaml           (node health, nodepool, autoscaler)
@@ -94,6 +95,53 @@ objects:
               for: 30m
               labels:
                 severity: critical
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: cert-manager
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: cert-manager
+          interval: 60s
+          rules:
+            - alert: CertManagerCertExpirySoon
+              annotations:
+                description: Kubernetes API TLS certificate for Hosted Control Plane is expiring soon. The HCP API endpoint will become unavailable after {{ $value | humanizeDuration }}.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/cert-manager/CertManagerCertExpirySoon.md
+                summary: The cert {{ $labels.name }} is {{ $value | humanizeDuration }} from expiry.
+              expr: |
+                (
+                  avg by (exported_namespace, namespace, name, _id) (
+                    certmanager_certificate_expiration_timestamp_seconds - time()
+                  ) < (21 * 24 * 3600)
+                )
+                and
+                (
+                  avg by (exported_namespace, namespace, name, _id) (
+                    certmanager_certificate_expiration_timestamp_seconds - time()
+                  ) > 0
+                )
+              for: 1h
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: CertManagerCertNotReady
+              annotations:
+                description: Kubernetes API TLS certificate for Hosted Control Plane has not been ready for at least 10 minutes. This may indicate Let's Encrypt issuance issues or DNS-01 challenge failures.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/cert-manager/CertManagerCertNotReady.md
+                summary: The cert {{ $labels.name }} is not ready to serve traffic.
+              expr: |
+                max by (name, exported_namespace, namespace, condition, _id) (
+                  certmanager_certificate_ready_status{condition!="True"} == 1
+                )
+              for: 10m
+              labels:
+                severity: warning
+                otel_collect: "true"
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
     metadata:
@@ -367,6 +415,44 @@ objects:
               for: 60m
               labels:
                 severity: critical
+                otel_collect: "true"
+        - name: core-cluster-operators
+          interval: 60s
+          rules:
+            - record: hcp_worker_nodes:available_count
+              expr: |
+                label_replace(
+                  count by (exported_namespace, _id)(capi_machine_info{node_healthy="True", ready="True"}),
+                  "namespace",
+                  "$1",
+                  "exported_namespace",
+                  "(.*)")
+            - record: core_cluster_operator:down:filtered
+              expr: |
+                max by (_id, namespace, name, reason) (
+                  cluster_operator_up{name=~"monitoring|network|console|dns|insights|service-ca|kube-storage-version-migrator|image-registry|storage"} == 0
+                )
+                and on (namespace) (hcp_worker_nodes:available_count >= 2)
+                unless on (_id) hypershift_cluster_alerts_disabled
+            - alert: CoreClusterOperatorDown
+              annotations:
+                summary: Core cluster operator {{ $labels.name }} has been down for 15 minutes.
+                description: The {{ $labels.name }} operator has been down for 15 minutes, and the components it manages may be unavailable or degraded.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/CoreClusterOperatorDown.md
+              expr: core_cluster_operator:down:filtered{name=~"console|network|monitoring|dns"}
+              for: 15m
+              labels:
+                severity: warning
+                otel_collect: "true"
+            - alert: DefaultIngressControllerDegraded
+              annotations:
+                summary: The default IngressController has been degraded for 30 minutes.
+                description: The default IngressController is degraded for {{ $labels._id }}. Ingress traffic may be impacted.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/DefaultIngressControllerDegraded.md
+              expr: (max by (_id, condition, name, namespace) (ingress_controller_conditions{name="default", condition="Degraded"} == 1)) unless on (_id) hypershift_cluster_alerts_disabled
+              for: 30m
+              labels:
+                severity: warning
                 otel_collect: "true"
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
@@ -648,6 +734,81 @@ objects:
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
     metadata:
+      name: api-rapid-burn
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: api-rapid-burn
+          interval: 30s
+          rules:
+            - alert: api-RapidErrorBudgetBurn
+              annotations:
+                message: Rapid error budget burn detected for openshift api (>90% failure rate)
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/api-ErrorBudgetBurn.md
+              expr: |-
+                label_replace(
+                        label_replace(
+                            label_replace((
+                1-(sum by (probe_url, apiserver_url, mc_name, _mc_id, sector, region, _id)((sum_over_time(probe_success{probe_url=~".*api.*"}[3m]) or sum_over_time(probe_success{apiserver_url=~".*api.*"}[3m])))/ sum by (probe_url, apiserver_url, mc_name, _mc_id, sector, region, _id)((count_over_time(probe_success{probe_url=~".*api.*"}[3m]) or count_over_time(probe_success{apiserver_url=~".*api.*"}[3m]))))> 0.90 and sum by (probe_url, apiserver_url, mc_name, _mc_id, sector, region, _id)((count_over_time(probe_success{probe_url=~".*api.*"}[3m]) or count_over_time(probe_success{apiserver_url=~".*api.*"}[3m]))) > 3
+                            ), "_id_or_ns", "ocm-$1-$2", "namespace", "ocm-([^-]*)-([^-]*).*"),
+                        "_id_or_ns", "$0", "_id", ".+")
+                    unless on (_id_or_ns) (
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
+                        or
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*")),
+                    "_id_or_ns", "", "_id_or_ns", ".*")
+              labels:
+                namespace: openshift-route-monitor-operator
+                severity: critical
+                short_window: 3m
+                otel_collect: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: sre-kube-apiserver-restarts
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: kube-apiserver-restarts
+          interval: 60s
+          rules:
+            - record: sre:kube_apiserver:container_restarts_total
+              expr: |
+                sum by (namespace, _id) (
+                  label_replace(
+                    kube_pod_container_status_restarts_total{pod=~"kube-apiserver-.*",namespace=~"ocm-.*-.*"},
+                    "exported_namespace",
+                    "$1-$2",
+                    "namespace",
+                    "(ocm-[^-]+)-([^-]+)-.*"
+                    )
+                * on (exported_namespace) group_left (_id)
+                  (max by (exported_namespace, _id) (hypershift_cluster_vcpus) * 0 + 1)
+                )
+            - alert: KubeAPIServerRestartingFrequently
+              annotations:
+                description: KubeAPIServer pods in the HCP namespace have restarted 3 or more times in the past 30 minutes.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/KubeAPIServerRestartingFrequently.md
+                summary: KubeAPIServer pods are restarting frequently in the HCP namespace.
+              expr: |
+                (increase(sre:kube_apiserver:container_restarts_total[30m]) >= 3)
+                and on(_id)
+                (
+                  sre:kube_apiserver:container_restarts_total > sre:kube_apiserver:container_restarts_total offset 1h
+                )
+              for: 2m
+              labels:
+                severity: critical
+                otel_collect: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
       name: sre-kube-apiserver-rules
       namespace: ${NAMESPACE}
       labels:
@@ -737,4 +898,25 @@ objects:
               for: 15m
               labels:
                 severity: critical
+                otel_collect: "true"
+            - alert: SAEDeploymentDoesNotHaveExpectedReplicas
+              annotations:
+                description: Splunk Audit Exporter does not have expected number of replicas for {{ $labels.namespace }}.
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/SAEDeploymentDoesNotHaveExpectedReplicas.md
+                summary: SAE deployment does not have expected replicas
+              expr: |
+                (
+                  count by (namespace, deployment, _id) (
+                    sum by(namespace, deployment, _id) (
+                      kube_deployment_status_replicas_available{namespace=~"ocm-.*", deployment="audit-webhook"}
+                    )
+                    <
+                    sum by(namespace, deployment, _id) (
+                      kube_deployment_spec_replicas{namespace=~"ocm-.*", deployment="audit-webhook"}
+                    )
+                  ) >= 1
+                ) unless on (_id) hypershift_cluster_alerts_disabled
+              for: 10m
+              labels:
+                severity: warning
                 otel_collect: "true"

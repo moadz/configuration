@@ -10,6 +10,7 @@ hcp/
 ├── api-server.yaml        # kube-apiserver, openshift-apiserver, error-budget-burn
 ├── audit.yaml             # Audit webhook CloudWatch alerts
 ├── billing.yaml           # Billing metric alerts
+├── cert-manager.yaml      # TLS certificate health
 ├── cluster-operators.yaml # ClusterOperator health alerts
 ├── control-plane.yaml     # etcd, kube-controller-manager, kube-scheduler
 ├── nodes.yaml             # Node health, nodepool, autoscaler
@@ -23,8 +24,10 @@ hcp/
 ### api-server.yaml
 API server availability and SLO monitoring:
 - `kube-api-error-budget-burn` - Recording rules for error budget calculations
-- `api` - Probe-based SLO alerts (api-ErrorBudgetBurn)
-- `sre-kube-apiserver-rules` - KubeAPIServer/OpenshiftAPIServer Down/Degraded
+- `api-SLOs-probe` - Probe-based SLO alerts (api-ErrorBudgetBurn)
+- `api-rapid-burn` - Rapid error budget burn (api-RapidErrorBudgetBurn)
+- `kube-apiserver-restarts` - Recording rule + KubeAPIServerRestartingFrequently
+- `osd-kube-apiserver-rules` - KubeAPIServer/OpenshiftAPIServer Down/Degraded
 
 ### control-plane.yaml
 Core control plane component monitoring:
@@ -32,9 +35,14 @@ Core control plane component monitoring:
 - `kube-controller-manager` - Controller manager availability
 - `kube-scheduler` - Scheduler availability
 
+### cert-manager.yaml
+TLS certificate health:
+- `cert-manager` - CertManagerCertExpirySoon, CertManagerCertNotReady
+
 ### cluster-operators.yaml
 OpenShift ClusterOperator health:
 - `cluster-operators` - ClusterOperatorDegraded, ClusterOperatorDown
+- `core-cluster-operators` - Recording rules (hcp_worker_nodes:available_count, core_cluster_operator:down:filtered) + CoreClusterOperatorDown, DefaultIngressControllerDegraded
 
 ### nodes.yaml
 Worker node and nodepool health:
@@ -64,7 +72,7 @@ Audit log forwarding to CloudWatch:
 
 ### splunk.yaml
 Splunk Audit Exporter health:
-- `sae-deployment` - SAEDeploymentMissing, SAEDeploymentDown
+- `SAEDeploymentErrors` - SAEDeploymentMissing, SAEDeploymentDown, SAEDeploymentDoesNotHaveExpectedReplicas
 
 ## Usage
 
@@ -104,7 +112,11 @@ This directory structure replaces the monolithic `../hcp.yaml` file. The split p
 
 ## Adding New Rules
 
-1. Identify the appropriate functional domain
+1. Identify the appropriate functional domain (or create a new file)
 2. Add the PrometheusRule to the corresponding file
-3. Update this README if adding a new PrometheusRule object
-4. Test with `oc process -f <file>.yaml -p NAMESPACE=test -p TENANT=test`
+3. If creating a new file, add it to the `FILES` array in `scripts/generate-hcp-rules.sh`
+4. Run `make hcp-rules` to regenerate `../hcp.yaml`
+5. Update this README with the new alert/recording rule
+6. Commit both the source file and the generated `hcp.yaml`
+7. Include `unless on (_id) hypershift_cluster_alerts_disabled` in alert expressions for limited support suppression
+8. Start new alerts with `severity: soaking` -- see the [alert graduation process](https://gitlab.cee.redhat.com/service/hypershift-pagerduty-config/-/blob/main/docs/ALERT-GRADUATION.md)

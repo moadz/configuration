@@ -18,6 +18,7 @@ fi
 FILES=(
     "audit.yaml"
     "billing.yaml"
+    "cert-manager.yaml"
     "nodes.yaml"
     "oauth.yaml"
     "observability.yaml"
@@ -61,6 +62,7 @@ cat > "$OUTPUT_FILE" << 'HEADER'
 #   - hcp/api-server.yaml      (kube-apiserver, openshift-apiserver, SLOs)
 #   - hcp/audit.yaml           (audit webhook CloudWatch)
 #   - hcp/billing.yaml         (billing metrics)
+#   - hcp/cert-manager.yaml    (TLS certificate health)
 #   - hcp/cluster-operators.yaml (ClusterOperator health)
 #   - hcp/control-plane.yaml   (etcd, kube-controller-manager, kube-scheduler)
 #   - hcp/nodes.yaml           (node health, nodepool, autoscaler)
