@@ -458,7 +458,12 @@ objects:
                   ovnkube_master_network_programming_duration_seconds_bucket|\
                   cluster_operator_conditions|\
                   certmanager_certificate_expiration_timestamp_seconds|\
-                  certmanager_certificate_ready_status\"}"
+                  certmanager_certificate_ready_status|\
+                  kube_node_status_condition|\
+                  node_filesystem_avail_bytes|\
+                  node_filesystem_size_bytes|\
+                  node_disk_written_bytes_total|\
+                  node_disk_read_bytes_total\"}"
               tlsConfig:
                 ca:
                   configMap:
@@ -472,3 +477,220 @@ objects:
                   key: tls.key
                   name: metrics-client-certs
                 serverName: prometheus-k8s.openshift-monitoring.svc
+
+      # Recording rules evaluated by the MonitoringStack Prometheus on each MC.
+      # Results are forwarded to RHOBS cells via remote write (already allowlisted).
+      # These replace recording rules previously evaluated by the Dynatrace Prometheus.
+
+      # OAuth recording rules
+      - apiVersion: monitoring.rhobs/v1
+        kind: PrometheusRule
+        metadata:
+          name: rhobs-hcp-oauth-recording-rules
+          namespace: ${NAMESPACE}
+        spec:
+          groups:
+            - name: OauthRecordingRules
+              interval: 60s
+              rules:
+                - record: sre:oauth:deployment_pods_unavailable
+                  expr: |
+                    sum by (namespace, _id) ((
+                      label_replace(
+                        min by(namespace, deployment) (
+                          kube_deployment_status_replicas_unavailable{deployment=~"oauth-openshift|openshift-oauth-apiserver", namespace=~"ocm-.*-.*"}
+                        ),
+                        "exported_namespace",
+                        "$1-$2",
+                        "namespace",
+                        "(ocm-[^-]+)-([^-]+)-.*"
+                      )
+                    * on (exported_namespace) group_left (_id)
+                      (max by (exported_namespace, _id) (hypershift_cluster_vcpus) * 0 + 1)
+                    ))
+
+      # Node recording rules -- identify hypershift nodes, compute resource consumption
+      # Ported from dynatrace-config/rules/monitoring/Nodes.yaml
+      - apiVersion: monitoring.rhobs/v1
+        kind: PrometheusRule
+        metadata:
+          name: rhobs-hcp-node-recording-rules
+          namespace: ${NAMESPACE}
+        spec:
+          groups:
+            - name: NodeRecordingRules
+              interval: 30s
+              rules:
+                # Identify nodes with only the worker role (hypershift worker nodes)
+                - record: node:is_hypershift
+                  expr: |
+                    group by (node) (kube_node_role{role="worker"} unless on(node) kube_node_role{role!="worker"})
+                # Enrich hypershift nodes with _id, instance_type, and node_type
+                - record: hypershift_node:info
+                  expr: |
+                    node:is_hypershift * on(node) group_right()
+                    topk by (node) (1, group by (_id, node, instance_type, node_type) (
+                      label_replace(label_replace(label_replace(
+                        label_replace(kube_node_labels, "exported_namespace", "$0", "label_hypershift_openshift_io_cluster_namespace", ".*")
+                        * on (exported_namespace) group_left(_id)
+                        (group by (_id, exported_namespace) (hypershift_cluster_limited_support_enabled) or vector(1)),
+                      "instance_type", "$0", "label_node_kubernetes_io_instance_type", ".*"),
+                      "node_type", "serving", "_id", ".+"),
+                      "node_type", "non-serving", "_id", "")))
+                # Network baseline throughput by instance type (Gbps)
+                # m5/r5 family
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.large|r5.large"}) * 0.75
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.xlarge|r5.xlarge"}) * 1.25
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.2xlarge|r5.2xlarge"}) * 2.5
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.4xlarge|r5.4xlarge"}) * 5
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.8xlarge|r5.8xlarge"}) * 10
+                # m6i/r6i family
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.large|r6i.large"}) * 0.781
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.xlarge|r6i.xlarge"}) * 1.562
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.2xlarge|r6i.2xlarge"}) * 3.125
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.4xlarge|r6i.4xlarge"}) * 6.25
+                - record: hypershift_node:network:baseline_throughput_in_Gbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.8xlarge|r6i.8xlarge"}) * 12.5
+                - record: hypershift_node:network:baseline_throughput_in_bytes_per_second
+                  expr: hypershift_node:network:baseline_throughput_in_Gbps * 128 * 1024 * 1024
+                # Disk I/O baseline throughput by instance type (Mbps)
+                # m5/r5 family
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.large|r5.large"}) * 650
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.xlarge|r5.xlarge"}) * 1150
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.2xlarge|r5.2xlarge"}) * 2300
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.4xlarge|r5.4xlarge"}) * 4750
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m5.8xlarge|r5.8xlarge"}) * 6800
+                # m6i/r6i family
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.large|r6i.large"}) * 650
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.xlarge|r6i.xlarge"}) * 1250
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.2xlarge|r6i.2xlarge"}) * 2500
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.4xlarge|r6i.4xlarge"}) * 5000
+                - record: hypershift_node:disk_io:baseline_throughput_in_Mbps
+                  expr: group by (node) (hypershift_node:info{instance_type=~"m6i.8xlarge|r6i.8xlarge"}) * 10000
+                - record: hypershift_node:disk_io:baseline_throughput_in_bytes_per_second
+                  expr: hypershift_node:disk_io:baseline_throughput_in_Mbps * 128 * 1024
+                # Resource consumption metrics
+                - record: hypershift_node:consumption:cpu
+                  expr: |
+                    hypershift_node:info * on(node) group_left()
+                    label_replace(
+                      sum by (instance) (
+                        1 - sum by (instance, cpu) (avg by (instance, cpu, mode) (rate(node_cpu_seconds_total{mode=~"idle|iowait|steal"}[2m])))
+                      )
+                      /
+                      count by (instance) (
+                        group by (instance, cpu) (node_cpu_seconds_total)
+                      ),
+                    "node", "$0", "instance", ".*")
+                - record: hypershift_node:consumption:memory
+                  expr: |
+                    hypershift_node:info * on(node) group_left()
+                    label_replace(
+                      avg by (instance) (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes),
+                    "node", "$0", "instance", ".*")
+                - record: hypershift_node:consumption:network:out
+                  expr: |
+                    hypershift_node:info * on(node) group_left()
+                    (
+                      label_replace(sum by (instance) (
+                          avg by (instance, device) (rate(node_network_transmit_bytes_total{device=~"en.*"}[1m]))
+                      ), "node", "$0", "instance", ".*") / on(node)
+                      hypershift_node:network:baseline_throughput_in_bytes_per_second
+                    )
+                - record: hypershift_node:consumption:network:in
+                  expr: |
+                    hypershift_node:info * on(node) group_left()
+                    (
+                      label_replace(sum by (instance) (
+                        avg by (instance, device) (rate(node_network_receive_bytes_total{device=~"en.*"}[1m]))
+                      ), "node", "$0", "instance", ".*") / on(node)
+                      hypershift_node:network:baseline_throughput_in_bytes_per_second
+                    )
+                - record: hypershift_node:consumption:filesystem
+                  expr: |
+                    hypershift_node:info * on(node) group_right(_id, instance_type, node_type)
+                    label_replace(label_replace(
+                      avg by (instance, device, mountpoint, fstype) (1  - node_filesystem_avail_bytes/node_filesystem_size_bytes),
+                    "node", "$0", "instance", ".*"),
+                    "instance", "", "", "")
+                - record: hypershift_node:consumption:disk_io:out
+                  expr: |
+                    hypershift_node:info * on(node) group_left()
+                    (
+                      label_replace(sum by (instance) (
+                        avg by (instance, device) (rate(node_disk_written_bytes_total[1m]))
+                      ), "node", "$0", "instance", ".*") / on(node)
+                      hypershift_node:disk_io:baseline_throughput_in_bytes_per_second
+                    )
+                - record: hypershift_node:consumption:disk_io:in
+                  expr: |
+                    hypershift_node:info * on(node) group_left()
+                    (
+                      label_replace(sum by (instance) (
+                        avg by (instance, device) (rate(node_disk_read_bytes_total[1m]))
+                      ), "node", "$0", "instance", ".*") / on(node)
+                      hypershift_node:disk_io:baseline_throughput_in_bytes_per_second
+                    )
+                # Node readiness and condition tracking
+                - record: hypershift_node:ready
+                  expr: |
+                    hypershift_node:info * on(node) group_left()
+                    min by (node) (kube_node_status_condition{condition="Ready", status="true"})
+                - record: hypershift_node:in_bad_condition
+                  expr: |
+                    hypershift_node:info * on(node) group_right(_id, instance_type, node_type)
+                    max by (node, condition) (kube_node_status_condition{condition!="Ready", status="true"})
+                # High usage threshold variants
+                - record: hypershift_node:high_usage
+                  expr: hypershift_node:consumption:cpu > 0.9
+                  labels:
+                    resource: CPU
+                    threshold: "90%"
+                - record: hypershift_node:high_usage
+                  expr: hypershift_node:consumption:memory > 0.8
+                  labels:
+                    resource: memory
+                    threshold: "80%"
+                - record: hypershift_node:high_usage
+                  expr: hypershift_node:consumption:network:out > 0.9
+                  labels:
+                    resource: "network_out"
+                    threshold: "90%"
+                - record: hypershift_node:high_usage
+                  expr: hypershift_node:consumption:network:in > 0.9
+                  labels:
+                    resource: "network_in"
+                    threshold: "90%"
+                - record: hypershift_node:high_usage
+                  expr: hypershift_node:consumption:filesystem > 0.9
+                  labels:
+                    resource: filesystem
+                    threshold: "90%"
+                - record: hypershift_node:high_usage
+                  expr: hypershift_node:consumption:disk_io:out > 0.9
+                  labels:
+                    resource: "disk_IO_out"
+                    threshold: "90%"
+                - record: hypershift_node:high_usage
+                  expr: hypershift_node:consumption:disk_io:in > 0.9
+                  labels:
+                    resource: "disk_IO_in"
+                    threshold: "90%"
