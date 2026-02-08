@@ -211,6 +211,14 @@ objects:
                       cluster_autoscaler_errors_total;.*|\
                       cluster_autoscaler_failed_scale_ups_total;.*|\
                       cluster_autoscaler:pod_status_ready;.*|\
+                      acm_managed_cluster_status_condition;.*|\
+                      acm_manifestwork_status_condition;.*|\
+                      acm_manifestwork_count;.*|\
+                      sre_acm_manifestwork_applied_success_total;.*|\
+                      sre_acm_manifestwork_applied_failed_total;.*|\
+                      sre_acm_manifestwork_applied_unknown_total;.*|\
+                      sre_acm_manifestwork_applied_total;.*|\
+                      sre_acm_manifestwork_applied_failed_ratio;.*|\
                       cluster_operator_conditions;.*|\
                       cluster_operator_up;.*|\
                       core_cluster_operator:down:filtered;.*|\
@@ -460,6 +468,9 @@ objects:
                   certmanager_certificate_expiration_timestamp_seconds|\
                   certmanager_certificate_ready_status|\
                   kube_node_status_condition|\
+                  acm_managed_cluster_status_condition|\
+                  acm_manifestwork_status_condition|\
+                  acm_manifestwork_count|\
                   node_filesystem_avail_bytes|\
                   node_filesystem_size_bytes|\
                   node_disk_written_bytes_total|\
@@ -694,3 +705,52 @@ objects:
                   labels:
                     resource: "disk_IO_in"
                     threshold: "90%"
+
+      # ACM ManifestWork recording rules (SC-specific)
+      # Evaluated on SCs where acm_manifestwork_status_condition metrics exist
+      - apiVersion: monitoring.rhobs/v1
+        kind: PrometheusRule
+        metadata:
+          name: rhobs-sc-acm-manifestwork-recording-rules
+          namespace: ${NAMESPACE}
+        spec:
+          groups:
+            - name: ACMManifestWorkRecordingRules
+              interval: 60s
+              rules:
+                - record: sre_acm_manifestwork_applied_success_total
+                  labels:
+                    service: server-foundation
+                    otel_collect: "true"
+                  expr: |
+                    count(acm_manifestwork_status_condition{condition="Applied", status="true"} == 1) or vector(0)
+                - record: sre_acm_manifestwork_applied_failed_total
+                  labels:
+                    service: server-foundation
+                    otel_collect: "true"
+                  expr: |
+                    count(acm_manifestwork_status_condition{condition="Applied", status="false"} == 1) or vector(0)
+                - record: sre_acm_manifestwork_applied_unknown_total
+                  labels:
+                    service: server-foundation
+                    otel_collect: "true"
+                  expr: |
+                    count(acm_manifestwork_status_condition{condition="Applied", status="unknown"} == 1) or vector(0)
+                - record: sre_acm_manifestwork_applied_total
+                  labels:
+                    service: server-foundation
+                    otel_collect: "true"
+                  expr: |
+                    count(acm_manifestwork_status_condition{condition="Applied"} == 1) or vector(0)
+                - record: sre_acm_manifestwork_applied_failed_ratio
+                  labels:
+                    service: server-foundation
+                    otel_collect: "true"
+                  expr: |
+                    (
+                      count(acm_manifestwork_status_condition{condition="Applied", status="false"} == 1)
+                      /
+                      count(acm_manifestwork_status_condition{condition="Applied"} == 1)
+                    )
+                    and
+                    count(acm_manifestwork_status_condition{condition="Applied"} == 1) > 0
