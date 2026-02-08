@@ -19,7 +19,7 @@ JSONNET_SRC = $(shell find . -type f -not -path './*vendor_jsonnet/*' \( -name '
 JSONNET_VENDOR_DIR = vendor_jsonnet
 
 .PHONY: all
-all: $(JSONNET_VENDOR_DIR) prometheusrules grafana manifests whitelisted_metrics hcp-rules
+all: $(JSONNET_VENDOR_DIR) prometheusrules grafana manifests whitelisted_metrics hcp-rules sc-rules
 
 $(JSONNET_VENDOR_DIR): $(JB) jsonnetfile.json jsonnetfile.lock.json
 	@$(JB) install --jsonnetpkg-home="$(JSONNET_VENDOR_DIR)"
@@ -71,6 +71,11 @@ validate: $(OC)
 hcp-rules:
 	@echo ">>>>> Generating HCP tenant rules from split files"
 	./scripts/generate-hcp-rules.sh
+
+.PHONY: sc-rules
+sc-rules:
+	@echo ">>>>> Generating SC tenant rules from split files"
+	./scripts/generate-sc-rules.sh
 
 .PHONY: lint-hcp-rules
 lint-hcp-rules: hcp-rules $(PROMTOOL) $(YQ)
