@@ -24,6 +24,10 @@ jobs:
     uses: ./.github/workflows/generate.yaml
     with:
       cluster: rhobsp01ue1
+  rhobsp01sae1:
+    uses: ./.github/workflows/generate.yaml
+    with:
+      cluster: rhobsp01sae1
   build:
     runs-on: ubuntu-latest
     steps:

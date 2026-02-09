@@ -1,0 +1,509 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: thanos-rhobs
+objects:
+- apiVersion: monitoring.thanos.io/v1alpha1
+  kind: ThanosStore
+  metadata:
+    name: default
+    namespace: rhobs-production
+  spec:
+    baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
+    blockConfig:
+      blockDiscoveryStrategy: concurrent
+      blockFilesConcurrency: 1
+      blockMetaFetchConcurrency: 32
+    cachingBucketConfig:
+      externalCacheConfig:
+        key: thanos.yaml
+        name: thanos-bucket-cache-memcached
+    ignoreDeletionMarksDelay: 24h
+    imagePullPolicy: IfNotPresent
+    indexCacheConfig:
+      externalCacheConfig:
+        key: thanos.yaml
+        name: thanos-index-cache-memcached
+    indexHeaderConfig:
+      enableLazyReader: true
+      lazyDownloadStrategy: lazy
+      lazyReaderIdleTimeout: 5m
+    logFormat: logfmt
+    logLevel: info
+    objectStorageConfig:
+      key: thanos.yaml
+      name: default-thanos-bucket
+      optional: false
+    replicas: 3
+    resourceRequirements:
+      limits:
+        memory: 20Gi
+      requests:
+        cpu: 100m
+        memory: 1Gi
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    shardingStrategy:
+      shards: 3
+      type: block
+    storage:
+      size: 10Gi
+    storeLimitsOptions: {}
+    timeRangeConfig:
+      maxTime: -22h
+    version: 0dcacf2a5108328d537dbcf59fcabc9b69f08a2b
+  status: {}
+- apiVersion: monitoring.thanos.io/v1alpha1
+  kind: ThanosCompact
+  metadata:
+    annotations:
+      service.beta.openshift.io/serving-cert-secret-name: compact-tls
+      serviceaccounts.openshift.io/oauth-redirectreference.application: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-compact-rhobs"}}'
+    name: rhobs
+    namespace: rhobs-production
+  spec:
+    additionalArgs:
+    - --deduplication.replica-label=replica
+    additionalContainers:
+    - args:
+      - -provider=openshift
+      - -https-address=:8443
+      - -http-address=
+      - -email-domain=*
+      - -upstream=http://localhost:10902
+      - -openshift-service-account=thanos-compact-rhobs
+      - '-openshift-sar={"resource": "namespaces", "verb": "get", "name": "rhobs-production",
+        "namespace": "rhobs-production"}'
+      - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get",
+        "name": "rhobs-production", "namespace": "rhobs-production"}}'
+      - -tls-cert=/etc/tls/private/tls.crt
+      - -tls-key=/etc/tls/private/tls.key
+      - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+      - -cookie-secret-file=/etc/oauth-cookie/cookie.txt
+      - -openshift-ca=/etc/pki/tls/cert.pem
+      - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      image: registry.redhat.io/openshift4/ose-oauth-proxy:v4.14
+      name: oauth-proxy
+      ports:
+      - containerPort: 8443
+        name: https
+        protocol: TCP
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /etc/tls/private
+        name: tls
+        readOnly: true
+      - mountPath: /etc/oauth-cookie
+        name: oauth-cookie
+        readOnly: true
+    additionalServicePorts:
+    - name: https
+      port: 8443
+      targetPort: 8443
+    additionalVolumes:
+    - name: tls
+      secret:
+        secretName: compact-tls
+    - name: oauth-cookie
+      secret:
+        secretName: oauth-cookie
+    baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
+    compactConfig:
+      compactConcurrency: 1
+    debugConfig:
+      acceptMalformedIndex: true
+      haltOnError: true
+      maxCompactionLevel: 3
+    downsamplingConfig:
+      disable: false
+      downsamplingConcurrency: 1
+    imagePullPolicy: IfNotPresent
+    logFormat: logfmt
+    logLevel: info
+    objectStorageConfig:
+      key: thanos.yaml
+      name: default-thanos-bucket
+      optional: false
+    resourceRequirements:
+      limits:
+        memory: 20Gi
+      requests:
+        cpu: 100m
+        memory: 1Gi
+    retentionConfig:
+      fiveMinutes: 365d
+      oneHour: 365d
+      raw: 365d
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    storage:
+      size: 50Gi
+    version: 0dcacf2a5108328d537dbcf59fcabc9b69f08a2b
+  status: {}
+- apiVersion: monitoring.thanos.io/v1alpha1
+  kind: ThanosQuery
+  metadata:
+    name: rhobs
+    namespace: rhobs-production
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/component: query-layer
+                app.kubernetes.io/instance: thanos-query-rhobs
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
+    customStoreLabelSelector:
+      matchLabels:
+        app.kubernetes.io/part-of: thanos
+        operator.thanos.io/store-api: "true"
+    grpcProxyStrategy: lazy
+    imagePullPolicy: IfNotPresent
+    logFormat: logfmt
+    logLevel: info
+    podDisruptionBudgetConfig:
+      enable: false
+    queryFrontend:
+      additionalContainers:
+      - args:
+        - -provider=openshift
+        - -https-address=:8443
+        - -http-address=
+        - -email-domain=*
+        - -upstream=http://localhost:9090
+        - -openshift-service-account=thanos-query-frontend-rhobs
+        - '-openshift-sar={"resource": "namespaces", "verb": "get", "name": "rhobs-production",
+          "namespace": "rhobs-production"}'
+        - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get",
+          "name": "rhobs-production", "namespace": "rhobs-production"}}'
+        - -tls-cert=/etc/tls/private/tls.crt
+        - -tls-key=/etc/tls/private/tls.key
+        - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+        - -cookie-secret-file=/etc/oauth-cookie/cookie.txt
+        - -openshift-ca=/etc/pki/tls/cert.pem
+        - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        image: registry.redhat.io/openshift4/ose-oauth-proxy:v4.14
+        name: oauth-proxy
+        ports:
+        - containerPort: 8443
+          name: https
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /etc/tls/private
+          name: tls
+          readOnly: true
+        - mountPath: /etc/oauth-cookie
+          name: oauth-cookie
+          readOnly: true
+      additionalServicePorts:
+      - name: https
+        port: 8443
+        targetPort: 8443
+      additionalVolumes:
+      - name: tls
+        secret:
+          secretName: query-frontend-tls
+      - name: oauth-cookie
+        secret:
+          secretName: oauth-cookie
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: query-frontend
+                  app.kubernetes.io/instance: thanos-query-frontend-rhobs
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      annotations:
+        service.beta.openshift.io/serving-cert-secret-name: query-frontend-tls
+        serviceaccounts.openshift.io/oauth-redirectreference.application: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}'
+      baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
+      compressResponses: true
+      imagePullPolicy: IfNotPresent
+      labelsDefaultTimeRange: 336h
+      labelsMaxRetries: 3
+      labelsSplitInterval: 48h
+      logFormat: logfmt
+      logLevel: info
+      logQueriesLongerThan: 10s
+      queryLabelSelector:
+        matchLabels:
+          operator.thanos.io/query-api: "true"
+      queryRangeMaxRetries: 3
+      queryRangeResponseCacheConfig:
+        externalCacheConfig:
+          key: thanos.yaml
+          name: thanos-query-range-cache-memcached
+      queryRangeSplitInterval: 48h
+      replicas: 3
+      resourceRequirements:
+        limits:
+          memory: 20Gi
+        requests:
+          cpu: 100m
+          memory: 1Gi
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      version: 0dcacf2a5108328d537dbcf59fcabc9b69f08a2b
+    replicaLabels:
+    - prometheus_replica
+    - replica
+    - rule_replica
+    replicas: 3
+    resourceRequirements:
+      limits:
+        memory: 20Gi
+      requests:
+        cpu: 100m
+        memory: 1Gi
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    telemetryQuantiles:
+      duration:
+      - "0.1"
+      - "0.25"
+      - "0.75"
+      - "1.25"
+      - "1.75"
+      - "2.5"
+      - "3"
+      - "5"
+      - "10"
+      - "15"
+      - "30"
+      - "60"
+      - "120"
+    version: 0dcacf2a5108328d537dbcf59fcabc9b69f08a2b
+    webConfig:
+      prefixHeader: X-Forwarded-Prefix
+  status:
+    querierStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
+    queryFrontendStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
+- apiVersion: monitoring.thanos.io/v1alpha1
+  kind: ThanosReceive
+  metadata:
+    name: rhobs
+    namespace: rhobs-production
+  spec:
+    ingesterSpec:
+      defaultObjectStorageConfig:
+        key: thanos.yaml
+        name: default-thanos-bucket
+        optional: false
+      hashrings:
+      - affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: thanos-receive-ingester
+                    app.kubernetes.io/instance: thanos-receive-ingester-rhobs-default
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        asyncForwardWorkerCount: 50
+        baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
+        externalLabels:
+          replica: $(POD_NAME)
+        imagePullPolicy: IfNotPresent
+        logFormat: logfmt
+        logLevel: info
+        name: default
+        objectStorageConfig:
+          key: thanos.yaml
+          name: default-thanos-bucket
+          optional: false
+        replicas: 3
+        resourceRequirements:
+          requests:
+            cpu: "2"
+            memory: 15Gi
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
+        storage:
+          size: 10Gi
+        storeLimitsOptions: {}
+        tenancyConfig:
+          defaultTenantID: FB870BF3-9F3A-44FF-9BF7-D7A047A52F43
+          tenantHeader: THANOS-TENANT
+          tenantLabelName: tenant_id
+          tenantMatcherType: exact
+        tooFarInFutureTimeWindow: 5m
+        tsdbConfig:
+          retention: 1d
+        version: 0dcacf2a5108328d537dbcf59fcabc9b69f08a2b
+    routerSpec:
+      additionalArgs:
+      - "--receive.grpc-service-config={\n  \"loadBalancingPolicy\":\"round_robin\",\n
+        \ \"retryPolicy\": {\n    \"maxAttempts\": 0,\n    \"initialBackoff\": \"0.1s\",\n
+        \   \"backoffMultiplier\": 1,\n    \"retryableStatusCodes\": [\n  \t  \"UNAVAILABLE\"\n
+        \   ]\n  }\n}"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: thanos-receive-router
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
+      externalLabels:
+        receive: "true"
+      imagePullPolicy: IfNotPresent
+      logFormat: logfmt
+      logLevel: info
+      podDisruptionBudgetConfig:
+        enable: true
+      replicas: 3
+      replicationFactor: 3
+      resourceRequirements:
+        requests:
+          cpu: "1"
+          memory: 5Gi
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      version: 0dcacf2a5108328d537dbcf59fcabc9b69f08a2b
+  status:
+    routerStatus:
+      availableReplicas: 0
+      readyReplicas: 0
+      replicas: 0
+      unavailableReplicas: 0
+      updatedReplicas: 0
+- apiVersion: monitoring.thanos.io/v1alpha1
+  kind: ThanosRuler
+  metadata:
+    name: rhobs
+    namespace: rhobs-production
+  spec:
+    alertLabelDrop:
+    - rule_replica
+    alertmanagerURL: dnssrv+http://alertmanager-cluster.rhobs-production.svc.cluster.local:9093
+    baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
+    defaultObjectStorageConfig:
+      key: thanos.yaml
+      name: default-thanos-bucket
+      optional: false
+    evaluationInterval: 1m
+    externalLabels:
+      rule_replica: $(NAME)
+    imagePullPolicy: IfNotPresent
+    logFormat: logfmt
+    logLevel: info
+    queryLabelSelector:
+      matchLabels:
+        app.kubernetes.io/part-of: thanos
+        operator.thanos.io/query-api: "true"
+    replicas: 1
+    resourceRequirements:
+      limits:
+        memory: 5Gi
+      requests:
+        cpu: 100m
+        memory: 1Gi
+    retention: 48h
+    ruleConfigSelector:
+      matchLabels:
+        operator.thanos.io/prometheus-rule: "true"
+    ruleTenancyConfig:
+      tenantLabel: tenant_id
+      tenantValueLabel: operator.thanos.io/tenant
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    storage:
+      size: 10Gi
+    version: 0dcacf2a5108328d537dbcf59fcabc9b69f08a2b
+  status: {}
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app.kubernetes.io/part-of: thanos
+    name: thanos-compact-rhobs
+    namespace: rhobs-production
+  spec:
+    host: ""
+    port:
+      targetPort: https
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: reencrypt
+    to:
+      kind: Service
+      name: thanos-compact-rhobs
+      weight: 100
+  status:
+    ingress: null
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app.kubernetes.io/part-of: thanos
+    name: thanos-query-frontend-rhobs
+    namespace: rhobs-production
+  spec:
+    host: ""
+    port:
+      targetPort: https
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: reencrypt
+    to:
+      kind: Service
+      name: thanos-query-frontend-rhobs
+      weight: 100
+  status:
+    ingress: null
+parameters:
+- from: '[a-zA-Z0-9]{40}'
+  generate: expression
+  name: OAUTH_PROXY_COOKIE_SECRET
