@@ -22,7 +22,7 @@ func init() {
 			WithTracingEnabled(),
 			WithTenants(rhobsp01ue1Tenants()),
 			WithRBAC(rhobsp01ue1RBAC()),
-			WithCustomRoute("rhobs.us-east-1-0.api.openshift.com"),
+			WithCustomRoute("us-east-1-0.rhobs.api.openshift.com"),
 		),
 		Templates:  rhobsp01ue1TemplateMaps(),
 		BuildSteps: rhobsp01ue1BuildSteps(),

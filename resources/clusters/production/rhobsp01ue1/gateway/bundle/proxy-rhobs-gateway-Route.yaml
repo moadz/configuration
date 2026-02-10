@@ -12,7 +12,7 @@ metadata:
   name: rhobs-gateway
   namespace: rhobs-production
 spec:
-  host: rhobs.us-east-1-0.api.openshift.com
+  host: us-east-1-0.rhobs.api.openshift.com
   port:
     targetPort: public
   tls:

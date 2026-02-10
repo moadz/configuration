@@ -12,7 +12,7 @@ metadata:
   name: rhobs-gateway
   namespace: rhobs-stage
 spec:
-  host: rhobs.us-west-2-0.api.stage.openshift.com
+  host: us-west-2-0.rhobs.api.stage.openshift.com
   port:
     targetPort: public
   tls:
