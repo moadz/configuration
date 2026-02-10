@@ -19,6 +19,7 @@
 #   - hcp/oauth.yaml           (OAuth service health)
 #   - hcp/observability.yaml   (watchdog, prometheus targets)
 #   - hcp/splunk.yaml          (SAE deployment)
+#   - hcp/synthetics.yaml      (synthetic monitoring component health)
 # ============================================================================
 apiVersion: template.openshift.io/v1
 kind: Template
@@ -1185,3 +1186,50 @@ objects:
               labels:
                 severity: warning
                 otel_collect: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PrometheusRule
+    metadata:
+      name: rhobs-synthetics-rmo
+      namespace: ${NAMESPACE}
+      labels:
+        operator.thanos.io/prometheus-rule: "true"
+        operator.thanos.io/tenant: ${TENANT}
+    spec:
+      groups:
+        - name: rhobs-synthetics-rmo
+          interval: 1m
+          rules:
+            - alert: RMOAPIRequestErrorRate
+              expr: |
+                (
+                  rate(rhobs_route_monitor_operator_api_requests_total{status="error"}[10m])
+                  /
+                  rate(rhobs_route_monitor_operator_api_requests_total[10m])
+                ) > 0.5
+              for: 15m
+              labels:
+                severity: warning
+                service: rhobs-synthetics
+              annotations:
+                summary: RMO on {{ $labels.mc_name }} has high RHOBS API error rate
+                description: Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) has >50% API request error rate for 15 minutes.
+            - alert: RMOOIDCTokenRefreshFailures
+              expr: |
+                rate(rhobs_route_monitor_operator_oidc_token_refresh_total{status="error"}[10m]) > 0
+                unless
+                rate(rhobs_route_monitor_operator_oidc_token_refresh_total{status="success"}[10m]) > 0
+              for: 15m
+              labels:
+                severity: warning
+                service: rhobs-synthetics
+              annotations:
+                summary: RMO on {{ $labels.mc_name }} cannot refresh OIDC tokens
+                description: Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) has had no successful OIDC token refreshes for 15 minutes. Probe lifecycle operations will fail.
+            - alert: RMOProbeDeletionTimeout
+              expr: increase(rhobs_route_monitor_operator_probe_deletion_timeout_total[1h]) > 0
+              labels:
+                severity: warning
+                service: rhobs-synthetics
+              annotations:
+                summary: RMO on {{ $labels.mc_name }} had probe deletion timeouts
+                description: Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) triggered fail-open behavior during probe deletion. Orphaned probes may exist and require manual cleanup.

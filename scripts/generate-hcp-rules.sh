@@ -27,6 +27,7 @@ FILES=(
     "api-server.yaml"
     "kube-api-error-budget.yaml"
     "splunk.yaml"
+    "synthetics.yaml"
 )
 
 # Create temporary files
@@ -71,6 +72,7 @@ cat > "$OUTPUT_FILE" << 'HEADER'
 #   - hcp/oauth.yaml           (OAuth service health)
 #   - hcp/observability.yaml   (watchdog, prometheus targets)
 #   - hcp/splunk.yaml          (SAE deployment)
+#   - hcp/synthetics.yaml      (synthetic monitoring component health)
 # ============================================================================
 HEADER
 
