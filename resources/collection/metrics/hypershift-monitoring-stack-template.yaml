@@ -279,6 +279,7 @@ objects:
                       sre:nodepool:invalid_payload_nodepool_provision_failure;.*|\
                       vector_component_sent_events_total;.*|\
                       probe_success;.*|\
+                      rhobs_route_monitor_operator_.*;.*|\
                       certmanager_certificate_expiration_timestamp_seconds;.*|\
                       certmanager_certificate_ready_status;.*|\
                       mce_hs_addon_failed_reconcile_count;.*|\
@@ -440,6 +441,7 @@ objects:
                   kube_pod_container_status_restarts_total|\
                   controller_runtime_reconcile_total|\
                   controller_runtime_reconcile_errors_total|\
+                  rhobs_route_monitor_operator_.*|\
                   workqueue_depth|\
                   node_cpu_seconds_total|\
                   node_memory_MemTotal_bytes|\
