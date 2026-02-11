@@ -1233,3 +1233,12 @@ objects:
               annotations:
                 summary: RMO on {{ $labels.mc_name }} had probe deletion timeouts
                 description: Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) triggered fail-open behavior during probe deletion. Orphaned probes may exist and require manual cleanup.
+            - alert: RMOMetricsAbsent
+              expr: absent(rhobs_route_monitor_operator_info)
+              for: 15m
+              labels:
+                severity: critical
+                service: rhobs-synthetics
+              annotations:
+                summary: RMO metrics are absent from all MCs
+                description: No route-monitor-operator metrics have been received from any MC for 15 minutes. The RMO may not be running or MC metric collection may be broken.

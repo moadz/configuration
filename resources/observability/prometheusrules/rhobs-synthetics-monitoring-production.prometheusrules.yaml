@@ -90,3 +90,33 @@ spec:
       labels:
         service: rhobs-synthetics
         severity: warning
+  - name: rhobs-synthetics-watchdog
+    rules:
+    - alert: SyntheticsAgentReconcileStale
+      annotations:
+        description: The synthetics-agent has not completed a reconciliation cycle in over 5 minutes (it normally runs every 30 seconds). The agent may be hung or crashed without the process exiting.
+        summary: Synthetics Agent reconciliation is stale
+      expr: |
+        (time() - rhobs_synthetics_agent_last_reconciliation_timestamp_seconds) > 300
+      for: 2m
+      labels:
+        service: rhobs-synthetics
+        severity: critical
+    - alert: SyntheticsAPIMetricsAbsent
+      annotations:
+        description: No metrics are being received from the synthetics-api. The service may be completely down or its metrics endpoint may be unreachable.
+        summary: Synthetics API metrics are absent
+      expr: absent(up{job="synthetics-api"})
+      for: 10m
+      labels:
+        service: rhobs-synthetics
+        severity: critical
+    - alert: SyntheticsAgentMetricsAbsent
+      annotations:
+        description: No metrics are being received from the synthetics-agent. The service may be completely down or its metrics endpoint may be unreachable.
+        summary: Synthetics Agent metrics are absent
+      expr: absent(up{job="synthetics-agent"})
+      for: 10m
+      labels:
+        service: rhobs-synthetics
+        severity: critical
