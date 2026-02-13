@@ -117,31 +117,22 @@ objects:
           cpu: 500m
           memory: 1Gi
 
-  # Grant the MonitoringStack Prometheus access to cluster metrics
-  - apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRoleBinding
-    metadata:
-      labels:
-        managed.openshift.io/osd: "true"
-      name: rhobs-ocm-ms-view
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: ClusterRole
-      name: cluster-monitoring-view
-    subjects:
-      - kind: ServiceAccount
-        name: rhobs-ocm-monitoring-stack-prometheus
-        namespace: ${NAMESPACE}
-
   # Federation ServiceMonitor to collect OCM namespace metrics from CMO Prometheus
+  # Deployed in ${NAMESPACE} with namespaceSelector to target openshift-monitoring
+  # NOTE: ClusterRoleBinding for cluster-monitoring-view must be deployed separately
+  # (e.g., via namespace openshiftResources) since saas-deploy should not create
+  # cluster-scoped resources.
   - apiVersion: monitoring.rhobs/v1
     kind: ServiceMonitor
     metadata:
       labels:
         app.kubernetes.io/name: prometheus
       name: ocm-cmo-federate
-      namespace: ${OPENSHIFT_MONITORING_NAMESPACE}
+      namespace: ${NAMESPACE}
     spec:
+      namespaceSelector:
+        matchNames:
+          - ${OPENSHIFT_MONITORING_NAMESPACE}
       selector:
         matchLabels:
           app.kubernetes.io/component: prometheus
