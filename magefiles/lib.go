@@ -47,6 +47,7 @@ var migratedClusters = []clusters.ClusterName{
 	clusters.ClusterRHOBSUSWestTwoStaging,
 	clusters.ClusterRHOBSUSEastOneProduction,
 	clusters.ClusterRHOBSUSouthAmericaEastOneProduction,
+	clusters.ClusterRHOBSUEuropeWestOneProduction,
 }
 
 func isMigratedCluster(config clusters.ClusterConfig) bool {
