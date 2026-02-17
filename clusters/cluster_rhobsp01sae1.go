@@ -7,12 +7,12 @@ import (
 )
 
 const (
-	ClusterRHOBSUSouthAmericaEastOneProduction ClusterName = "rhobsp01sae1"
+	ClusterRHOBSSouthAmericaEastOneProduction ClusterName = "rhobsp01sae1"
 )
 
 func init() {
 	RegisterCluster(ClusterConfig{
-		Name:        ClusterRHOBSUSouthAmericaEastOneProduction,
+		Name:        ClusterRHOBSSouthAmericaEastOneProduction,
 		Environment: EnvironmentProduction,
 		Namespace:   "rhobs-production",
 		GatewayConfig: NewGatewayConfig(

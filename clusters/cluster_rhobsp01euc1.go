@@ -7,12 +7,12 @@ import (
 )
 
 const (
-	ClusterRHOBSEuropeWestOneProduction ClusterName = "rhobsp01euw1"
+	ClusterRHOBSEuropeCentralOneProduction ClusterName = "rhobsp01euc1"
 )
 
 func init() {
 	RegisterCluster(ClusterConfig{
-		Name:        ClusterRHOBSEuropeWestOneProduction,
+		Name:        ClusterRHOBSEuropeCentralOneProduction,
 		Environment: EnvironmentProduction,
 		Namespace:   "rhobs-production",
 		GatewayConfig: NewGatewayConfig(
@@ -20,16 +20,16 @@ func init() {
 			WithLoggingEnabled(),
 			WithSyntheticsEnabled(),
 			WithTracingEnabled(),
-			WithTenants(rhobsp01euw1Tenants()),
-			WithRBAC(rhobsp01euw1RBAC()),
-			WithCustomRoute("eu-west-1-0.rhobs.api.openshift.com"),
+			WithTenants(rhobsp01euc1Tenants()),
+			WithRBAC(rhobsp01euc1RBAC()),
+			WithCustomRoute("eu-central-1-0.rhobs.api.openshift.com"),
 		),
-		Templates:  rhobsp01euw1TemplateMaps(),
-		BuildSteps: rhobsp01euw1BuildSteps(),
+		Templates:  rhobsp01euc1TemplateMaps(),
+		BuildSteps: rhobsp01euc1BuildSteps(),
 	})
 }
 
-func rhobsp01euw1Tenants() observatoriumapi.Tenants {
+func rhobsp01euc1Tenants() observatoriumapi.Tenants {
 	return observatoriumapi.Tenants{
 		Tenants: []observatoriumapi.Tenant{
 			{
@@ -47,7 +47,7 @@ func rhobsp01euw1Tenants() observatoriumapi.Tenants {
 	}
 }
 
-func rhobsp01euw1RBAC() cfgobservatorium.ObservatoriumRBAC {
+func rhobsp01euc1RBAC() cfgobservatorium.ObservatoriumRBAC {
 	opts := &cfgobservatorium.BindingOpts{}
 	opts.WithServiceAccountName("cd54dce2-590e-4ea4-9b83-a83c58205962").
 		WithTenant(cfgobservatorium.HcpTenant).
@@ -59,7 +59,7 @@ func rhobsp01euw1RBAC() cfgobservatorium.ObservatoriumRBAC {
 	return *config
 }
 
-func rhobsp01euw1BuildSteps() []string {
+func rhobsp01euc1BuildSteps() []string {
 	return []string{
 		StepGateway,
 		StepDefaultThanosStack,
@@ -69,7 +69,7 @@ func rhobsp01euw1BuildSteps() []string {
 	}
 }
 
-// rhobsp01euw1TemplateMaps returns template mappings specific to the rhobsp01euw1 production cluster
-func rhobsp01euw1TemplateMaps() TemplateMaps {
+// rhobsp01euc1TemplateMaps returns template mappings specific to the rhobsp01euc1 production cluster
+func rhobsp01euc1TemplateMaps() TemplateMaps {
 	return DefaultBaseTemplate().Override()
 }
