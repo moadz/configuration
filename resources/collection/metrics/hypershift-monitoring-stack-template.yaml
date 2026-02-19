@@ -279,6 +279,7 @@ objects:
                       sre:nodepool:invalid_payload_nodepool_provision_failure;.*|\
                       vector_component_sent_events_total;.*|\
                       probe_success;.*|\
+                      probe_http_duration_seconds;.*|\
                       rhobs_route_monitor_operator_.*;.*|\
                       certmanager_certificate_expiration_timestamp_seconds;.*|\
                       certmanager_certificate_ready_status;.*|\
