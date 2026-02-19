@@ -27,7 +27,7 @@ $(JSONNET_VENDOR_DIR): $(JB) jsonnetfile.json jsonnetfile.lock.json
 
 .PHONY: update
 update: $(JB) jsonnetfile.json jsonnetfile.lock.json
-	@$(JB) update --jsonnetpkg-home="$(JSONNET_VENDOR_DIR)" https://github.com/observatorium/observatorium/configuration@main
+	@$(JB) update --jsonnetpkg-home="$(JSONNET_VENDOR_DIR)" https://github.com/openshift/telemeter/jsonnet/telemeter@main
 
 .PHONY: format
 format: $(JSONNET_SRC) $(JSONNETFMT) go-format
