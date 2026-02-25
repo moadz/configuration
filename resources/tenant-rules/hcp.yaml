@@ -377,7 +377,7 @@ objects:
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/HCPPrometheusPodMonitorDown.md
                 description: PodMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} has been down for 30m.
             - alert: HCPPrometheusServiceMonitorDown
-              expr: (sre:hcp_servicemonitor_up:sum{name!~"node-tuning-operator|ovnkube-control-plane|cluster-version-operator"} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
+              expr: (sre:hcp_servicemonitor_up:sum{name!~"node-tuning-operator|ovnkube-control-plane|cluster-version-operator|olm-operator-metrics|catalog-operator-metrics"} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 30m
               labels:
                 severity: critical
