@@ -33,7 +33,7 @@ objects:
               annotations:
                 summary: "No `watchdog` heartbeat for {{ $labels._id }} detected"
                 description: "No `watchdog` heartbeat for {{ $labels._id }} detected. This means the alerting stack is not functioning properly and alerts may not fire."
-                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/DeadMansSnitch.md"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/DeadMansSnitch.md"
               expr: sum by (_id, _mc_id, region, sector) (vector(1)) unless on (_id) (watchdog or hypershift_cluster_alerts_disabled)
               for: 15m
               labels:
@@ -62,7 +62,7 @@ objects:
                 severity: critical
               annotations:
                 summary: "PodMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} is down."
-                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/HCPPrometheusPodMonitorDown.md"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/HCPPrometheusPodMonitorDown.md"
                 description: "PodMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} has been down for 30m."
             # Until https://issues.redhat.com/browse/OCPBUGS-55399 is resolved, node-tuning-operator metrics do not work in HyperShift
             # Until https://issues.redhat.com//browse/OCPBUGS-62851 is resolved, cluster-version-operator metrics do not work in HyperShift
@@ -75,5 +75,5 @@ objects:
                 severity: critical
               annotations:
                 summary: "ServiceMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} is down."
-                runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/HCPPrometheusServiceMonitorDown.md"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/HCPPrometheusServiceMonitorDown.md"
                 description: "ServiceMonitor {{ $labels.name }} in namespace {{ $labels.namespace }} has been down for 30m."

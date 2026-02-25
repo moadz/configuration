@@ -41,6 +41,7 @@ objects:
               annotations:
                 summary: "RMO on {{ $labels.mc_name }} has high RHOBS API error rate"
                 description: "Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) has >50% API request error rate for 15 minutes."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/RMOAPIRequestErrorRate.md"
             - alert: RMOOIDCTokenRefreshFailures
               expr: |
                 rate(rhobs_route_monitor_operator_oidc_token_refresh_total{status="error"}[10m]) > 0
@@ -53,6 +54,7 @@ objects:
               annotations:
                 summary: "RMO on {{ $labels.mc_name }} cannot refresh OIDC tokens"
                 description: "Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) has had no successful OIDC token refreshes for 15 minutes. Probe lifecycle operations will fail."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/RMOOIDCTokenRefreshFailures.md"
             - alert: RMOProbeDeletionTimeout
               expr: increase(rhobs_route_monitor_operator_probe_deletion_timeout_total[1h]) > 0
               labels:
@@ -61,6 +63,7 @@ objects:
               annotations:
                 summary: "RMO on {{ $labels.mc_name }} had probe deletion timeouts"
                 description: "Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) triggered fail-open behavior during probe deletion. Orphaned probes may exist and require manual cleanup."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/RMOProbeDeletionTimeout.md"
             - alert: RMOMetricsAbsent
               expr: absent(rhobs_route_monitor_operator_info)
               for: 15m
@@ -70,6 +73,7 @@ objects:
               annotations:
                 summary: "RMO metrics are absent from all MCs"
                 description: "No route-monitor-operator metrics have been received from any MC for 15 minutes. The RMO may not be running or MC metric collection may be broken."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/RMOMetricsAbsent.md"
 
   # Synthetics-API health alerts
   # synthetics-api runs on RHOBS cells, metrics scraped locally
@@ -95,6 +99,7 @@ objects:
               annotations:
                 summary: "Synthetics API is down"
                 description: "The synthetics-api service has been unreachable for 5 minutes. Probe lifecycle management is unavailable."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAPIDown.md"
             - alert: SyntheticsAPIHighErrorRate
               expr: |
                 (
@@ -109,6 +114,7 @@ objects:
               annotations:
                 summary: "Synthetics API has high probestore error rate"
                 description: "The synthetics-api has >10% probestore error rate for 10 minutes."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAPIHighErrorRate.md"
             - alert: SyntheticsAPIHighLatency
               expr: |
                 histogram_quantile(0.99, rate(rhobs_synthetics_api_http_request_duration_seconds_bucket[5m])) > 5
@@ -119,6 +125,7 @@ objects:
               annotations:
                 summary: "Synthetics API has high request latency"
                 description: "The synthetics-api p99 request latency has been above 5 seconds for 10 minutes."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAPIHighLatency.md"
             - alert: SyntheticsAPIMetricsAbsent
               expr: absent(up{job="synthetics-api"})
               for: 10m
@@ -128,6 +135,7 @@ objects:
               annotations:
                 summary: "Synthetics API metrics are absent"
                 description: "No metrics are being received from the synthetics-api. The service may be completely down or its metrics endpoint may be unreachable."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAPIMetricsAbsent.md"
 
   # Synthetics-Agent health alerts
   # synthetics-agent runs on RHOBS cells, metrics scraped locally
@@ -153,6 +161,7 @@ objects:
               annotations:
                 summary: "Synthetics Agent is down"
                 description: "The synthetics-agent has been unreachable for 5 minutes. Probe reconciliation is not running."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAgentDown.md"
             - alert: SyntheticsAgentReconcileFailures
               expr: |
                 (
@@ -167,6 +176,7 @@ objects:
               annotations:
                 summary: "Synthetics Agent has high reconciliation failure rate"
                 description: "The synthetics-agent has >50% reconciliation failure rate for 15 minutes. Probe CRs may not be getting created or updated."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAgentReconcileFailures.md"
             - alert: SyntheticsAgentFetchFailures
               expr: |
                 rate(rhobs_synthetics_agent_probe_list_fetch_total{status="error"}[10m]) > 0
@@ -179,6 +189,7 @@ objects:
               annotations:
                 summary: "Synthetics Agent cannot fetch probe list from API"
                 description: "The synthetics-agent has had no successful API fetches for 10 minutes. New probes will not be created and existing probes will not be reconciled."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAgentFetchFailures.md"
             - alert: SyntheticsAgentNoProbesManaged
               expr: rhobs_synthetics_agent_probe_resources_managed == 0
               for: 30m
@@ -188,6 +199,7 @@ objects:
               annotations:
                 summary: "Synthetics Agent is managing zero probes"
                 description: "The synthetics-agent has been managing zero probe CRs for 30 minutes. This may indicate a configuration issue or API connectivity problem."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAgentNoProbesManaged.md"
             - alert: SyntheticsAgentReconcileStale
               expr: |
                 (time() - rhobs_synthetics_agent_last_reconciliation_timestamp_seconds) > 300
@@ -198,6 +210,7 @@ objects:
               annotations:
                 summary: "Synthetics Agent reconciliation is stale"
                 description: "The synthetics-agent has not completed a reconciliation cycle in over 5 minutes (it normally runs every 30 seconds). The agent may be hung or crashed without the process exiting."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAgentReconcileStale.md"
             - alert: SyntheticsAgentMetricsAbsent
               expr: absent(up{job="synthetics-agent"})
               for: 10m
@@ -207,3 +220,4 @@ objects:
               annotations:
                 summary: "Synthetics Agent metrics are absent"
                 description: "No metrics are being received from the synthetics-agent. The service may be completely down or its metrics endpoint may be unreachable."
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/SyntheticsAgentMetricsAbsent.md"

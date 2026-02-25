@@ -33,7 +33,7 @@ objects:
                 severity: warning
               annotations:
                 message: "{{ $labels.nodepool_name }} nodepool on {{ $labels._id }} is not creating nodes"
-                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodePoolFailing.md
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/NodePoolFailing.md
                 summary: NodePool is not creating nodes
   # Nodes need upscaling warning
   - apiVersion: monitoring.coreos.com/v1
@@ -56,7 +56,7 @@ objects:
                 severity: warning
               annotations:
                 message: "HCP cluster {{ $labels._id }} is short on nodes"
-                runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/hypershift/NodesNeedUpscale.md
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/NodesNeedUpscale.md
                 summary: Nodes need upscaling
   # Cluster autoscaler down
   - apiVersion: monitoring.coreos.com/v1
