@@ -8,26 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  rhobsi01uw2:
-    uses: ./.github/workflows/generate.yaml
-    with:
-      cluster: rhobsi01uw2
-  rhobss01ue1:
-    uses: ./.github/workflows/generate.yaml
-    with:
-      cluster: rhobss01ue1
-  rhobss01uw2:
-    uses: ./.github/workflows/generate.yaml
-    with:
-      cluster: rhobss01uw2
-  rhobsp01ue1:
-    uses: ./.github/workflows/generate.yaml
-    with:
-      cluster: rhobsp01ue1
-  rhobsp01sae1:
-    uses: ./.github/workflows/generate.yaml
-    with:
-      cluster: rhobsp01sae1
   build:
     runs-on: ubuntu-latest
     steps:
