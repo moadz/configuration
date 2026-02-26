@@ -12,7 +12,7 @@ parameters:
     description: Tenant to deploy the rules to
     required: true
 objects:
-  # Watchdog and DeadMansSnitch
+  # Watchdog and HCPWatchdogDown
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
     metadata:
@@ -29,11 +29,11 @@ objects:
             # This alert fires when the `watchdog` heartbeat metric for a specific `_id` is missing.
             # If this fires, alerts for the referenced `_id` are not processing, meaning that
             # other alerts for that _id are not able to fire and a loss of observability has occurred.
-            - alert: DeadMansSnitch
+            - alert: HCPWatchdogDown
               annotations:
                 summary: "No `watchdog` heartbeat for {{ $labels._id }} detected"
                 description: "No `watchdog` heartbeat for {{ $labels._id }} detected. This means the alerting stack is not functioning properly and alerts may not fire."
-                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/DeadMansSnitch.md"
+                runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/HCPWatchdogDown.md"
               expr: sum by (_id, _mc_id, region, sector) (vector(1)) unless on (_id) (watchdog or hypershift_cluster_alerts_disabled)
               for: 15m
               labels:

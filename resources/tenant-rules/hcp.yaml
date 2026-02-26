@@ -343,11 +343,11 @@ objects:
         - name: watchdog
           interval: 30s
           rules:
-            - alert: DeadMansSnitch
+            - alert: HCPWatchdogDown
               annotations:
                 summary: No `watchdog` heartbeat for {{ $labels._id }} detected
                 description: No `watchdog` heartbeat for {{ $labels._id }} detected. This means the alerting stack is not functioning properly and alerts may not fire.
-                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/DeadMansSnitch.md
+                runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/HCPWatchdogDown.md
               expr: sum by (_id, _mc_id, region, sector) (vector(1)) unless on (_id) (watchdog or hypershift_cluster_alerts_disabled)
               for: 15m
               labels:
