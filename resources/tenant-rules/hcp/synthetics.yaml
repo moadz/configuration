@@ -64,15 +64,21 @@ objects:
                 summary: "RMO on {{ $labels.mc_name }} had probe deletion timeouts"
                 description: "Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) triggered fail-open behavior during probe deletion. Orphaned probes may exist and require manual cleanup."
                 runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/RMOProbeDeletionTimeout.md"
+            # Only fire if RMO metrics were recently present (proves RMO is
+            # deployed in this region). Avoids false positives in regions
+            # where RMO hasn't been rolled out yet.
             - alert: RMOMetricsAbsent
-              expr: absent(rhobs_route_monitor_operator_info)
-              for: 15m
+              expr: |
+                (absent(rhobs_route_monitor_operator_info) == 1)
+                unless
+                (absent_over_time(rhobs_route_monitor_operator_info[1h]) == 1)
+              for: 30m
               labels:
                 severity: critical
                 service: rhobs-synthetics
               annotations:
                 summary: "RMO metrics are absent from all MCs"
-                description: "No route-monitor-operator metrics have been received from any MC for 15 minutes. The RMO may not be running or MC metric collection may be broken."
+                description: "No route-monitor-operator metrics have been received from any MC for 30 minutes, but metrics were present within the last hour. The RMO may have stopped running or MC metric collection may be broken."
                 runbook_url: "https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/RMOMetricsAbsent.md"
 
   # Synthetics-API health alerts

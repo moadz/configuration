@@ -403,7 +403,7 @@ objects:
                 summary: Cluster operator is in degraded state.
                 description: The {{ $labels.name }} operator is reporting a degraded state for {{ $labels._id }}.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/ClusterOperatorDegraded.md
-              expr: (cluster_operator_conditions{condition="Degraded"} == 1) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
+              expr: (cluster_operator_conditions{condition="Degraded",_id!=""} == 1) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
                 severity: warning
@@ -413,7 +413,7 @@ objects:
                 summary: Cluster operator is unavailable.
                 description: The {{ $labels.name }} operator is unavailable for {{ $labels._id }}.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/ClusterOperatorDown.md
-              expr: (cluster_operator_conditions{condition="Available"} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
+              expr: (cluster_operator_conditions{condition="Available",_id!=""} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
                 severity: critical
@@ -1237,14 +1237,17 @@ objects:
                 description: Route-monitor-operator on MC {{ $labels.mc_name }} ({{ $labels.region }}) triggered fail-open behavior during probe deletion. Orphaned probes may exist and require manual cleanup.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/RMOProbeDeletionTimeout.md
             - alert: RMOMetricsAbsent
-              expr: absent(rhobs_route_monitor_operator_info)
-              for: 15m
+              expr: |
+                (absent(rhobs_route_monitor_operator_info) == 1)
+                unless
+                (absent_over_time(rhobs_route_monitor_operator_info[1h]) == 1)
+              for: 30m
               labels:
                 severity: critical
                 service: rhobs-synthetics
               annotations:
                 summary: RMO metrics are absent from all MCs
-                description: No route-monitor-operator metrics have been received from any MC for 15 minutes. The RMO may not be running or MC metric collection may be broken.
+                description: No route-monitor-operator metrics have been received from any MC for 30 minutes, but metrics were present within the last hour. The RMO may have stopped running or MC metric collection may be broken.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/rhobs-synthetics/RMOMetricsAbsent.md
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
