@@ -40,12 +40,17 @@ objects:
                 otel_collect: "true"
             # Exclude operators covered by CoreClusterOperatorDown (which has
             # smarter worker-node health gating and fires at warning severity).
+            # Gate on at least 1 healthy worker node to avoid critical pages when
+            # clusters have 0 workers (all dataplane operators will be unavailable).
             - alert: ClusterOperatorDown
               annotations:
                 summary: "Cluster operator is unavailable."
                 description: "The {{ $labels.name }} operator is unavailable for {{ $labels._id }}."
                 runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/ClusterOperatorDown.md"
-              expr: (cluster_operator_conditions{condition="Available",_id!="",name!~"console|network|monitoring|dns"} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
+              expr: |
+                (cluster_operator_conditions{condition="Available",_id!="",name!~"console|network|monitoring|dns"} == 0)
+                and on (namespace) (hcp_worker_nodes:available_count >= 1)
+                unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
                 severity: critical
