@@ -413,7 +413,7 @@ objects:
                 summary: Cluster operator is unavailable.
                 description: The {{ $labels.name }} operator is unavailable for {{ $labels._id }}.
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/v4/alerts/ClusterOperatorDown.md
-              expr: (cluster_operator_conditions{condition="Available",_id!=""} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
+              expr: (cluster_operator_conditions{condition="Available",_id!="",name!~"console|network|monitoring|dns"} == 0) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
                 severity: critical
