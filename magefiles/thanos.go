@@ -905,8 +905,8 @@ func TmpRulerCR(namespace string, templates clusters.TemplateMaps) *v1alpha1.Tha
 				},
 			},
 			RuleTenancyConfig: &v1alpha1.RuleTenancyConfig{
-				TenantLabel:      "tenant_id",
-				TenantValueLabel: "operator.thanos.io/tenant",
+				EnforcedTenantIdentifier: ptr.To("tenant_id"),
+				TenantSpecifierLabel:     ptr.To("operator.thanos.io/tenant"),
 			},
 			ObjectStorageConfig: clusters.TemplateFn("TELEMETER", templates.ObjectStorageBucket),
 			ExternalLabels: map[string]string{
@@ -1556,8 +1556,8 @@ func defaultRulerCR(namespace string, templates clusters.TemplateMaps) runtime.O
 				},
 			},
 			RuleTenancyConfig: &v1alpha1.RuleTenancyConfig{
-				TenantLabel:      "tenant_id",
-				TenantValueLabel: "operator.thanos.io/tenant",
+				EnforcedTenantIdentifier: ptr.To("tenant_id"),
+				TenantSpecifierLabel:     ptr.To("operator.thanos.io/tenant"),
 			},
 			ExternalLabels: map[string]string{
 				"rule_replica": "$(NAME)",
@@ -1777,8 +1777,8 @@ func rulerCR(namespace string, templates clusters.TemplateMaps) []runtime.Object
 				},
 				ObjectStorageConfig: clusters.TemplateFn("TELEMETER", templates.ObjectStorageBucket),
 				RuleTenancyConfig: &v1alpha1.RuleTenancyConfig{
-					TenantLabel:      "tenant_id",
-					TenantValueLabel: "operator.thanos.io/tenant",
+					EnforcedTenantIdentifier: ptr.To("tenant_id"),
+					TenantSpecifierLabel:     ptr.To("operator.thanos.io/tenant"),
 				},
 				AlertmanagerURL:    "dnssrv+http://alertmanager-cluster." + namespace + ".svc.cluster.local:9093",
 				AlertLabelDrop:     []string{"rule_replica"},

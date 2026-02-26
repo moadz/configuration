@@ -8,16 +8,16 @@ spec:
   - rule_replica
   alertmanagerURL: dnssrv+http://alertmanager-cluster.rhobs-int.svc.cluster.local:9093
   baseImage: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos
-  defaultObjectStorageConfig:
-    key: thanos.yaml
-    name: default-thanos-bucket
-    optional: false
   evaluationInterval: 1m
   externalLabels:
     rule_replica: $(NAME)
   imagePullPolicy: IfNotPresent
   logFormat: logfmt
   logLevel: info
+  objectStorageConfig:
+    key: thanos.yaml
+    name: default-thanos-bucket
+    optional: false
   queryLabelSelector:
     matchLabels:
       app.kubernetes.io/part-of: thanos
@@ -34,8 +34,8 @@ spec:
     matchLabels:
       operator.thanos.io/prometheus-rule: "true"
   ruleTenancyConfig:
-    tenantLabel: tenant_id
-    tenantValueLabel: operator.thanos.io/tenant
+    enforcedTenantIdentifier: tenant_id
+    tenantSpecifierLabel: operator.thanos.io/tenant
   securityContext:
     seccompProfile:
       type: RuntimeDefault

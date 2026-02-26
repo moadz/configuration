@@ -4738,30 +4738,6 @@ spec:
                 description: Base container image (without tags) to use for the Thanos
                   components deployed via operator.
                 type: string
-              defaultObjectStorageConfig:
-                description: ObjectStorageConfig is the secret that contains the object
-                  storage configuration for Ruler to upload blocks.
-                properties:
-                  key:
-                    description: The key of the secret to select from.  Must be a
-                      valid secret key.
-                    type: string
-                  name:
-                    default: ""
-                    description: |-
-                      Name of the referent.
-                      This field is effectively required, but due to backwards compatibility is
-                      allowed to be empty. Instances of this type with an empty value here are
-                      almost certainly wrong.
-                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                    type: string
-                  optional:
-                    description: Specify whether the Secret or its key must be defined
-                    type: boolean
-                required:
-                - key
-                type: object
-                x-kubernetes-map-type: atomic
               evaluationInterval:
                 default: 1m
                 description: EvaluationInterval is the default interval at which rules
@@ -4811,7 +4787,9 @@ spec:
               labels:
                 additionalProperties:
                   type: string
-                description: Labels are additional labels to add to the Ruler component.
+                description: |-
+                  Labels are additional labels to add to components.
+                  If labels are nested, the innermost nested label will take preference.
                 type: object
               logFormat:
                 default: logfmt
@@ -4834,6 +4812,30 @@ spec:
                 description: NodeSelector defines on which Nodes the workloads are
                   scheduled.
                 type: object
+              objectStorageConfig:
+                description: ObjectStorageConfig is the secret that contains the object
+                  storage configuration for Ruler to upload blocks.
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
+                type: object
+                x-kubernetes-map-type: atomic
               paused:
                 description: |-
                   When a resource is paused, no actions except for deletion
@@ -5043,21 +5045,16 @@ spec:
               ruleTenancyConfig:
                 description: RuleTenancyConfig is the configuration for the rule tenancy.
                 properties:
-                  tenantLabel:
+                  enforcedTenantIdentifier:
                     description: |-
-                      TenantLabel is the label that will be used to identify the tenant.
-                      Setting this value will mean, that all rules configured on ThanosRuler will
-                      have this labelname (with value to set the tenant label value).
-                      effectively <tenantLabelName> = <value of tenantValueLabel key>
+                      EnforcedTenantIdentifier will be injected into each Prometheus rule as a label to enforce tenancy
+                      For example if enforcedTenantIdentifier: "tenant_id" then up{} becomes up{tenant_id={TenantSpecifierLabelValue}
                     type: string
-                  tenantValueLabel:
-                    description: |-
-                      TenantValueLabel is the key of the PrometheusRule label that will be used to set the value of the tenant label
-                      for particular rules configured on ThanosRuler.
+                  tenantSpecifierLabel:
+                    description: TenantSpecifierLabel is the key of the label of the
+                      ConfigMap or PrometheusRule that will be used to set the value
+                      of the EnforcedTenantIdentifier
                     type: string
-                required:
-                - tenantLabel
-                - tenantValueLabel
                 type: object
               securityContext:
                 description: |-
@@ -5359,8 +5356,8 @@ spec:
                 type: string
             required:
             - alertmanagerURL
-            - defaultObjectStorageConfig
             - externalLabels
+            - objectStorageConfig
             - replicas
             - retention
             - ruleConfigSelector

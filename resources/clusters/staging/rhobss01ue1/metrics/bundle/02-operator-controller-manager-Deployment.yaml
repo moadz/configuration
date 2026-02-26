@@ -39,7 +39,7 @@ spec:
         - --log.level=debug
         command:
         - /manager
-        image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator:4b2242f42d204be12ab3350a7b3bbb02e0be399e
+        image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator:6390cb9cec28b7ffebec06f5049e0f937cbf216f
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
