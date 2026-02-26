@@ -1,0 +1,29 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: rhobs-gateway-service-monitor
+objects:
+- apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: rhobs-gateway
+      app.kubernetes.io/part-of: rhobs
+    name: rhobs-gateway
+  spec:
+    endpoints:
+    - interval: 30s
+      port: internal
+    - interval: 30s
+      port: metrics
+    namespaceSelector:
+      matchNames:
+      - rhobs-production
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: api
+        app.kubernetes.io/instance: rhobs
+        app.kubernetes.io/name: rhobs-gateway
+        app.kubernetes.io/part-of: rhobs

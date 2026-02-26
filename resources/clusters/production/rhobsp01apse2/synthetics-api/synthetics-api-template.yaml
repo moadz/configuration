@@ -1,0 +1,156 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: synthetics-api
+objects:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app.kubernetes.io/component: synthetics-api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: synthetics-api
+      app.kubernetes.io/part-of: rhobs
+      app.kubernetes.io/version: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+    name: synthetics-api
+    namespace: rhobs-production
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: synthetics-api
+        app.kubernetes.io/instance: rhobs
+        app.kubernetes.io/name: synthetics-api
+        app.kubernetes.io/part-of: rhobs
+        app.kubernetes.io/version: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/component: synthetics-api
+          app.kubernetes.io/instance: rhobs
+          app.kubernetes.io/name: synthetics-api
+          app.kubernetes.io/part-of: rhobs
+          app.kubernetes.io/version: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+      spec:
+        containers:
+        - env:
+          - name: NAMESPACE
+            value: rhobs-production
+          image: quay.io/redhat-services-prod/openshift/rhobs-synthetics-api:cea7d4656cd0ad338e580cc6ba266264a9938e5c
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 8080
+            initialDelaySeconds: 30
+          name: synthetics-api
+          ports:
+          - containerPort: 8080
+            name: synthetics-api
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 5
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePolicy: FallbackToLogsOnError
+        serviceAccountName: synthetics-api
+  status: {}
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    labels:
+      app.kubernetes.io/component: synthetics-api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: synthetics-api
+      app.kubernetes.io/part-of: rhobs
+      app.kubernetes.io/version: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+    name: synthetics-api
+    namespace: rhobs-production
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      app.kubernetes.io/component: synthetics-api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: synthetics-api
+      app.kubernetes.io/part-of: rhobs
+      app.kubernetes.io/version: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+    name: synthetics-api
+    namespace: rhobs-production
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: synthetics-api
+  subjects:
+  - kind: ServiceAccount
+    name: synthetics-api
+    namespace: rhobs-production
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app.kubernetes.io/component: synthetics-api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: synthetics-api
+      app.kubernetes.io/part-of: rhobs
+      app.kubernetes.io/version: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+    name: synthetics-api
+    namespace: rhobs-production
+  spec:
+    ports:
+    - name: synthetics-api
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app.kubernetes.io/component: synthetics-api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: synthetics-api
+      app.kubernetes.io/part-of: rhobs
+      app.kubernetes.io/version: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    labels:
+      app.kubernetes.io/component: synthetics-api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: synthetics-api
+      app.kubernetes.io/part-of: rhobs
+      app.kubernetes.io/version: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+    name: synthetics-api
+    namespace: rhobs-production
+parameters:
+- name: IMAGE_DIGEST
+- name: IMAGE_TAG
+  value: cea7d4656cd0ad338e580cc6ba266264a9938e5c
+- name: NAMESPACE
+  value: rhobs
