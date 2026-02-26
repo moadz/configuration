@@ -128,6 +128,9 @@ objects:
           - --whitelist={__name__="cluster:health:group_severity:count", severity=~"critical|warning|info|none"}
           - --whitelist={__name__="cluster:infrastructure_topology:info", mode=~"HighlyAvailable|SingleReplica"}
           - --whitelist={__name__="cluster:ingress_controller_aws_nlb_active:sum"}
+          - --whitelist={__name__="cluster:k8s_mcp_http_requests:sum"}
+          - --whitelist={__name__="cluster:k8s_mcp_tool_calls:sum"}
+          - --whitelist={__name__="cluster:k8s_mcp_tool_errors:sum"}
           - --whitelist={__name__="cluster:kata_monitor_running_shim_count:sum"}
           - --whitelist={__name__="cluster:kube_persistentvolume_plugin_type_counts:sum"}
           - --whitelist={__name__="cluster:kube_persistentvolumeclaim_resource_requests_storage_bytes:provisioner:sum"}
@@ -180,6 +183,7 @@ objects:
           - --whitelist={__name__="cnv:vmi_status_running:count"}
           - --whitelist={__name__="cnv_abnormal", reason=~"memory_working_set_delta_from_request|memory_rss_delta_from_request"}
           - --whitelist={__name__="code:apiserver_request_total:rate:sum"}
+          - --whitelist={__name__="collector:node_scrape_collector_success:avg",collector=~"ethtool|cpufreq|tcpstat|netdev|netclass|buddyinfo|mountstats|ksmd|processes|systemd"}
           - --whitelist={__name__="console_url"}
           - --whitelist={__name__="count:up0"}
           - --whitelist={__name__="count:up1"}
@@ -436,6 +440,9 @@ objects:
           - --whitelist={__name__="cluster:health:group_severity:count", severity=~"critical|warning|info|none"}
           - --whitelist={__name__="cluster:infrastructure_topology:info", mode=~"HighlyAvailable|SingleReplica"}
           - --whitelist={__name__="cluster:ingress_controller_aws_nlb_active:sum"}
+          - --whitelist={__name__="cluster:k8s_mcp_http_requests:sum"}
+          - --whitelist={__name__="cluster:k8s_mcp_tool_calls:sum"}
+          - --whitelist={__name__="cluster:k8s_mcp_tool_errors:sum"}
           - --whitelist={__name__="cluster:kata_monitor_running_shim_count:sum"}
           - --whitelist={__name__="cluster:kube_persistentvolume_plugin_type_counts:sum"}
           - --whitelist={__name__="cluster:kube_persistentvolumeclaim_resource_requests_storage_bytes:provisioner:sum"}
@@ -488,6 +495,7 @@ objects:
           - --whitelist={__name__="cnv:vmi_status_running:count"}
           - --whitelist={__name__="cnv_abnormal", reason=~"memory_working_set_delta_from_request|memory_rss_delta_from_request"}
           - --whitelist={__name__="code:apiserver_request_total:rate:sum"}
+          - --whitelist={__name__="collector:node_scrape_collector_success:avg",collector=~"ethtool|cpufreq|tcpstat|netdev|netclass|buddyinfo|mountstats|ksmd|processes|systemd"}
           - --whitelist={__name__="console_url"}
           - --whitelist={__name__="count:up0"}
           - --whitelist={__name__="count:up1"}
