@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/instance: rhobs
     app.kubernetes.io/name: rhobs-gateway
     app.kubernetes.io/part-of: rhobs
-    app.kubernetes.io/version: 1fb4dafb58f6158c832f307d8e37729f390f4f5a
+    app.kubernetes.io/version: 9fc0a6990fbc9cdcd81a69fc97aba8c3ccd66f8c
   name: rhobs-gateway
   namespace: rhobs-stage
 spec:
@@ -29,7 +29,7 @@ spec:
         app.kubernetes.io/instance: rhobs
         app.kubernetes.io/name: rhobs-gateway
         app.kubernetes.io/part-of: rhobs
-        app.kubernetes.io/version: 1fb4dafb58f6158c832f307d8e37729f390f4f5a
+        app.kubernetes.io/version: 9fc0a6990fbc9cdcd81a69fc97aba8c3ccd66f8c
     spec:
       affinity:
         podAntiAffinity:
@@ -60,7 +60,7 @@ spec:
         - --logs.tail.endpoint=http://observatorium-lokistack-query-frontend-http.rhobs-stage.svc.cluster.local:3100
         - --logs.write.endpoint=http://observatorium-lokistack-distributor-http.rhobs-stage.svc.cluster.local:3100
         - --probes.endpoint=http://synthetics-api.rhobs-stage.svc.cluster.local:8080
-        image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:1fb4dafb58f6158c832f307d8e37729f390f4f5a
+        image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:9fc0a6990fbc9cdcd81a69fc97aba8c3ccd66f8c
         livenessProbe:
           failureThreshold: 10
           httpGet:

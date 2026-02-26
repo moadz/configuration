@@ -21,20 +21,24 @@ type (
 	Sync mg.Namespace
 )
 
-// Operator syncs the given operator manifests from the specified ref.
+// Konflux syncs the given operator manifests from the specified ref.
 // Ref can be a specific commit or "latest" to use the latest commit from upstream.
-func (s Sync) Operator(operator string, ref string) error {
-	switch operator {
-	case "thanos":
+func (s Sync) Konflux(dependency string, ref string) error {
+	switch dependency {
+	case "thanos-operator":
 		if err := s.syncThanosOperator(ref); err != nil {
 			return fmt.Errorf("failed to sync Thanos Operator: %w", err)
 		}
-	case "loki":
+	case "loki-operator":
 		if err := s.syncLokiOperator(ref); err != nil {
 			return fmt.Errorf("failed to sync Loki Operator: %w", err)
 		}
+	case "observatorium-api":
+		if err := s.syncObservatoriumAPI(ref); err != nil {
+			return fmt.Errorf("failed to sync Observatorium API: %w", err)
+		}
 	default:
-		return fmt.Errorf("unsupported operator: %s", operator)
+		return fmt.Errorf("unsupported dependency: %s", dependency)
 	}
 
 	return nil
@@ -42,18 +46,18 @@ func (s Sync) Operator(operator string, ref string) error {
 
 // syncThanosOperator syncs Thanos Operator manifests from the given ref.
 func (s Sync) syncThanosOperator(ref string) error {
-	return operatorCRDSyncer{
+	return dependencySyncer{
 		konfluxRef: gitCommitRef{
 			org:  "rhobs",
 			repo: "rhobs-konflux-thanos-operator",
 			ref:  ref,
 		},
 		submodule: "thanos-operator",
-		operatorTagVariable: goValue{
+		imageTagVariable: goValue{
 			filename: "clusters/template.go",
 			name:     "ThanosOperatorVersion",
 		},
-		crdVersionVariable: goValue{
+		crdVersionVariable: &goValue{
 			filename: "magefiles/thanos-operator.go",
 			name:     "thanosOperatorCRDRef",
 		},
@@ -62,18 +66,18 @@ func (s Sync) syncThanosOperator(ref string) error {
 
 // syncLokiOperator syncs Thanos Operator manifests from the given ref.
 func (s Sync) syncLokiOperator(ref string) error {
-	return operatorCRDSyncer{
+	return dependencySyncer{
 		konfluxRef: gitCommitRef{
 			org:  "rhobs",
 			repo: "rhobs-konflux-loki-operator",
 			ref:  ref,
 		},
 		submodule: "loki-operator",
-		operatorTagVariable: goValue{
+		imageTagVariable: goValue{
 			filename: "magefiles/loki-operator.go",
 			name:     "lokiOperatorVersion",
 		},
-		crdVersionVariable: goValue{
+		crdVersionVariable: &goValue{
 			filename: "magefiles/loki-operator.go",
 			name:     "lokiOperatorCRDRef",
 		},
@@ -81,18 +85,36 @@ func (s Sync) syncLokiOperator(ref string) error {
 	}.sync()
 }
 
-// operatorSyncer synchronizes the CRD manifests based on the operator's
+// syncObservatoriumAPI syncs Observatorium API from the given ref.
+func (s Sync) syncObservatoriumAPI(ref string) error {
+	return dependencySyncer{
+		konfluxRef: gitCommitRef{
+			org:  "rhobs",
+			repo: "rhobs-konflux-obs-api",
+			ref:  ref,
+		},
+		submodule: "api",
+		imageTagVariable: goValue{
+			filename: "clusters/template.go",
+			name:     "ObservatoriumVersion",
+		},
+		skipGoModUpdate: true,
+	}.sync()
+}
+
+// dependencySyncer synchronizes the image version and/or CRD manifests based on the dependency's
 // submodule commit SHA in a Konflux repository.
 //
 // Currently supported repositories are
 // - https://github.com/rhobs/rhobs-konflux-loki-operator
 // - https://github.com/rhobs/rhobs-konflux-thanos-operator
-type operatorCRDSyncer struct {
+// - https://github.com/rhobs/rhobs-konflux-obs-api
+type dependencySyncer struct {
 	konfluxRef gitCommitRef
 	submodule  string
 
-	operatorTagVariable goValue
-	crdVersionVariable  goValue
+	imageTagVariable   goValue
+	crdVersionVariable *goValue
 
 	skipGoModUpdate bool
 }
@@ -113,7 +135,7 @@ func (v goValue) String() string {
 	return fmt.Sprintf("%s (%s)", v.name, v.filename)
 }
 
-func (s operatorCRDSyncer) sync() error {
+func (s dependencySyncer) sync() error {
 	var (
 		err       error
 		component = path.Join(s.konfluxRef.org, s.konfluxRef.repo)
@@ -139,8 +161,8 @@ func (s operatorCRDSyncer) sync() error {
 	}
 
 	fmt.Fprintf(os.Stdout, "Syncing %s at commit %s\n", component, ref)
-	if err = s.operatorTagVariable.updateConst(ref); err != nil {
-		return fmt.Errorf("failed to update %q variable: %w", s.operatorTagVariable, err)
+	if err = s.imageTagVariable.updateConst(ref); err != nil {
+		return fmt.Errorf("failed to update %q variable: %w", s.imageTagVariable, err)
 	}
 
 	info := submodule.Info{
@@ -154,9 +176,11 @@ func (s operatorCRDSyncer) sync() error {
 	}
 
 	fmt.Fprintf(os.Stdout, "Parsed submodule %s commit: %s\n", module.Path, module.Commit)
-	err = s.crdVersionVariable.updateConst(module.Commit)
-	if err != nil {
-		return fmt.Errorf("failed to update Thanos Operator CRD ref: %w", err)
+	if s.crdVersionVariable != nil {
+		err = s.crdVersionVariable.updateConst(module.Commit)
+		if err != nil {
+			return fmt.Errorf("failed to update Thanos Operator CRD ref: %w", err)
+		}
 	}
 
 	// Update go.mod with the commit SHA.
@@ -167,7 +191,7 @@ func (s operatorCRDSyncer) sync() error {
 	return nil
 }
 
-func (s operatorCRDSyncer) updateGoMod(gitSubmodule submodule.Module) error {
+func (s dependencySyncer) updateGoMod(gitSubmodule submodule.Module) error {
 	if s.skipGoModUpdate {
 		return nil
 	}

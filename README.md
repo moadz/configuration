@@ -30,7 +30,7 @@ This works for now as we are maintainers of the project, but in future we might 
 3. Run this [workflow](https://github.com/rhobs/rhobs-konflux-thanos-operator/actions/workflows/update-submodules.yml) targeting `main`.
 4. Merge the [generated PR](https://github.com/rhobs/rhobs-konflux-thanos-operator/pulls).
 5. Visit [quay.io](https://quay.io/repository/redhat-services-prod/rhobs-mco-tenant/rhobs-thanos-operator?tab=tags&tag=latest) to ensure the new image is built and available.
-6. Run `mage sync:operator thanos latest`
+6. Run `mage sync:konflux thanos-operator latest`
 7. Run `mage build:environment production` to generate the manifests for production environment.
 
 ## Building RHOBS Cells with Mage
@@ -41,25 +41,27 @@ This repository leans heavily on [Mage](https://magefile.org/) to build various 
 mage -l
 ```
 
-### Synchronizing Operators
+### Synchronizing Dependencies
 
-Because we ship operators and their Custom Resource Definitions (CRDs) as part of our RHOBS service, 
+Because we ship dependencies, operators and their Custom Resource Definitions (CRDs) as part of our RHOBS service, 
 we need to keep them in sync with the versions deployed in our clusters. 
 We are further complicated by the reqirement to ship images built on Konflux so we need to maintain a mapping between 
-upstream operator versions and our Konflux-built images.
+upstream versions and our Konflux-built images.
 
-To facilitate this, we provide a Mage target `mage sync:operator` that automates the synchronization process.
-This allows us to keep the image versions in sync with the CRDs they support.
+To facilitate this, we provide a Mage target `mage sync:konflux` that automates the synchronization process.
+This allows us to keep the dependency image versions in sync with upstreams as well as with the CRDs they support.
 
 The target requires two parameters:
-1. `operator`: The name of the operator to synchronize and should be one of (`thanos`, `loki`).
+1. `dependency`: The name of the dependency to synchronize and should be one of (`thanos-operator`, `loki-operator`, `observatorium-api`).
 2. The commit hash for the fork we want to sync to or "latest" to sync to the latest commit on the supported branch.
 
-For `thanos`, this is the commit hash on https://github.com/rhobs/rhobs-konflux-thanos-operator
+For `thanos-operator`, this is the commit hash on https://github.com/rhobs/rhobs-konflux-thanos-operator
+For `observatorium-api`, this is the commit hash on https://github.com/rhobs/rhobs-konflux-obs-api
 An example is shown below:
 
 ```bash
-mage sync:operator thanos latest
+mage sync:konflux thanos-operator latest
+mage sync:konflux observatorium-api latest
 ```
 This will update some internal configuration and sync the dependency in go modules.
 You can now proceed to build for a specific environment using `mage build:environment <env>`.
