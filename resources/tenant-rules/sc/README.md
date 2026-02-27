@@ -11,7 +11,7 @@ sc/
 ├── acm-grc.yaml               # ACM GRC policy controller alerts
 ├── acm-manifestwork.yaml      # ACM ManifestWork failure alerts
 ├── cert-manager.yaml          # TLS certificate health alerts
-└── observability.yaml         # DeadMansSnitch watchdog
+└── observability.yaml         # SCWatchdog (alerting pipeline heartbeat)
 ```
 
 ## Alerts
@@ -25,7 +25,7 @@ sc/
 | ACMManifestWorkAppliedHighFailureRate | acm-manifestwork.yaml | warning | 5m |
 | CertManagerCertExpirySoon | cert-manager.yaml | warning | 1h |
 | CertManagerCertNotReady | cert-manager.yaml | warning | 10m |
-| DeadMansSnitch | observability.yaml | critical | -- |
+| SCWatchdog | observability.yaml | none | -- |
 
 ## Recording Rules
 

@@ -27,12 +27,11 @@ objects:
           rules:
             - record: watchdog
               expr: group by (_id)(kube_node_labels)
-            - alert: DeadMansSnitch
+            - alert: SCWatchdog
               annotations:
                 description: >
-                  This is an alert meant to ensure that the entire alerting pipeline is functional.
-                  This alert is always firing, therefore it should always be firing in Alertmanager
-                  and always fire against a receiver.
+                  Always-firing watchdog alert for the SC alerting pipeline.
+                  If this alert stops firing, the pipeline is broken.
               expr: watchdog
               labels:
-                severity: critical
+                severity: none

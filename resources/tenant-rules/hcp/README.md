@@ -62,7 +62,7 @@ Worker node and nodepool health:
 
 ### observability.yaml
 Monitoring infrastructure health:
-- `watchdog` - DeadMansSnitch heartbeat
+- `watchdog` - HCPWatchdogDown heartbeat
 - `sre-prometheus-target-alerting` - PodMonitor/ServiceMonitor health
 
 ### oauth.yaml
