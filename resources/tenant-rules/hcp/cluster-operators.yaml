@@ -28,12 +28,16 @@ objects:
             # hypershift_cluster_waiting_initial_avaibility_duration_seconds is used to not alert
             # in case the cluster is in installing state. This would create noise (e.g. audit webhook
             # servicemonitor is deployed before the cluster is available - but can't start if KAS is not up).
+            # Gate on >= 2 healthy workers to avoid noise from 0-worker clusters.
             - alert: ClusterOperatorDegraded
               annotations:
                 summary: "Cluster operator is in degraded state."
                 description: "The {{ $labels.name }} operator is reporting a degraded state for {{ $labels._id }}."
                 runbook_url: "https://github.com/openshift/ops-sop/blob/master/v4/alerts/ClusterOperatorDegraded.md"
-              expr: (cluster_operator_conditions{condition="Degraded",_id!=""} == 1) unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
+              expr: |
+                (cluster_operator_conditions{condition="Degraded",_id!=""} == 1)
+                and on (namespace) (hcp_worker_nodes:available_count >= 2)
+                unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
                 severity: warning
@@ -83,12 +87,16 @@ objects:
               labels:
                 severity: warning
                 otel_collect: "true"
+            # Gate on >= 2 healthy workers to avoid noise from 0-worker clusters.
             - alert: DefaultIngressControllerDegraded
               annotations:
                 summary: "The default IngressController has been degraded for 30 minutes."
                 description: "The default IngressController is degraded for {{ $labels._id }}. Ingress traffic may be impacted."
                 runbook_url: https://github.com/openshift/ops-sop/blob/master/hypershift/alerts/DefaultIngressControllerDegraded.md
-              expr: (max by (_id, condition, name, namespace) (ingress_controller_conditions{name="default", condition="Degraded"} == 1)) unless on (_id) hypershift_cluster_alerts_disabled
+              expr: |
+                (max by (_id, condition, name, namespace) (ingress_controller_conditions{name="default", condition="Degraded"} == 1))
+                and on (namespace) (hcp_worker_nodes:available_count >= 2)
+                unless on (_id) hypershift_cluster_alerts_disabled
               for: 30m
               labels:
                 severity: warning
