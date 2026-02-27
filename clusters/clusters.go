@@ -108,6 +108,10 @@ const (
 	StepLokiOperator     = "loki-operator"
 	StepDefaultLokiStack = "default-loki-stack"
 
+	StepTempoOperatorCRDS = "tempo-operator-crds"
+	StepTempoOperator     = "tempo-operator"
+	StepDefaultTempoStack = "default-tempo-stack"
+
 	StepServiceMonitors = "servicemonitors"
 
 	StepAlertmanager = "alertmanager"
@@ -151,6 +155,14 @@ func DefaultLoggingBuildSteps() []string {
 		StepLokiOperatorCRDS,
 		StepLokiOperator,
 		StepDefaultLokiStack,
+	}
+}
+
+func DefaultTracingBuildSteps() []string {
+	return []string{
+		StepTempoOperatorCRDS,
+		StepTempoOperator,
+		StepDefaultTempoStack,
 	}
 }
 

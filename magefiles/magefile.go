@@ -49,6 +49,17 @@ var BuildStepFunctions = map[string]func(Build, clusters.ClusterConfig) error{
 		b.DefaultLokiStack(cfg)
 		return nil
 	},
+	clusters.StepTempoOperatorCRDS: func(b Build, cfg clusters.ClusterConfig) error {
+		return b.TempoOperatorCRDS(cfg)
+	},
+	clusters.StepTempoOperator: func(b Build, cfg clusters.ClusterConfig) error {
+		b.TempoOperator(cfg)
+		return nil
+	},
+	clusters.StepDefaultTempoStack: func(b Build, cfg clusters.ClusterConfig) error {
+		b.DefaultTempoStack(cfg)
+		return nil
+	},
 	clusters.StepServiceMonitors: func(b Build, cfg clusters.ClusterConfig) error {
 		b.ServiceMonitors(cfg)
 		return nil

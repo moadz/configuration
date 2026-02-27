@@ -22,6 +22,7 @@ type TemplateMaps struct {
 	ResourceRequirements ParamMap[corev1.ResourceRequirements]
 	ObjectStorageBucket  ParamMap[v1alpha1.ObjectStorageConfig]
 	LokiOverrides        ParamMap[LokiOverrides]
+	TempoOverrides       ParamMap[TempoOverrides]
 }
 
 type LokiOverrides struct {
@@ -44,6 +45,36 @@ type LokiLimitOverrides struct {
 }
 
 type LokiComponentSpec struct {
+	Replicas int32
+}
+
+type TempoOverrides struct {
+	TempoLimitOverrides
+	Distributor   TempoComponentSpec
+	Ingester      TempoComponentSpec
+	Compactor     TempoComponentSpec
+	Querier       TempoComponentSpec
+	QueryFrontend TempoComponentSpec
+}
+
+type TempoLimitOverrides struct {
+	Size              string
+	StorageSize       string
+	ReplicationFactor int
+	RetentionDays     int
+
+	// Per-tenant ingestion limits
+	IngestionBurstSizeBytes int
+	IngestionRateLimitBytes int
+	MaxBytesPerTrace        int
+	MaxTracesPerUser        int
+
+	// Per-tenant query limits
+	MaxBytesPerTagValues   int
+	MaxSearchBytesPerTrace int
+}
+
+type TempoComponentSpec struct {
 	Replicas int32
 }
 
@@ -142,6 +173,9 @@ func (v Versions) Apply(t TemplateMaps) TemplateMaps {
 // LokiOverridesMap override
 type LokiOverridesMap map[string]LokiOverrides
 
+// TempoOverridesMap override
+type TempoOverridesMap map[string]TempoOverrides
+
 func (l LokiOverridesMap) Apply(t TemplateMaps) TemplateMaps {
 	if t.LokiOverrides == nil {
 		t.LokiOverrides = make(ParamMap[LokiOverrides])
@@ -160,6 +194,29 @@ func (l LokiOverridesMap) Apply(t TemplateMaps) TemplateMaps {
 		}
 
 		t.LokiOverrides[k] = merged
+	}
+	return t
+}
+
+func (tm TempoOverridesMap) Apply(t TemplateMaps) TemplateMaps {
+	if t.TempoOverrides == nil {
+		t.TempoOverrides = make(ParamMap[TempoOverrides])
+	}
+	for k, v := range tm {
+		// Get existing config or create empty one
+		existing := t.TempoOverrides[k]
+
+		// Merge the override with existing values
+		merged := TempoOverrides{
+			TempoLimitOverrides: mergeTempoLimitOverrides(existing.TempoLimitOverrides, v.TempoLimitOverrides),
+			Distributor:         mergeTempoComponentSpec(existing.Distributor, v.Distributor),
+			Ingester:            mergeTempoComponentSpec(existing.Ingester, v.Ingester),
+			Compactor:           mergeTempoComponentSpec(existing.Compactor, v.Compactor),
+			Querier:             mergeTempoComponentSpec(existing.Querier, v.Querier),
+			QueryFrontend:       mergeTempoComponentSpec(existing.QueryFrontend, v.QueryFrontend),
+		}
+
+		t.TempoOverrides[k] = merged
 	}
 	return t
 }
@@ -190,6 +247,51 @@ func mergeLokiLimitOverrides(existing, override LokiLimitOverrides) LokiLimitOve
 	}
 	if override.QueryTimeout != "" {
 		result.QueryTimeout = override.QueryTimeout
+	}
+	return result
+}
+
+// mergeTempoComponentSpec merges two TempoComponentSpec, using override values when non-zero
+func mergeTempoComponentSpec(existing, override TempoComponentSpec) TempoComponentSpec {
+	result := existing
+	if override.Replicas != 0 {
+		result.Replicas = override.Replicas
+	}
+	return result
+}
+
+// mergeTempoLimitOverrides merges two TempoLimitOverrides, using override values when non-zero/non-empty
+func mergeTempoLimitOverrides(existing, override TempoLimitOverrides) TempoLimitOverrides {
+	result := existing
+	if override.Size != "" {
+		result.Size = override.Size
+	}
+	if override.StorageSize != "" {
+		result.StorageSize = override.StorageSize
+	}
+	if override.ReplicationFactor != 0 {
+		result.ReplicationFactor = override.ReplicationFactor
+	}
+	if override.RetentionDays != 0 {
+		result.RetentionDays = override.RetentionDays
+	}
+	if override.IngestionBurstSizeBytes != 0 {
+		result.IngestionBurstSizeBytes = override.IngestionBurstSizeBytes
+	}
+	if override.IngestionRateLimitBytes != 0 {
+		result.IngestionRateLimitBytes = override.IngestionRateLimitBytes
+	}
+	if override.MaxBytesPerTrace != 0 {
+		result.MaxBytesPerTrace = override.MaxBytesPerTrace
+	}
+	if override.MaxTracesPerUser != 0 {
+		result.MaxTracesPerUser = override.MaxTracesPerUser
+	}
+	if override.MaxBytesPerTagValues != 0 {
+		result.MaxBytesPerTagValues = override.MaxBytesPerTagValues
+	}
+	if override.MaxSearchBytesPerTrace != 0 {
+		result.MaxSearchBytesPerTrace = override.MaxSearchBytesPerTrace
 	}
 	return result
 }
@@ -270,6 +372,9 @@ const (
 
 	// Object storage keys
 	DefaultBucket = "DEFAULT_BUCKET"
+
+	// Tempo component keys
+	TempoConfig = "TEMPO_CONFIG"
 )
 
 var logLevels = []string{"debug", "info", "warn", "error"}
@@ -444,6 +549,21 @@ func DefaultBaseTemplate() TemplateMaps {
 				},
 				QueryFrontend: LokiComponentSpec{
 					Replicas: 2,
+				},
+			},
+		},
+		TempoOverrides: ParamMap[TempoOverrides]{
+			TempoConfig: TempoOverrides{
+				TempoLimitOverrides: TempoLimitOverrides{
+					Size:                    "1x.extra-small",
+					StorageSize:             "10Gi",
+					ReplicationFactor:       1,
+					RetentionDays:           7,
+					IngestionBurstSizeBytes: 20000000,
+					IngestionRateLimitBytes: 15000000,
+					MaxBytesPerTrace:        0,
+					MaxBytesPerTagValues:    5000000,
+					MaxSearchBytesPerTrace:  0,
 				},
 			},
 		},

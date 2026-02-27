@@ -37,6 +37,10 @@ func (s Sync) Konflux(dependency string, ref string) error {
 		if err := s.syncObservatoriumAPI(ref); err != nil {
 			return fmt.Errorf("failed to sync Observatorium API: %w", err)
 		}
+	case "tempo-operator":
+		if err := s.syncTempoOperator(ref); err != nil {
+			return fmt.Errorf("failed to sync Tempo Operator: %w", err)
+		}
 	default:
 		return fmt.Errorf("unsupported dependency: %s", dependency)
 	}
@@ -102,11 +106,33 @@ func (s Sync) syncObservatoriumAPI(ref string) error {
 	}.sync()
 }
 
+// syncTempoOperator syncs Tempo Operator manifests from the given ref.
+func (s Sync) syncTempoOperator(ref string) error {
+	return dependencySyncer{
+		konfluxRef: gitCommitRef{
+			org:  "os-observability",
+			repo: "konflux-tempo",
+			ref:  ref,
+		},
+		submodule: "tempo-operator",
+		imageTagVariable: goValue{
+			filename: "magefiles/tempo-operator.go",
+			name:     "tempoOperatorVersion",
+		},
+		crdVersionVariable: &goValue{
+			filename: "magefiles/tempo-operator.go",
+			name:     "tempoOperatorCRDRef",
+		},
+		skipGoModUpdate: true,
+	}.sync()
+}
+
 // dependencySyncer synchronizes the image version and/or CRD manifests based on the dependency's
 // submodule commit SHA in a Konflux repository.
 //
 // Currently supported repositories are
 // - https://github.com/rhobs/rhobs-konflux-loki-operator
+// - https://github.com/os-observability/konflux-tempo
 // - https://github.com/rhobs/rhobs-konflux-thanos-operator
 // - https://github.com/rhobs/rhobs-konflux-obs-api
 type dependencySyncer struct {
