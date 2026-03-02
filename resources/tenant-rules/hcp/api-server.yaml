@@ -175,7 +175,13 @@ objects:
                     unless on (_id_or_ns) (
                         label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "_id", ".*")
                         or
-                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*")),
+                        label_replace(hypershift_cluster_alerts_disabled, "_id_or_ns", "$0", "exported_namespace", ".*")
+                        or
+                        # Do not fire if the cluster is not ready yet (initial availability wait).
+                        label_replace(hypershift_cluster_waiting_initial_avaibility_duration_seconds, "_id_or_ns", "$0", "_id", ".*")
+                        or
+                        # Do not fire if the cluster is uninstalling.
+                        label_replace(hypershift_cluster_deleting_duration_seconds, "_id_or_ns", "$0", "_id", ".*")),
                     "_id_or_ns", "", "_id_or_ns", ".*")
               labels:
                 namespace: openshift-route-monitor-operator

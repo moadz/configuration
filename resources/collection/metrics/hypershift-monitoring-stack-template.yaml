@@ -234,6 +234,7 @@ objects:
                       hypershift_cluster_limited_support_enabled;.*|\
                       hypershift_cluster_alerts_disabled;.*|\
                       hypershift_cluster_silence_alerts;.*|\
+                      hypershift_cluster_deleting_duration_seconds;.*|\
                       hypershift_cluster_vcpus_computation_error;.*|\
                       sre:oauth:pods_up;.*|\
                       sre:oauth:deployment_pods_unavailable;.*|\
