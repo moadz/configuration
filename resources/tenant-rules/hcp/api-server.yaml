@@ -72,6 +72,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: critical
                 short_window: 5m
+                alert_group: api-slo
                 otel_collect: "true"
             - alert: api-ErrorBudgetBurn
               annotations:
@@ -97,6 +98,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: critical
                 short_window: 30m
+                alert_group: api-slo
                 otel_collect: "true"
             - alert: api-ErrorBudgetBurn
               annotations:
@@ -121,6 +123,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: warning
                 short_window: 2h
+                alert_group: api-slo
                 otel_collect: "true"
             - alert: api-ErrorBudgetBurn
               annotations:
@@ -145,6 +148,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: warning
                 short_window: 6h
+                alert_group: api-slo
                 otel_collect: "true"
   # Rapid error budget burn for API server (probe-based, >90% failure rate over 3m)
   # Fires immediately when detecting acute API server incidents
@@ -187,6 +191,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: critical
                 short_window: 3m
+                alert_group: api-slo
                 otel_collect: "true"
   # KubeAPIServer restart detection and availability alerts
   - apiVersion: monitoring.coreos.com/v1

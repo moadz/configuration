@@ -668,6 +668,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: critical
                 short_window: 5m
+                alert_group: api-slo
                 otel_collect: "true"
             - alert: api-ErrorBudgetBurn
               annotations:
@@ -693,6 +694,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: critical
                 short_window: 30m
+                alert_group: api-slo
                 otel_collect: "true"
             - alert: api-ErrorBudgetBurn
               annotations:
@@ -717,6 +719,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: warning
                 short_window: 2h
+                alert_group: api-slo
                 otel_collect: "true"
             - alert: api-ErrorBudgetBurn
               annotations:
@@ -741,6 +744,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: warning
                 short_window: 6h
+                alert_group: api-slo
                 otel_collect: "true"
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
@@ -781,6 +785,7 @@ objects:
                 namespace: openshift-route-monitor-operator
                 severity: critical
                 short_window: 3m
+                alert_group: api-slo
                 otel_collect: "true"
   - apiVersion: monitoring.coreos.com/v1
     kind: PrometheusRule
@@ -1052,6 +1057,7 @@ objects:
                 long: 1h
                 short: 5m
                 severity: warning
+                alert_group: api-slo
                 otel_collect: "true"
               expr: |
                 max_over_time(count by (_id, job, namespace,type,verb)(apiserver_request:error_rate_1h > (14.40 * 0.0001) and apiserver_request:error_rate_5m > (14.40 * 0.0001))[5m:])
@@ -1065,6 +1071,7 @@ objects:
                 long: 6h
                 short: 30m
                 severity: warning
+                alert_group: api-slo
                 otel_collect: "true"
               expr: |
                 max_over_time(count by (_id, job, namespace,type,verb)(apiserver_request:error_rate_6h > (6.00 * 0.0001) and apiserver_request:error_rate_30m > (6.00 * 0.0001))[10m:])
@@ -1121,6 +1128,7 @@ objects:
                 long: 1d
                 short: 2h
                 severity: warning
+                alert_group: api-slo
                 otel_collect: "true"
               expr: |
                 apiserver_request:error_rate_1d > (3.00 * 0.0001)
@@ -1136,6 +1144,7 @@ objects:
                 long: 3d
                 short: 6h
                 severity: warning
+                alert_group: api-slo
                 otel_collect: "true"
               expr: |
                 apiserver_request:error_rate_3d > (1.00 * 0.0001)
