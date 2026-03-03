@@ -540,4 +540,3 @@ func createConsolidatedTempoServiceMonitors(namespace string) []runtime.Object {
 		},
 	}
 }
-
