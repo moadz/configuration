@@ -783,7 +783,7 @@ objects:
                     "_id_or_ns", "", "_id_or_ns", ".*")
               labels:
                 namespace: openshift-route-monitor-operator
-                severity: critical
+                severity: soaking
                 short_window: 3m
                 alert_group: api-slo
                 otel_collect: "true"
