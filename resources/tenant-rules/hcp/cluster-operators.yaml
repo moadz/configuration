@@ -29,6 +29,7 @@ objects:
             # in case the cluster is in installing state. This would create noise (e.g. audit webhook
             # servicemonitor is deployed before the cluster is available - but can't start if KAS is not up).
             # Gate on >= 2 healthy workers to avoid noise from 0-worker clusters.
+            # Dynatrace does not have this alert. Soak for observation only.
             - alert: ClusterOperatorDegraded
               annotations:
                 summary: "Cluster operator is in degraded state."
@@ -40,7 +41,7 @@ objects:
                 unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
-                severity: warning
+                severity: soaking
                 otel_collect: "true"
             # Aligned with Dynatrace: only the ingress operator fires at
             # critical. All other dataplane operators are covered by

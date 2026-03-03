@@ -409,7 +409,7 @@ objects:
                 unless on (_id) (hypershift_cluster_waiting_initial_avaibility_duration_seconds or hypershift_cluster_alerts_disabled)
               for: 60m
               labels:
-                severity: warning
+                severity: soaking
                 otel_collect: "true"
             - alert: ClusterOperatorDown
               annotations:
@@ -1056,7 +1056,7 @@ objects:
               labels:
                 long: 1h
                 short: 5m
-                severity: warning
+                severity: soaking
                 otel_collect: "true"
               expr: |
                 max_over_time(count by (_id, job, namespace,type,verb)(apiserver_request:error_rate_1h > (14.40 * 0.0001) and apiserver_request:error_rate_5m > (14.40 * 0.0001))[5m:])
@@ -1069,7 +1069,7 @@ objects:
               labels:
                 long: 6h
                 short: 30m
-                severity: warning
+                severity: soaking
                 otel_collect: "true"
               expr: |
                 max_over_time(count by (_id, job, namespace,type,verb)(apiserver_request:error_rate_6h > (6.00 * 0.0001) and apiserver_request:error_rate_30m > (6.00 * 0.0001))[10m:])
@@ -1125,7 +1125,7 @@ objects:
               labels:
                 long: 1d
                 short: 2h
-                severity: warning
+                severity: soaking
                 otel_collect: "true"
               expr: |
                 apiserver_request:error_rate_1d > (3.00 * 0.0001)
@@ -1140,7 +1140,7 @@ objects:
               labels:
                 long: 3d
                 short: 6h
-                severity: warning
+                severity: soaking
                 otel_collect: "true"
               expr: |
                 apiserver_request:error_rate_3d > (1.00 * 0.0001)
