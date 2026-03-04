@@ -7,7 +7,6 @@ import (
 	templatev1 "github.com/openshift/api/template/v1"
 	"github.com/rhobs/configuration/clusters"
 	"github.com/thanos-community/thanos-operator/config"
-
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -222,8 +221,8 @@ func operatorResources(namespace string, m clusters.TemplateMaps) ([]runtime.Obj
 		return nil, err
 	}
 	// Override name and labels for our deployment
-	managerRole.ObjectMeta.Name = "thanos-operator-manager-role"
-	managerRole.ObjectMeta.Labels = map[string]string{
+	managerRole.Name = "thanos-operator-manager-role"
+	managerRole.Labels = map[string]string{
 		"app.kubernetes.io/component":                  "rbac",
 		"app.kubernetes.io/created-by":                 "thanos-operator",
 		"app.kubernetes.io/instance":                   "manager-role",
@@ -249,19 +248,19 @@ func operatorResources(namespace string, m clusters.TemplateMaps) ([]runtime.Obj
 
 	for _, crd := range config.CRDList {
 		viewer := config.CRDViewerClusterRole(crd)
-		viewer.ObjectMeta.Labels["rbac.authorization.k8s.io/aggregate-to-view"] = "true"
+		viewer.Labels["rbac.authorization.k8s.io/aggregate-to-view"] = "true"
 		objs = append(objs, viewer)
 		editor := config.CRDEditorClusterRole(crd)
-		editor.ObjectMeta.Labels["rbac.authorization.k8s.io/aggregate-to-edit"] = "true"
+		editor.Labels["rbac.authorization.k8s.io/aggregate-to-edit"] = "true"
 		objs = append(objs, editor)
 	}
 
 	metricsReader := config.AuthProxyClientClusterRole()
-	metricsReader.ObjectMeta.Labels["rbac.authorization.k8s.io/aggregate-to-view"] = "true"
+	metricsReader.Labels["rbac.authorization.k8s.io/aggregate-to-view"] = "true"
 	objs = append(objs, metricsReader)
 
 	service := config.AuthProxyService()
-	service.ObjectMeta.Annotations = map[string]string{
+	service.Annotations = map[string]string{
 		"service.beta.openshift.io/serving-cert-secret-name": "kube-rbac-proxy-tls",
 	}
 	objs = append(objs, service)

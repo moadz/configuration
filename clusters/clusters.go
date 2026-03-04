@@ -3,9 +3,8 @@ package clusters
 import (
 	"fmt"
 
-	cfgobservatorium "github.com/rhobs/configuration/configuration/observatorium"
-
 	observatoriumapi "github.com/observatorium/observatorium/configuration_go/abstr/kubernetes/observatorium/api"
+	cfgobservatorium "github.com/rhobs/configuration/configuration/observatorium"
 )
 
 // ClusterName represents a specific cluster identifier

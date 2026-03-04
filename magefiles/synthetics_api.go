@@ -5,15 +5,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/rhobs/configuration/clusters"
-
 	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
 	kitlog "github.com/go-kit/log"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	templatev1 "github.com/openshift/api/template/v1"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
-
+	"github.com/rhobs/configuration/clusters"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"

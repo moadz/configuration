@@ -114,8 +114,8 @@ func ThanosPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePrometheu
 	if nonCriticalPostProcessing {
 		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
 	}
-	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
-	builder.PrometheusRule.Spec.Groups = ReplaceStoreRhobsWithDefault(builder.PrometheusRule.Spec.Groups)
+	builder.Spec.Groups = ReplaceSummaryWithMessage(builder.Spec.Groups)
+	builder.Spec.Groups = ReplaceStoreRhobsWithDefault(builder.Spec.Groups)
 
 	return &appInterfacePrometheusRule{
 		Schema:         schemaPath,
@@ -147,7 +147,7 @@ func ThanosOperatorPrometheusRule(nonCriticalPostProcessing bool) *appInterfaceP
 	if nonCriticalPostProcessing {
 		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
 	}
-	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
+	builder.Spec.Groups = ReplaceSummaryWithMessage(builder.Spec.Groups)
 
 	return &appInterfacePrometheusRule{
 		Schema:         schemaPath,
@@ -181,7 +181,7 @@ func AlertmanagerPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePro
 	if nonCriticalPostProcessing {
 		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
 	}
-	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
+	builder.Spec.Groups = ReplaceSummaryWithMessage(builder.Spec.Groups)
 
 	return &appInterfacePrometheusRule{
 		Schema:         schemaPath,
@@ -211,7 +211,7 @@ func LokiPrometheusRule(nonCriticalPostProcessing bool) *appInterfacePrometheusR
 	if nonCriticalPostProcessing {
 		builder.PrometheusRule = RuleNonCriticalPostProcessing(builder.PrometheusRule)
 	}
-	builder.PrometheusRule.Spec.Groups = ReplaceSummaryWithMessage(builder.PrometheusRule.Spec.Groups)
+	builder.Spec.Groups = ReplaceSummaryWithMessage(builder.Spec.Groups)
 
 	return &appInterfacePrometheusRule{
 		Schema:         schemaPath,

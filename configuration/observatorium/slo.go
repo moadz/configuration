@@ -579,7 +579,7 @@ func GenSLO(genPyrra, genRules *mimic.Generator) {
 // envSLOs generates the resultant config for a particular rhobsInstanceEnv.
 func envSLOs(envName rhobsInstanceEnv, objs []pyrrav1alpha1.ServiceLevelObjective, ruleFilename string, genPyrra, genRules *mimic.Generator) {
 	for _, obj := range objs {
-		name := string(envName) + "-" + obj.ObjectMeta.Name + ".yaml"
+		name := string(envName) + "-" + obj.Name + ".yaml"
 		genPyrra.Add(name, encoding.GhodssYAML(obj))
 	}
 

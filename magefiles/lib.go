@@ -15,9 +15,8 @@ import (
 	monv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
 	appsv1 "k8s.io/api/apps/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -251,9 +250,9 @@ func getAndRemoveObject[T metav1.Object](objects []runtime.Object, name string) 
 
 // postProcessServiceMonitor updates the service monitor to work with the app-sre prometheus.
 func postProcessServiceMonitor(serviceMonitor *monv1.ServiceMonitor, namespaceSelector string) encoding.Encoder {
-	serviceMonitor.ObjectMeta.Namespace = openshiftCustomerMonitoringNamespace
+	serviceMonitor.Namespace = openshiftCustomerMonitoringNamespace
 	serviceMonitor.Spec.NamespaceSelector.MatchNames = []string{namespaceSelector}
-	serviceMonitor.ObjectMeta.Labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
+	serviceMonitor.Labels[openshiftCustomerMonitoringLabel] = openShiftClusterMonitoringLabelValue
 
 	name := serviceMonitor.Name + "-service-monitor-" + namespaceSelector
 

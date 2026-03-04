@@ -17,7 +17,6 @@ import (
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
 	"github.com/thanos-community/thanos-operator/api/v1alpha1"
-
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -1191,7 +1190,7 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 			"service.beta.openshift.io/serving-cert-secret-name":               "query-frontend-tls",
 			"serviceaccounts.openshift.io/oauth-redirectreference.application": `{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}`,
 		}
-		query.Spec.QueryFrontend.Additional.ServicePorts = append(query.Spec.QueryFrontend.Additional.ServicePorts, corev1.ServicePort{
+		query.Spec.QueryFrontend.ServicePorts = append(query.Spec.QueryFrontend.ServicePorts, corev1.ServicePort{
 			Name: "https",
 			Port: 8443,
 			TargetPort: intstr.IntOrString{
@@ -1199,9 +1198,9 @@ func defaultQueryCR(namespace string, templates clusters.TemplateMaps, oauth boo
 				IntVal: 8443,
 			},
 		})
-		query.Spec.QueryFrontend.Additional.Containers = append(query.Spec.QueryFrontend.Additional.Containers, makeOauthProxyContainer(9090, namespace, "thanos-query-frontend-rhobs", "query-frontend-tls"))
-		query.Spec.QueryFrontend.Additional.Volumes = append(query.Spec.QueryFrontend.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "query-frontend-tls"))
-		query.Spec.QueryFrontend.Additional.Volumes = append(query.Spec.QueryFrontend.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
+		query.Spec.QueryFrontend.Containers = append(query.Spec.QueryFrontend.Containers, makeOauthProxyContainer(9090, namespace, "thanos-query-frontend-rhobs", "query-frontend-tls"))
+		query.Spec.QueryFrontend.Volumes = append(query.Spec.QueryFrontend.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "query-frontend-tls"))
+		query.Spec.QueryFrontend.Volumes = append(query.Spec.QueryFrontend.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
 	}
 
 	objs = append(objs, query)
@@ -1502,7 +1501,7 @@ func defaultCompactCR(namespace string, templates clusters.TemplateMaps, oauth b
 			"service.beta.openshift.io/serving-cert-secret-name":               "compact-tls",
 			"serviceaccounts.openshift.io/oauth-redirectreference.application": `{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-compact-rhobs"}}`,
 		}
-		defaultCompact.Spec.Additional.ServicePorts = append(defaultCompact.Spec.Additional.ServicePorts, corev1.ServicePort{
+		defaultCompact.Spec.ServicePorts = append(defaultCompact.Spec.ServicePorts, corev1.ServicePort{
 			Name: "https",
 			Port: 8443,
 			TargetPort: intstr.IntOrString{
@@ -1510,9 +1509,9 @@ func defaultCompactCR(namespace string, templates clusters.TemplateMaps, oauth b
 				IntVal: 8443,
 			},
 		})
-		defaultCompact.Spec.Additional.Containers = append(defaultCompact.Spec.Additional.Containers, makeOauthProxyContainer(10902, namespace, "thanos-compact-rhobs", "compact-tls"))
-		defaultCompact.Spec.Additional.Volumes = append(defaultCompact.Spec.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "compact-tls"))
-		defaultCompact.Spec.Additional.Volumes = append(defaultCompact.Spec.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
+		defaultCompact.Spec.Containers = append(defaultCompact.Spec.Containers, makeOauthProxyContainer(10902, namespace, "thanos-compact-rhobs", "compact-tls"))
+		defaultCompact.Spec.Volumes = append(defaultCompact.Spec.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "compact-tls"))
+		defaultCompact.Spec.Volumes = append(defaultCompact.Spec.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
 	}
 
 	objs = append(objs, defaultCompact)
@@ -1723,7 +1722,7 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 			"service.beta.openshift.io/serving-cert-secret-name":               "query-frontend-tls",
 			"serviceaccounts.openshift.io/oauth-redirectreference.application": `{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"thanos-query-frontend-rhobs"}}`,
 		}
-		query.Spec.QueryFrontend.Additional.ServicePorts = append(query.Spec.QueryFrontend.Additional.ServicePorts, corev1.ServicePort{
+		query.Spec.QueryFrontend.ServicePorts = append(query.Spec.QueryFrontend.ServicePorts, corev1.ServicePort{
 			Name: "https",
 			Port: 8443,
 			TargetPort: intstr.IntOrString{
@@ -1731,9 +1730,9 @@ func queryCR(namespace string, templates clusters.TemplateMaps, oauth bool, with
 				IntVal: 8443,
 			},
 		})
-		query.Spec.QueryFrontend.Additional.Containers = append(query.Spec.QueryFrontend.Additional.Containers, makeOauthProxyContainer(9090, namespace, "thanos-query-frontend-rhobs", "query-frontend-tls"))
-		query.Spec.QueryFrontend.Additional.Volumes = append(query.Spec.QueryFrontend.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "query-frontend-tls"))
-		query.Spec.QueryFrontend.Additional.Volumes = append(query.Spec.QueryFrontend.Additional.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
+		query.Spec.QueryFrontend.Containers = append(query.Spec.QueryFrontend.Containers, makeOauthProxyContainer(9090, namespace, "thanos-query-frontend-rhobs", "query-frontend-tls"))
+		query.Spec.QueryFrontend.Volumes = append(query.Spec.QueryFrontend.Volumes, kghelpers.NewPodVolumeFromSecret("tls", "query-frontend-tls"))
+		query.Spec.QueryFrontend.Volumes = append(query.Spec.QueryFrontend.Volumes, kghelpers.NewPodVolumeFromSecret("oauth-cookie", "oauth-cookie"))
 	}
 
 	objs = append(objs, query)

@@ -166,7 +166,7 @@ func alertmanagerKubernetes(opts *alertmanager.AlertManagerOptions, options mani
 
 func alertmanagerPostProcess(manifests []runtime.Object, namespace string) encoding.Encoder {
 	service := kghelpers.GetObject[*corev1.Service](manifests, alertManagerName)
-	service.ObjectMeta.Annotations[servingCertSecretNameAnnotation] = alertmanagerTLSSecret
+	service.Annotations[servingCertSecretNameAnnotation] = alertmanagerTLSSecret
 	service.Spec.Ports = append(service.Spec.Ports, corev1.ServicePort{
 		Name:       "https",
 		Port:       8443,
@@ -188,7 +188,7 @@ func alertmanagerPostProcess(manifests []runtime.Object, namespace string) encod
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      alertManagerName,
 			Namespace: namespace,
-			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").ObjectMeta.Labels),
+			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").Labels),
 		},
 		Spec: routev1.RouteSpec{
 			Port: &routev1.RoutePort{
@@ -276,7 +276,7 @@ func generateAlertmanagerBundleFromTemplate(config clusters.ClusterConfig) error
 // but returns the processed manifests directly for bundle generation instead of wrapping in template
 func alertmanagerPostProcessForBundle(manifests []runtime.Object, namespace string) []runtime.Object {
 	service := kghelpers.GetObject[*corev1.Service](manifests, alertManagerName)
-	service.ObjectMeta.Annotations[servingCertSecretNameAnnotation] = alertmanagerTLSSecret
+	service.Annotations[servingCertSecretNameAnnotation] = alertmanagerTLSSecret
 	service.Spec.Ports = append(service.Spec.Ports, corev1.ServicePort{
 		Name:       "https",
 		Port:       8443,
@@ -299,7 +299,7 @@ func alertmanagerPostProcessForBundle(manifests []runtime.Object, namespace stri
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      alertManagerName,
 			Namespace: namespace,
-			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").ObjectMeta.Labels),
+			Labels:    maps.Clone(kghelpers.GetObject[*appsv1.StatefulSet](manifests, "").Labels),
 		},
 		Spec: routev1.RouteSpec{
 			Port: &routev1.RoutePort{

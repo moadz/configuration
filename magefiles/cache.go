@@ -3,13 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/rhobs/configuration/clusters"
-
 	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
 	"github.com/observatorium/observatorium/configuration_go/kubegen/openshift"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
-
+	"github.com/rhobs/configuration/clusters"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

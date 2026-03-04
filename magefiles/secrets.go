@@ -4,8 +4,6 @@ import (
 	"os"
 	"time"
 
-	"gopkg.in/yaml.v2"
-
 	"github.com/bwplotka/mimic"
 	"github.com/bwplotka/mimic/encoding"
 	"github.com/go-kit/log"
@@ -17,7 +15,7 @@ import (
 	"github.com/thanos-io/thanos/pkg/cacheutil"
 	"github.com/thanos-io/thanos/pkg/queryfrontend"
 	storecache "github.com/thanos-io/thanos/pkg/store/cache"
-
+	"gopkg.in/yaml.v2"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

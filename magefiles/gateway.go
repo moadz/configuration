@@ -17,7 +17,6 @@ import (
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/rhobs/configuration/clusters"
 	cfgobservatorium "github.com/rhobs/configuration/configuration/observatorium"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -112,7 +111,7 @@ func generateGatewayBundle(config clusters.ClusterConfig) error {
 
 	deployment := gatewayDeployment(config.Templates, ns, config.GatewayConfig)
 	// Ensure metadata.name is rhobs-gateway
-	deployment.ObjectMeta.Name = gatewayName
+	deployment.Name = gatewayName
 
 	// Gateway resources
 	gatewayObjs := []runtime.Object{
