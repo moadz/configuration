@@ -19,7 +19,7 @@ JSONNET_SRC = $(shell find . -type f -not -path './*vendor_jsonnet/*' \( -name '
 JSONNET_VENDOR_DIR = vendor_jsonnet
 
 .PHONY: all
-all: $(JSONNET_VENDOR_DIR) prometheusrules grafana manifests whitelisted_metrics hcp-rules sc-rules
+all: $(JSONNET_VENDOR_DIR) prometheusrules grafana manifests whitelisted_metrics
 
 $(JSONNET_VENDOR_DIR): $(JB) jsonnetfile.json jsonnetfile.lock.json
 	@$(JB) install --jsonnetpkg-home="$(JSONNET_VENDOR_DIR)"
@@ -65,22 +65,7 @@ go-format: $(GOIMPORTS) $(GOLANGCI_LINT)
 .PHONY: validate
 validate: $(OC)
 	@echo ">>>>> Validating OpenShift Templates"
-	find . -type f \( -name '*template.yaml' \) ! -name 'hypershift-token-refresher-template.yaml' ! -name 'hypershift-cluster-log-forwarder-template.yaml' ! -name 'hypershift-monitoring-stack-template.yaml' ! -name 'hcp_rules_template.yaml' ! -name 'ocm-component-monitoring-stack-template.yaml' ! -name 'ocm-component-token-refresher-template.yaml' | $(XARGS) -I{} $(OC) process -f {} --local -o yaml > /dev/null
-
-.PHONY: hcp-rules
-hcp-rules:
-	@echo ">>>>> Generating HCP tenant rules from split files"
-	./scripts/generate-hcp-rules.sh
-
-.PHONY: sc-rules
-sc-rules:
-	@echo ">>>>> Generating SC tenant rules from split files"
-	./scripts/generate-sc-rules.sh
-
-.PHONY: lint-hcp-rules
-lint-hcp-rules: hcp-rules $(PROMTOOL) $(YQ)
-	@echo ">>>>> Linting HCP tenant rules"
-	./scripts/lint-hcp-rules.sh $(PROMTOOL) $(YQ)
+	find . -type f \( -name '*template.yaml' \) | $(XARGS) -I{} $(OC) process -f {} --local -o yaml > /dev/null
 
 .PHONY: prometheusrules
 prometheusrules: resources/observability/prometheusrules
