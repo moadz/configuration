@@ -2137,11 +2137,13 @@ objects:
           "record": "cluster:usage:workload:capacity_physical_cpu_hours"
         - "expr": |
             max by(_id) (count_over_time(cluster:usage:workload:capacity_physical_cpu_cores:max:5m[1h:5m])) / scalar(steps:count1h)
+            or
+            max by(_id) (count_over_time((hostedcluster:hypershift_cluster_vcpus:max > 0)[1h:5m])) / scalar(steps:count1h)
           "labels":
             "tenant_id": "FB870BF3-9F3A-44FF-9BF7-D7A047A52F43"
           "record": "cluster:usage:workload:capacity_physical_instance_hours"
         - "expr": |
-            max by (_id) (cluster:usage:workload:capacity_physical_instance_hours)
+            max by(_id) (count_over_time(cluster:usage:workload:capacity_physical_cpu_cores:max:5m[1h:5m])) / scalar(steps:count1h)
             or
             max by(_id) (count_over_time((hostedcluster:hypershift_cluster_vcpus:max > 0)[1h:5m])) / scalar(steps:count1h)
           "labels":
