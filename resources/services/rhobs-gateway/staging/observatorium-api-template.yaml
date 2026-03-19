@@ -1,8 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  creationTimestamp: null
-  name: observatorium-api
+  name: rhobs-gateway
 objects:
 - apiVersion: v1
   data:
@@ -410,26 +409,24 @@ objects:
   metadata:
     annotations:
       qontract.recycle: "true"
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
-      app.kubernetes.io/name: observatorium-api
+      app.kubernetes.io/name: rhobs-gateway
       app.kubernetes.io/part-of: rhobs
       app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
-    name: observatorium-api
+    name: rhobs-gateway
     namespace: rhobs-stage
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
-      app.kubernetes.io/name: observatorium-api
+      app.kubernetes.io/name: rhobs-gateway
       app.kubernetes.io/part-of: rhobs
       app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
-    name: observatorium-api
+    name: rhobs-gateway
     namespace: rhobs-stage
   spec:
     replicas: 2
@@ -437,7 +434,7 @@ objects:
       matchLabels:
         app.kubernetes.io/component: api
         app.kubernetes.io/instance: rhobs
-        app.kubernetes.io/name: observatorium-api
+        app.kubernetes.io/name: rhobs-gateway
         app.kubernetes.io/part-of: rhobs
     strategy:
       rollingUpdate:
@@ -446,11 +443,10 @@ objects:
       type: RollingUpdate
     template:
       metadata:
-        creationTimestamp: null
         labels:
           app.kubernetes.io/component: api
           app.kubernetes.io/instance: rhobs
-          app.kubernetes.io/name: observatorium-api
+          app.kubernetes.io/name: rhobs-gateway
           app.kubernetes.io/part-of: rhobs
           app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
       spec:
@@ -463,7 +459,7 @@ objects:
                   - key: app.kubernetes.io/name
                     operator: In
                     values:
-                    - observatorium-api
+                    - rhobs-gateway
                 topologyKey: kubernetes.io/hostname
               weight: 100
         containers:
@@ -477,7 +473,8 @@ objects:
           - --server.read-timeout=5m
           - --metrics.read.endpoint=http://thanos-query-frontend-rhobs.rhobs-stage.svc.cluster.local:9090
           - --metrics.write.endpoint=http://thanos-receive-router-rhobs.rhobs-stage.svc.cluster.local:19291
-          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:210d0f7ddfd29f43068cb0060c32ff47cb9ca41a
+          - --metrics.status.endpoint=http://thanos-query-rhobs.rhobs-stage.svc.cluster.local:9090
+          image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-observatorium-api:9fc0a6990fbc9cdcd81a69fc97aba8c3ccd66f8c
           livenessProbe:
             failureThreshold: 10
             httpGet:
@@ -538,17 +535,17 @@ objects:
             valueFrom:
               secretKeyRef:
                 key: issuer-url
-                name: observatorium-api
+                name: rhobs-gateway
           - name: CLIENT_ID
             valueFrom:
               secretKeyRef:
                 key: client-id
-                name: observatorium-api
+                name: rhobs-gateway
           - name: CLIENT_SECRET
             valueFrom:
               secretKeyRef:
                 key: client-secret
-                name: observatorium-api
+                name: rhobs-gateway
           image: quay.io/redhat-services-prod/rhobs-mco-tenant/rhobs-opa-ams:da95dce02a3be7dade09199ce5a9d91a5ac6a878
           livenessProbe:
             failureThreshold: 10
@@ -577,28 +574,27 @@ objects:
             requests:
               cpu: 500m
               memory: 100Mi
-        serviceAccountName: observatorium-api
+        serviceAccountName: rhobs-gateway
         volumes:
         - configMap:
-            name: observatorium-api
+            name: rhobs-gateway
           name: rbac
         - name: tenants
           secret:
-            secretName: observatorium-api
+            secretName: rhobs-gateway
   status: {}
 - apiVersion: v1
   kind: Secret
   metadata:
     annotations:
       qontract.recycle: "true"
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
-      app.kubernetes.io/name: observatorium-api
+      app.kubernetes.io/name: rhobs-gateway
       app.kubernetes.io/part-of: rhobs
       app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
-    name: observatorium-api
+    name: rhobs-gateway
     namespace: rhobs-stage
   stringData:
     client-id: ${CLIENT_ID}
@@ -732,14 +728,13 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
-      app.kubernetes.io/name: observatorium-api
+      app.kubernetes.io/name: rhobs-gateway
       app.kubernetes.io/part-of: rhobs
       app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
-    name: observatorium-api
+    name: rhobs-gateway
     namespace: rhobs-stage
   spec:
     internalTrafficPolicy: Cluster
@@ -773,7 +768,7 @@ objects:
     selector:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
-      app.kubernetes.io/name: observatorium-api
+      app.kubernetes.io/name: rhobs-gateway
       app.kubernetes.io/part-of: rhobs
     sessionAffinity: None
     type: ClusterIP
@@ -782,14 +777,13 @@ objects:
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
-    creationTimestamp: null
     labels:
       app.kubernetes.io/component: api
       app.kubernetes.io/instance: rhobs
-      app.kubernetes.io/name: observatorium-api
+      app.kubernetes.io/name: rhobs-gateway
       app.kubernetes.io/part-of: rhobs
       app.kubernetes.io/version: 9aada65247a07782465beb500323a0e18d7e3d05
-    name: observatorium-api
+    name: rhobs-gateway
     namespace: rhobs-stage
 parameters:
 - description: Organization ID for OSD
