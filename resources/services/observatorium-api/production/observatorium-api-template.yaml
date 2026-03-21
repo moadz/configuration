@@ -227,6 +227,12 @@ objects:
         subjects:
         - kind: user
           name: service-account-bff5b6de-e6ef-4f83-8f5d-a1db8370c995
+      - name: d13bc04a-2763-4b3b-9ccb-a264f5d64aa9
+        roles:
+        - telemeter-metrics-read
+        subjects:
+        - kind: user
+          name: service-account-d13bc04a-2763-4b3b-9ccb-a264f5d64aa9
       - name: 0174b0a8-649a-4a95-bdff-9592f41b0de4
         roles:
         - telemeter-metrics-read
