@@ -412,6 +412,39 @@ func GenerateRBAC() *ObservatoriumRBAC {
 		withConcreteName:    true,
 	})
 
+	// RHTAP - SPRE Alert staging special read access request
+	attachBinding(&obsRBAC, BindingOpts{
+		name:                "1fc0f182-dfc0-40e2-a147-b768927d9c20",
+		tenant:              rhtapTenant,
+		signals:             []Resource{MetricsResource},
+		perms:               []rbac.Permission{rbac.Read},
+		envs:                []env{stagingEnv},
+		skipConventionCheck: true,
+		withConcreteName:    true,
+	})
+
+	// RHTAP - SPRE Alert production special read access request
+	attachBinding(&obsRBAC, BindingOpts{
+		name:                "4819e9be-e3e0-42de-b4a6-231443107d8e",
+		tenant:              rhtapTenant,
+		signals:             []Resource{MetricsResource},
+		perms:               []rbac.Permission{rbac.Read},
+		envs:                []env{productionEnv},
+		skipConventionCheck: true,
+		withConcreteName:    true,
+	})
+
+	// RHTAP - SPRE Alert production special write access request
+	attachBinding(&obsRBAC, BindingOpts{
+		name:                "44d9cf7d-69a9-4acd-88c2-dd66b338c1eb",
+		tenant:              rhtapTenant,
+		signals:             []Resource{MetricsResource},
+		perms:               []rbac.Permission{rbac.Write},
+		envs:                []env{productionEnv},
+		skipConventionCheck: true,
+		withConcreteName:    true,
+	})
+
 	// RHEL
 	// Reader serviceaccount
 	attachBinding(&obsRBAC, BindingOpts{
