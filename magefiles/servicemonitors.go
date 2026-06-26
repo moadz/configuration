@@ -44,7 +44,11 @@ func (p Production) ServiceMonitors() {
 }
 
 func serviceMonitorTemplateGen(gen *mimic.Generator, objs []runtime.Object) {
-	template := openshift.WrapInTemplate(objs, metav1.ObjectMeta{Name: "thanos-operator-servicemonitors"}, []templatev1.Parameter{})
+	allObjs := make([]runtime.Object, 0, len(objs)*2)
+	for _, obj := range objs {
+		allObjs = append(allObjs, obj, updateAPIGroup(obj, clusters.RHOBSMonitoringAPIGroup))
+	}
+	template := openshift.WrapInTemplate(allObjs, metav1.ObjectMeta{Name: "thanos-operator-servicemonitors"}, []templatev1.Parameter{})
 	encoder := encoding.GhodssYAML(template)
 	gen.Add("servicemonitors.yaml", encoder)
 	gen.Generate()

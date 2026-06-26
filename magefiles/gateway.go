@@ -86,6 +86,7 @@ func gateway(config clusters.ClusterConfig, fn builderBuilderGenFunc) error {
 	sms := []runtime.Object{
 		gatewayServiceMonitor(clusters.StageMaps, ns, config.GatewayConfig),
 	}
+	sms = append(sms, updateAPIGroup(sms[0], clusters.RHOBSMonitoringAPIGroup))
 
 	template = openshift.WrapInTemplate(sms, metav1.ObjectMeta{
 		Name: gatewayName + "-service-monitor",

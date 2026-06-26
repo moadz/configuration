@@ -126,7 +126,11 @@ func cache(g func() *mimic.Generator, m clusters.TemplateMaps, confs []*memcache
 	gen.Add(cacheTemplate, enc)
 	gen.Generate()
 
-	template = openshift.WrapInTemplate(sms, metav1.ObjectMeta{
+	smsWithCOO := make([]runtime.Object, 0, len(sms)*2)
+	for _, sm := range sms {
+		smsWithCOO = append(smsWithCOO, sm, updateAPIGroup(sm, clusters.RHOBSMonitoringAPIGroup))
+	}
+	template = openshift.WrapInTemplate(smsWithCOO, metav1.ObjectMeta{
 		Name: cacheName + "-service-monitor",
 	}, nil)
 	gen = g()

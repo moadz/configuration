@@ -29,3 +29,29 @@ objects:
         app.kubernetes.io/instance: rhobs
         app.kubernetes.io/name: rhobs-gateway
         app.kubernetes.io/part-of: rhobs
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: api
+      app.kubernetes.io/instance: rhobs
+      app.kubernetes.io/name: rhobs-gateway
+      app.kubernetes.io/part-of: rhobs
+    name: rhobs-gateway
+  spec:
+    endpoints:
+    - interval: 30s
+      port: internal
+    - interval: 30s
+      port: metrics
+    - interval: 30s
+      port: opa-ams-metrics
+    namespaceSelector:
+      matchNames:
+      - rhobs-production
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: api
+        app.kubernetes.io/instance: rhobs
+        app.kubernetes.io/name: rhobs-gateway
+        app.kubernetes.io/part-of: rhobs

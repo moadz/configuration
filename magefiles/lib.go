@@ -256,7 +256,8 @@ func postProcessServiceMonitor(serviceMonitor *monv1.ServiceMonitor, namespaceSe
 
 	name := serviceMonitor.Name + "-service-monitor-" + namespaceSelector
 
-	template := openshift.WrapInTemplate([]runtime.Object{serviceMonitor}, metav1.ObjectMeta{
+	cooSM := updateAPIGroup(serviceMonitor, clusters.RHOBSMonitoringAPIGroup)
+	template := openshift.WrapInTemplate([]runtime.Object{serviceMonitor, cooSM}, metav1.ObjectMeta{
 		Name: name,
 	}, nil)
 	return encoding.GhodssYAML(template)
