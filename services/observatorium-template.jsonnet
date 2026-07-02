@@ -1,19 +1,28 @@
 local obs = import 'observatorium.libsonnet';
+
+local withRhobsVariant(obj) =
+  if obj.apiVersion == 'monitoring.coreos.com/v1' && obj.kind == 'ServiceMonitor'
+  then [obj, obj { apiVersion: 'monitoring.rhobs/v1' }]
+  else [obj];
+
 {
   apiVersion: 'template.openshift.io/v1',
   kind: 'Template',
   metadata: { name: 'observatorium' },
   objects:
-    [
-      obs.manifests[name] {
-        metadata+: { namespace:: 'hidden' },
-      }
-      for name in std.objectFields(obs.manifests)
-      if obs.manifests[name] != null &&
-         !std.startsWith(name, 'observatorium/thanos-') &&
-         !std.startsWith(name, 'observatorium/loki-') &&
-         !std.startsWith(name, 'observatorium/tracing-')
-    ],
+    std.flatMap(
+      withRhobsVariant,
+      [
+        obs.manifests[name] {
+          metadata+: { namespace:: 'hidden' },
+        }
+        for name in std.objectFields(obs.manifests)
+        if obs.manifests[name] != null &&
+           !std.startsWith(name, 'observatorium/thanos-') &&
+           !std.startsWith(name, 'observatorium/loki-') &&
+           !std.startsWith(name, 'observatorium/tracing-')
+      ]
+    ),
   parameters: [
     { name: 'NAMESPACE', value: 'observatorium' },
     // Used for ServiceMonitors to discover workloads in given namespaces.

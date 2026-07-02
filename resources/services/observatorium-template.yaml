@@ -92,6 +92,23 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: memcached
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-api-cache-memcached
+  spec:
+    endpoints:
+    - port: metrics
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: api-cache
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: memcached
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
@@ -309,6 +326,23 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: rules-obsctl-reloader
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: rules-obsctl-reloader
+  spec:
+    endpoints:
+    - port: internal
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: rules-obsctl-reloader
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: rules-obsctl-reloader
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -439,6 +473,23 @@ objects:
       app.kubernetes.io/version: ${RULES_OBJSTORE_IMAGE_TAG}
     name: rules-objstore
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: rules-objstore
+  spec:
+    endpoints:
+    - port: internal
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: rules-storage
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: rules-objstore
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
@@ -703,6 +754,23 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: observatorium-up
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-up-ruler
+  spec:
+    endpoints:
+    - port: http
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: blackbox-prober
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: observatorium-up
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: v1
   kind: Service
   metadata:
@@ -724,6 +792,23 @@ objects:
       app.kubernetes.io/name: observatorium-up
       app.kubernetes.io/part-of: observatorium
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-up
+  spec:
+    endpoints:
+    - port: http
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: blackbox-prober
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: observatorium-up
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
@@ -1476,6 +1561,24 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: observatorium-api
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-api
+  spec:
+    endpoints:
+    - port: internal
+    - port: opa-ams-metrics
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: api
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: observatorium-api
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -1643,6 +1746,23 @@ objects:
       app.kubernetes.io/version: ${GUBERNATOR_IMAGE_TAG}
     name: observatorium-gubernator
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-gubernator
+  spec:
+    endpoints:
+    - port: http
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: rate-limiter
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: gubernator
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
