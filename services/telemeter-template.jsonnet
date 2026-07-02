@@ -123,27 +123,33 @@ local tr = (import 'github.com/observatorium/token-refresher/jsonnet/lib/token-r
   apiVersion: 'template.openshift.io/v1',
   kind: 'Template',
   metadata: { name: 'telemeter' },
-  objects: [
-    telemeter.telemeterServer[name] {
-      metadata+: { namespace:: 'hidden' },
-    }
-    for name in std.objectFields(telemeter.telemeterServer)
-  ] + [
-    telemeter.memcached[name] {
-      metadata+: { namespace:: 'hidden' },
-    }
-    for name in std.objectFields(telemeter.memcached)
-  ] + [
-    prometheusAms[name] {
-      metadata+: { namespace:: 'hidden' },
-    }
-    for name in std.objectFields(prometheusAms)
-  ] + [
-    tr[name] {
-      metadata+: { namespace:: 'hidden' },
-    }
-    for name in std.objectFields(tr)
-  ],
+  objects: std.flatMap(
+    function(obj)
+      if obj.apiVersion == 'monitoring.coreos.com/v1' && obj.kind == 'ServiceMonitor'
+      then [obj, obj { apiVersion: 'monitoring.rhobs/v1' }]
+      else [obj],
+    [
+      telemeter.telemeterServer[name] {
+        metadata+: { namespace:: 'hidden' },
+      }
+      for name in std.objectFields(telemeter.telemeterServer)
+    ] + [
+      telemeter.memcached[name] {
+        metadata+: { namespace:: 'hidden' },
+      }
+      for name in std.objectFields(telemeter.memcached)
+    ] + [
+      prometheusAms[name] {
+        metadata+: { namespace:: 'hidden' },
+      }
+      for name in std.objectFields(prometheusAms)
+    ] + [
+      tr[name] {
+        metadata+: { namespace:: 'hidden' },
+      }
+      for name in std.objectFields(tr)
+    ]
+  ),
   parameters: [
     { name: 'NAMESPACE', value: 'telemeter' },
 

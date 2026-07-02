@@ -166,6 +166,28 @@ objects:
     selector:
       matchLabels:
         k8s-app: rhelemeter-server
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      endpoint: metrics
+      k8s-app: rhelemeter-server
+      prometheus: app-sre
+    name: rhelemeter-server
+  spec:
+    endpoints:
+    - interval: 60s
+      port: internal
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true
+    jobLabel: k8s-app
+    namespaceSelector:
+      matchNames:
+      - ${NAMESPACE}
+    selector:
+      matchLabels:
+        k8s-app: rhelemeter-server
 parameters:
 - name: NAMESPACE
   value: rhelemeter

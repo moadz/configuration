@@ -1,15 +1,24 @@
 local obs = import 'observatorium.libsonnet';
+
+local withRhobsVariant(obj) =
+  if obj.apiVersion == 'monitoring.coreos.com/v1' && obj.kind == 'ServiceMonitor'
+  then [obj, obj { apiVersion: 'monitoring.rhobs/v1' }]
+  else [obj];
+
 {
   apiVersion: 'template.openshift.io/v1',
   kind: 'Template',
   metadata: { name: 'metric-federation-rule' },
-  objects: [
-    obs.thanos.manifests[name] {
-      metadata+: { namespace:: 'hidden' },
-    }
-    for name in std.objectFields(obs.thanos.manifests)
-    if obs.thanos.manifests[name] != null && std.startsWith(name, 'metric-federation')
-  ],
+  objects: std.flatMap(
+    withRhobsVariant,
+    [
+      obs.thanos.manifests[name] {
+        metadata+: { namespace:: 'hidden' },
+      }
+      for name in std.objectFields(obs.thanos.manifests)
+      if obs.thanos.manifests[name] != null && std.startsWith(name, 'metric-federation')
+    ]
+  ),
   parameters: [
     { name: 'NAMESPACE', value: 'observatorium-metrics' },
     { name: 'NAMESPACES', value: '["observatorium-metrics"]' },

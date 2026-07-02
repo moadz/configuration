@@ -81,6 +81,34 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: thanos-compact
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: database-compactor
+      app.kubernetes.io/instance: observatorium
+      app.kubernetes.io/name: thanos-compact
+      app.kubernetes.io/part-of: observatorium
+      prometheus: app-sre
+    name: observatorium-thanos-compact
+  spec:
+    endpoints:
+    - port: http
+      relabelings:
+      - action: replace
+        separator: /
+        sourceLabels:
+        - namespace
+        - pod
+        targetLabel: instance
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: database-compactor
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: thanos-compact
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
@@ -333,6 +361,25 @@ objects:
       app.kubernetes.io/name: alertmanager
       app.kubernetes.io/part-of: observatorium
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: alertmanager
+      app.kubernetes.io/name: alertmanager
+      app.kubernetes.io/part-of: observatorium
+      prometheus: app-sre
+    name: observatorium-alertmanager
+  spec:
+    endpoints:
+    - port: http
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: alertmanager
+        app.kubernetes.io/name: alertmanager
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
@@ -789,6 +836,34 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: observatorium-ruler-query
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: query-layer
+      app.kubernetes.io/instance: observatorium
+      app.kubernetes.io/name: observatorium-ruler-query
+      app.kubernetes.io/part-of: observatorium
+      prometheus: app-sre
+    name: observatorium-ruler-query
+  spec:
+    endpoints:
+    - port: http
+      relabelings:
+      - action: replace
+        separator: /
+        sourceLabels:
+        - namespace
+        - pod
+        targetLabel: instance
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: query-layer
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: observatorium-ruler-query
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: v1
   data:
     file_sd.yaml: '- targets: ${THANOS_QUERIER_FILE_SD_TARGETS}'
@@ -1055,6 +1130,23 @@ objects:
       app.kubernetes.io/version: ${MEMCACHED_IMAGE_TAG}
     name: observatorium-thanos-query-range-cache-memcached
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-thanos-query-range-cache-memcached
+  spec:
+    endpoints:
+    - port: metrics
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: query-range-cache
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: memcached
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
@@ -1409,6 +1501,34 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: thanos-query-frontend
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: query-cache
+      app.kubernetes.io/instance: observatorium
+      app.kubernetes.io/name: thanos-query-frontend
+      app.kubernetes.io/part-of: observatorium
+      prometheus: app-sre
+    name: observatorium-thanos-query-frontend
+  spec:
+    endpoints:
+    - port: http
+      relabelings:
+      - action: replace
+        separator: /
+        sourceLabels:
+        - namespace
+        - pod
+        targetLabel: instance
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: query-cache
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: thanos-query-frontend
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: v1
   data:
     session_secret: c2VjcmV0
@@ -1462,6 +1582,34 @@ objects:
       app.kubernetes.io/version: ${THANOS_IMAGE_TAG}
     name: observatorium-thanos-query
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: query-layer
+      app.kubernetes.io/instance: observatorium
+      app.kubernetes.io/name: thanos-query
+      app.kubernetes.io/part-of: observatorium
+      prometheus: app-sre
+    name: observatorium-thanos-query
+  spec:
+    endpoints:
+    - port: http
+      relabelings:
+      - action: replace
+        separator: /
+        sourceLabels:
+        - namespace
+        - pod
+        targetLabel: instance
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: query-layer
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: thanos-query
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
@@ -1650,6 +1798,23 @@ objects:
       app.kubernetes.io/version: ${THANOS_RECEIVE_CONTROLLER_IMAGE_TAG}
     name: observatorium-thanos-receive-controller
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-thanos-receive-controller
+  spec:
+    endpoints:
+    - port: http
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: kubernetes-controller
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: thanos-receive-controller
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
@@ -2020,6 +2185,33 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: thanos-receive
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: database-write-hashring
+      app.kubernetes.io/instance: observatorium
+      app.kubernetes.io/name: thanos-receive
+      app.kubernetes.io/part-of: observatorium
+      prometheus: app-sre
+    name: observatorium-thanos-receive
+  spec:
+    endpoints:
+    - port: http
+      relabelings:
+      - separator: /
+        sourceLabels:
+        - namespace
+        - pod
+        targetLabel: instance
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: database-write-hashring
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: thanos-receive
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: v1
   data:
     observatorium.yaml: |-
@@ -2251,6 +2443,36 @@ objects:
       app.kubernetes.io/version: ${THANOS_IMAGE_TAG}
     name: observatorium-thanos-rule
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: rule-evaluation-engine
+      app.kubernetes.io/instance: observatorium
+      app.kubernetes.io/name: thanos-rule
+      app.kubernetes.io/part-of: observatorium
+      prometheus: app-sre
+    name: observatorium-thanos-rule
+  spec:
+    endpoints:
+    - port: http
+      relabelings:
+      - action: replace
+        separator: /
+        sourceLabels:
+        - namespace
+        - pod
+        targetLabel: instance
+    - port: reloader
+    - port: metrics
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: rule-evaluation-engine
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: thanos-rule
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
@@ -2563,6 +2785,23 @@ objects:
         app.kubernetes.io/instance: observatorium
         app.kubernetes.io/name: memcached
         app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-thanos-store-bucket-cache-memcached
+  spec:
+    endpoints:
+    - port: metrics
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: store-bucket-cache
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: memcached
+        app.kubernetes.io/part-of: observatorium
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
@@ -2680,6 +2919,23 @@ objects:
       app.kubernetes.io/version: ${MEMCACHED_IMAGE_TAG}
     name: observatorium-thanos-store-index-cache-memcached
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      prometheus: app-sre
+    name: observatorium-thanos-store-index-cache-memcached
+  spec:
+    endpoints:
+    - port: metrics
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: store-index-cache
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: memcached
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:
@@ -4348,6 +4604,33 @@ objects:
             storage: ${THANOS_STORE_PVC_STORAGE}
         storageClassName: ${STORAGE_CLASS}
 - apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    labels:
+      app.kubernetes.io/component: object-store-gateway
+      app.kubernetes.io/instance: observatorium
+      app.kubernetes.io/name: thanos-store
+      app.kubernetes.io/part-of: observatorium
+      prometheus: app-sre
+    name: observatorium-thanos-store-shard
+  spec:
+    endpoints:
+    - port: http
+      relabelings:
+      - separator: /
+        sourceLabels:
+        - namespace
+        - pod
+        targetLabel: instance
+    namespaceSelector:
+      matchNames: ${{NAMESPACES}}
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: object-store-gateway
+        app.kubernetes.io/instance: observatorium
+        app.kubernetes.io/name: thanos-store
+        app.kubernetes.io/part-of: observatorium
+- apiVersion: monitoring.rhobs/v1
   kind: ServiceMonitor
   metadata:
     labels:

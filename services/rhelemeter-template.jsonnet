@@ -29,12 +29,18 @@ local rhelemeter = (import 'rhelemeter.libsonnet') {
   apiVersion: 'template.openshift.io/v1',
   kind: 'Template',
   metadata: { name: 'rhelemeter' },
-  objects: [
-    rhelemeter.rhelemeterServer[name] {
-      metadata+: { namespace:: 'hidden' },
-    }
-    for name in std.objectFields(rhelemeter.rhelemeterServer)
-  ],
+  objects: std.flatMap(
+    function(obj)
+      if obj.apiVersion == 'monitoring.coreos.com/v1' && obj.kind == 'ServiceMonitor'
+      then [obj, obj { apiVersion: 'monitoring.rhobs/v1' }]
+      else [obj],
+    [
+      rhelemeter.rhelemeterServer[name] {
+        metadata+: { namespace:: 'hidden' },
+      }
+      for name in std.objectFields(rhelemeter.rhelemeterServer)
+    ]
+  ),
   parameters: [
     { name: 'NAMESPACE', value: 'rhelemeter' },
     { name: 'IMAGE_TAG', value: '5923762' },
