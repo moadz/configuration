@@ -47,6 +47,7 @@
                   '--limit-receive-bytes=600000',
                   '--forward-url=' + config.telemeterServer.telemeterForwardURL,
                 ],
+                resources: config.telemeterServer.resources,
               }
               for c in super.containers
             ],

@@ -373,13 +373,7 @@ objects:
               path: /healthz/ready
               port: 8443
               scheme: HTTPS
-          resources:
-            limits:
-              cpu: ${TELEMETER_SERVER_CPU_LIMIT}
-              memory: ${TELEMETER_SERVER_MEMORY_LIMIT}
-            requests:
-              cpu: ${TELEMETER_SERVER_CPU_REQUEST}
-              memory: ${TELEMETER_SERVER_MEMORY_REQUEST}
+          resources: ${{TELEMETER_SERVER_RESOURCES}}
           volumeMounts:
           - mountPath: /etc/pki/service
             name: telemeter-server-tls
@@ -686,13 +680,7 @@ objects:
               path: /healthz/ready
               port: 8443
               scheme: HTTPS
-          resources:
-            limits:
-              cpu: ${TELEMETER_SERVER_CPU_LIMIT}
-              memory: ${TELEMETER_SERVER_MEMORY_LIMIT}
-            requests:
-              cpu: ${TELEMETER_SERVER_CPU_REQUEST}
-              memory: ${TELEMETER_SERVER_MEMORY_REQUEST}
+          resources: ${{TELEMETER_SERVER_RESOURCES}}
           volumeMounts:
           - mountPath: /etc/pki/service
             name: telemeter-server-tls
@@ -1182,14 +1170,8 @@ parameters:
   value: ""
 - name: TELEMETER_LOG_LEVEL
   value: warn
-- name: TELEMETER_SERVER_CPU_LIMIT
-  value: "1"
-- name: TELEMETER_SERVER_CPU_REQUEST
-  value: 100m
-- name: TELEMETER_SERVER_MEMORY_LIMIT
-  value: 1Gi
-- name: TELEMETER_SERVER_MEMORY_REQUEST
-  value: 500Mi
+- name: TELEMETER_SERVER_RESOURCES
+  value: '{"requests":{"cpu":"100m","memory":"500Mi"},"limits":{"memory":"1Gi"}}'
 - name: TELEMETER_SERVER_TOKEN_EXPIRE_SECONDS
   value: "3600"
 - name: TOKEN_REFRESHER_IMAGE

@@ -16,14 +16,7 @@ local telemeter = (import 'telemeter.libsonnet') {
 
       whitelist+: (import '../configuration/telemeter/metrics.json') + (import '../configuration/telemeter-rosa/metrics.json'),
       elideLabels+: ['prometheus_replica'],
-      resourceLimits:: {
-        cpu: '${TELEMETER_SERVER_CPU_LIMIT}',
-        memory: '${TELEMETER_SERVER_MEMORY_LIMIT}',
-      },
-      resourceRequests:: {
-        cpu: '${TELEMETER_SERVER_CPU_REQUEST}',
-        memory: '${TELEMETER_SERVER_MEMORY_REQUEST}',
-      },
+      resources:: '${{TELEMETER_SERVER_RESOURCES}}',
     },
   },
 
@@ -189,10 +182,7 @@ local tr = (import 'github.com/observatorium/token-refresher/jsonnet/lib/token-r
     { name: 'STORAGE_CLASS', value: 'gp2' },
     { name: 'TELEMETER_FORWARD_URL', value: '' },
     { name: 'TELEMETER_LOG_LEVEL', value: 'warn' },
-    { name: 'TELEMETER_SERVER_CPU_LIMIT', value: '1' },
-    { name: 'TELEMETER_SERVER_CPU_REQUEST', value: '100m' },
-    { name: 'TELEMETER_SERVER_MEMORY_LIMIT', value: '1Gi' },
-    { name: 'TELEMETER_SERVER_MEMORY_REQUEST', value: '500Mi' },
+    { name: 'TELEMETER_SERVER_RESOURCES', value: '{"requests":{"cpu":"100m","memory":"500Mi"},"limits":{"memory":"1Gi"}}' },
     { name: 'TELEMETER_SERVER_TOKEN_EXPIRE_SECONDS', value: '3600' },
     { name: 'TOKEN_REFRESHER_IMAGE', value: 'quay.io/observatorium/token-refresher' },
     { name: 'TOKEN_REFRESHER_IMAGE_TAG', value: 'master-2021-03-05-b34376b' },
