@@ -98,6 +98,7 @@ local withRhobsVariant(obj) =
     { name: 'THANOS_QUERIER_FILE_SD_TARGETS', value: '[]' },
     { name: 'THANOS_QUERIER_PROXY_STRATEGY', value: 'eager' },
     { name: 'THANOS_QUERIER_ENGINE', value: 'prometheus' },
+    { name: 'THANOS_QUERIER_ENFORCE_TENANCY', value: 'false' },
     { name: 'THANOS_QUERIER_MAX_CONCURRENT', value: '20' },
     { name: 'THANOS_QUERY_FRONTEND_CPU_LIMIT', value: '1' },
     { name: 'THANOS_QUERY_FRONTEND_CPU_REQUEST', value: '100m' },
