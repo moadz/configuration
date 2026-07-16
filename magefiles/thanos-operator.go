@@ -311,6 +311,11 @@ func operatorServingCertConfigMaps(namespace string) []*corev1.ConfigMap {
     "resourceRequest": false
     "user":
       "name": "system:serviceaccount:openshift-customer-monitoring:prometheus-k8s"
+    "verb": "get"
+  - "path": "/metrics"
+    "resourceRequest": false
+    "user":
+      "name": "system:serviceaccount:app-sre-observability-per-cluster:app-sre-prometheus"
     "verb": "get"`,
 		},
 	}
